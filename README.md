@@ -18,7 +18,8 @@ you copy into your repo and customize.
 | **v0.4** | Select / RadioGroup / Icon + stacked Toast + runtime light/dark `Theme.mode` swap | ✅ |
 | **v0.5** | Arrow-key nav, horizontal RadioGroup, modal focus trap, build.rs scaffold hint | ✅ |
 | **v0.6** | PopupWindow-based Tooltip (escapes parent bounds) + font embedding guide | ✅ |
-| **v0.7** | PopupWindow Select, visual-regression CI (custom Rust harness), `npx slintcn` npm publish | upcoming |
+| **v0.7** | Growable Rust-backed Toast queue + headless snapshot CI (SoftwareRenderer) | ✅ |
+| **v0.8** | PopupWindow Select (needs scrim) + per-section snapshots + `npx slintcn` npm publish | upcoming |
 | **v1.0** | Game HUD registry — hotbar, reticle, keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
@@ -102,7 +103,7 @@ silently falling through to the default styling.
 | **AlertDialog** | Destructive confirm | `open`, `action-label`, `cancel-label`, `action-variant`, `confirmed()`, `cancelled()` |
 | **Sheet** | Side drawer | `open`, `side` (top/right/bottom/left), `panel-extent`, `@children` body |
 | **Tooltip** | Hover-revealed bubble (PopupWindow — escapes parent bounds) | `text`, `side`; wraps a trigger as `@children` |
-| **Toast** | Stacked imperative notifications (up to 3 simultaneous) | `ToastQueue.show(text, variant)` — variants: default · success · error |
+| **Toast** | Growable Sonner-shape queue (Rust-backed VecModel) | `ToastQueue.show(text, variant)` — variants: default · success · error |
 
 Keyboard activation (Enter / Space) and a visible 2 px focus ring are wired into
 every interactive primitive. Modals close on Escape; Dialog and Sheet close on
@@ -168,7 +169,30 @@ bin/__test__/             # node:test suite — `make test`
 ```
 
 Run `make verify` before committing — it runs node tests, `cargo build`, and
-`cargo clippy -D warnings` end-to-end.
+`cargo clippy -D warnings` end-to-end. Run `make snapshot` to headlessly render
+the showcase to `docs/img/snapshots/` via Slint's SoftwareRenderer (no display
+server required); the PNG baseline lives in the repo for visual-regression diffs.
+
+## Toast Rust glue (required for Toaster to function)
+
+Toast's queue lives in Rust (`slint::VecModel<ToastItem>`) — pure-Slint array
+mutation is too limited in 1.16 for a real stack. Mount this glue in your
+app's `main.rs`:
+
+```rust
+use slint::{ComponentHandle, Model, ModelRc, SharedString, Timer, TimerMode, VecModel};
+use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Duration};
+
+let items: Rc<VecModel<ToastItem>> = Rc::new(VecModel::default());
+let next_id = Rc::new(RefCell::new(1i32));
+let timers: Rc<RefCell<HashMap<i32, Timer>>> = Rc::default();
+let queue = ui.global::<ToastQueue>();
+queue.set_items(ModelRc::from(items.clone()));
+// see examples/showcase/src/main.rs for the full on_show / on_dismiss closures
+```
+
+Required Slint feature: `slint = { version = "1.16", features = ["compat-1-2"] }`.
+For visual-regression snapshots also enable `"renderer-software"`.
 
 ## Roadmap
 

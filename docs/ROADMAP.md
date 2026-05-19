@@ -143,7 +143,7 @@ Trapping Tab there would require the consumer to declare its
 focusable children to the Sheet — pushed to v0.6 with the larger
 PopupWindow rework.
 
-## v0.6 — PopupWindow Tooltip + font guide (current)
+## v0.6 — PopupWindow Tooltip + font guide
 
 - [x] **PopupWindow-based Tooltip** — Tooltip migrated from in-tree
       bubble to Slint's `PopupWindow`. The bubble now renders on a
@@ -165,8 +165,33 @@ PopupWindow rework.
 custom Rust harness using `slint::SoftwareRenderer` to rasterize the
 showcase to PNG without a display — pushed to v0.7.
 
-## v0.7 — pending
+## v0.7 — Rust-backed Toast + headless snapshot CI (current)
 
+- [x] **Growable Rust Toast queue** — `toast.slint` replaces the v0.4
+      3-slot ring buffer with a `slint::VecModel<ToastItem>` owned by
+      Rust. The showcase main.rs ships the reference glue: per-toast
+      `Timer` for auto-dismiss after 3 s, `on_show` pushes,
+      `on_dismiss` filter-removes. README documents the required
+      wiring. `ToastItem` and `ToastVariant` are re-exported from
+      app_window.slint so `include_modules!()` exposes them.
+- [x] **Headless snapshot CI** — `examples/showcase/src/bin/snapshot.rs`
+      implements `slint::platform::Platform` with a
+      `MinimalSoftwareWindow` and a `SoftwareRenderer`, then
+      rasterizes the showcase to PNG at 1100 × 760 (Rgb565 →
+      RGBA8). No display server needed. Baseline lives at
+      `docs/img/snapshots/showcase-buttons.png`. Build/run via
+      `make snapshot` (feature-gated on `snapshot` so the default
+      build stays lean). The required Slint feature is
+      `renderer-software`.
+
+## v0.8 — pending
+
+- [ ] **Per-section snapshots** — extend snapshot.rs to iterate over
+      every `active-section` value, render each, save per-section
+      PNG. Needs setting the property from Rust before render.
+- [ ] **Perceptual-diff CI step** — github actions workflow that
+      runs `make snapshot` on PR, diffs against the committed
+      baseline using a Rust crate (e.g., `image-compare`).
 - [ ] **PopupWindow-based Select dropdown** — probed in v0.6 and
       hit a real Slint 1.16 limit: PopupWindow has no `closed`
       callback, so when the user clicks outside with
@@ -183,13 +208,12 @@ showcase to PNG without a display — pushed to v0.7.
 - [ ] **Generalized modal focus trap** (Sheet @children + Dialog
       with body inputs) — likely a `focusables: [length]` prop on
       modals so consumers register their controls.
-- [ ] **Visual-regression CI** — custom Rust harness using
-      `SoftwareRenderer`, render showcase to PNG, perceptual diff.
 - [ ] **`npx slintcn@latest` published package** + registry raw-URL
-      install — one-way door, awaits author approval.
-- [ ] **Growable Toast queue** — Rust-side model (the 3-slot ring
-      buffer is the ceiling of pure-Slint array mutation in 1.16).
-- [ ] **Tab focusable registration** for Sheet body / Dialog body.
+      install — author needs to be logged in via `npm login`; the
+      Claude harness can't run `npm publish` without that.
+- [ ] **Fade-out animation on Toast dismissal** — currently instant
+      removal. Two-phase dismiss in Rust (set `dismissed: true`,
+      animate, then remove from model).
 
 ## v1.0 — expand beyond SaaS
 
