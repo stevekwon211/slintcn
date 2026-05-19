@@ -1,128 +1,765 @@
-// Imports use the *generated* layout under ui/slintcn/ — produced by the
+// slintcn showcase — shadcn/ui-docs-style layout.
+//
+// Sidebar (left, fixed) navigates between sections. Main content area
+// shows the active section. Overlays (Dialog/AlertDialog/Sheet) and the
+// Toaster mount at Window root so they're available from any section.
+//
+// Imports use the generated layout under ui/slintcn/ — produced by the
 // `slintcn add …` invocation in build.rs.
 
 import { Tokens } from "slintcn/theme/tokens.slint";
-import { Button, ButtonVariant, ButtonSize } from "slintcn/components/button.slint";
-import { Card, CardVariant } from "slintcn/components/card.slint";
-import { Input } from "slintcn/components/input.slint";
-import { Badge, BadgeVariant } from "slintcn/components/badge.slint";
-import { Separator, SeparatorOrientation } from "slintcn/components/separator.slint";
-import { Label, LabelVariant } from "slintcn/components/label.slint";
-import { Dialog } from "slintcn/components/dialog.slint";
-import { AlertDialog } from "slintcn/components/alert-dialog.slint";
-import { Sheet, SheetSide } from "slintcn/components/sheet.slint";
-import { Tooltip, TooltipSide } from "slintcn/components/tooltip.slint";
-import { Toaster, ToastQueue, ToastVariant } from "slintcn/components/toast.slint";
+import { Button, ButtonVariant, ButtonSize }    from "slintcn/components/button.slint";
+import { Card, CardVariant }                    from "slintcn/components/card.slint";
+import { Input }                                from "slintcn/components/input.slint";
+import { Badge, BadgeVariant, BadgeSize }       from "slintcn/components/badge.slint";
+import { Separator, SeparatorOrientation }      from "slintcn/components/separator.slint";
+import { Label, LabelVariant }                  from "slintcn/components/label.slint";
+import { Dialog }                               from "slintcn/components/dialog.slint";
+import { AlertDialog }                          from "slintcn/components/alert-dialog.slint";
+import { Sheet, SheetSide }                     from "slintcn/components/sheet.slint";
+import { Tooltip, TooltipSide }                 from "slintcn/components/tooltip.slint";
+import { Toaster, ToastQueue, ToastVariant }    from "slintcn/components/toast.slint";
+import { Tabs, TabItem }                        from "slintcn/components/tabs.slint";
+import { Checkbox }                             from "slintcn/components/checkbox.slint";
+import { Switch }                               from "slintcn/components/switch.slint";
+
+// Sidebar nav item — local helper, not part of the registry.
+component NavItem inherits Rectangle {
+    in property <string> label;
+    in property <bool> active: false;
+    callback clicked();
+
+    height: 34px;
+    background: active
+        ? Tokens.color-surface-2
+        : (touch.has-hover ? Tokens.color-surface-1 : transparent);
+    border-radius: Tokens.radius-sm;
+
+    Text {
+        x: 12px;
+        y: (parent.height - self.preferred-height) / 2;
+        text: root.label;
+        color: active
+            ? Tokens.color-foreground
+            : Tokens.color-muted-foreground;
+        font-size: Tokens.typography-body-size;
+        font-weight: active
+            ? Tokens.typography-weight-semibold
+            : Tokens.typography-weight-medium;
+    }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+
+    animate background {
+        duration: Tokens.motion-fast;
+        easing: Tokens.motion-easing-standard;
+    }
+}
+
+// Section heading (consistent typography across sections).
+component SectionHeading inherits VerticalLayout {
+    in property <string> title;
+    in property <string> subtitle;
+    spacing: 4px;
+
+    Text {
+        text: root.title;
+        color: Tokens.color-foreground;
+        font-size: 24px;
+        font-weight: Tokens.typography-weight-semibold;
+    }
+    if root.subtitle != "": Text {
+        text: root.subtitle;
+        color: Tokens.color-muted-foreground;
+        font-size: Tokens.typography-body-size;
+    }
+}
 
 export component AppWindow inherits Window {
     title: "slintcn showcase";
-    preferred-width: 720px;
+    preferred-width:  1100px;
     preferred-height: 760px;
     background: Tokens.color-background;
 
+    in-out property <int>  active-section: 0;
     in-out property <bool> dialog-open: false;
     in-out property <bool> alert-open: false;
     in-out property <bool> sheet-open: false;
+    in-out property <int>  settings-tab: 0;
+    in-out property <int>  tabs-demo: 0;
+    in-out property <bool> remember-me: true;
+    in-out property <bool> setting-notifications: true;
+    in-out property <bool> setting-marketing: false;
+    in-out property <bool> setting-dark-mode: true;
 
-    VerticalLayout {
+    HorizontalLayout {
         padding: 24px;
-        spacing: 20px;
+        spacing: 24px;
 
-        HorizontalLayout {
-            spacing: 8px;
-            Badge { text: "slintcn"; variant: BadgeVariant.default; }
-            Badge { text: "v0.2"; variant: BadgeVariant.secondary; }
-            Badge { text: "dark glass"; variant: BadgeVariant.outline; }
-        }
-
-        Label { text: "Buttons"; variant: LabelVariant.muted; }
-
-        HorizontalLayout {
-            spacing: 8px;
-            Button { variant: ButtonVariant.default;   text: "Default"; }
-            Button { variant: ButtonVariant.secondary; text: "Secondary"; }
-            Button { variant: ButtonVariant.outline;   text: "Outline"; }
-            Button { variant: ButtonVariant.ghost;     text: "Ghost"; }
-        }
-
-        HorizontalLayout {
-            spacing: 8px;
-            Button { variant: ButtonVariant.glass;       text: "Glass"; }
-            Button { variant: ButtonVariant.glow;        text: "Glow CTA"; size: ButtonSize.lg; }
-            Button { variant: ButtonVariant.destructive; text: "Delete"; }
-            Button { variant: ButtonVariant.link;        text: "Learn more"; }
-        }
-
-        Separator { orientation: SeparatorOrientation.horizontal; }
-
-        Label { text: "Form"; variant: LabelVariant.muted; }
-
-        Card {
-            variant: CardVariant.glass;
-            width: 100%;
-            height: 180px;
+        // ─── Sidebar ─────────────────────────────────────────────────
+        Rectangle {
+            width: 220px;
+            background: Tokens.color-card;
+            border-color: Tokens.color-border-hairline;
+            border-width: 1px;
+            border-radius: Tokens.radius-xl;
 
             VerticalLayout {
-                padding: parent.padding-l;
-                spacing: parent.gap-l;
+                padding: 20px;
+                spacing: 4px;
+                alignment: start;
 
-                Label { text: "Email"; variant: LabelVariant.required; }
-                Input { width: 100%; placeholder: "you@example.com"; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    Text {
+                        text: "slintcn";
+                        color: Tokens.color-foreground;
+                        font-size: 18px;
+                        font-weight: Tokens.typography-weight-semibold;
+                    }
+                    Badge {
+                        text: "v0.3";
+                        variant: BadgeVariant.secondary;
+                        size: BadgeSize.sm;
+                    }
+                }
 
-                Label { text: "Password"; variant: LabelVariant.required; }
-                Input { width: 100%; placeholder: "••••••••"; password: true; }
+                Rectangle { height: 14px; background: transparent; }
+
+                Label { text: "Components"; variant: LabelVariant.muted; }
+
+                NavItem {
+                    label: "Buttons";
+                    active: root.active-section == 0;
+                    clicked => { root.active-section = 0; }
+                }
+                NavItem {
+                    label: "Form";
+                    active: root.active-section == 1;
+                    clicked => { root.active-section = 1; }
+                }
+                NavItem {
+                    label: "Overlays";
+                    active: root.active-section == 2;
+                    clicked => { root.active-section = 2; }
+                }
+                NavItem {
+                    label: "Tabs";
+                    active: root.active-section == 3;
+                    clicked => { root.active-section = 3; }
+                }
+
+                Rectangle { height: 12px; background: transparent; }
+
+                Label { text: "Examples"; variant: LabelVariant.muted; }
+
+                NavItem {
+                    label: "Sign-in";
+                    active: root.active-section == 4;
+                    clicked => { root.active-section = 4; }
+                }
+                NavItem {
+                    label: "Settings";
+                    active: root.active-section == 5;
+                    clicked => { root.active-section = 5; }
+                }
+                NavItem {
+                    label: "Dashboard";
+                    active: root.active-section == 6;
+                    clicked => { root.active-section = 6; }
+                }
+
+                Rectangle {
+                    background: transparent;
+                    vertical-stretch: 1;
+                }
+
+                Separator { orientation: SeparatorOrientation.horizontal; }
+
+                Text {
+                    text: "Copy-paste UI for Slint";
+                    color: Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-label-size;
+                }
             }
         }
 
-        Separator { orientation: SeparatorOrientation.horizontal; }
+        // ─── Content area ────────────────────────────────────────────
+        Rectangle {
+            background: transparent;
+            horizontal-stretch: 1;
 
-        Label { text: "Overlays"; variant: LabelVariant.muted; }
+            // (0) Buttons gallery
+            if root.active-section == 0: VerticalLayout {
+                spacing: 20px;
+                alignment: start;
 
-        HorizontalLayout {
-            spacing: 8px;
-            Button {
-                variant: ButtonVariant.glow;
-                text: "Open Dialog";
-                clicked => { root.dialog-open = true; }
-            }
-            Button {
-                variant: ButtonVariant.destructive;
-                text: "Delete account";
-                clicked => { root.alert-open = true; }
-            }
-            Button {
-                variant: ButtonVariant.outline;
-                text: "Open Sheet";
-                clicked => { root.sheet-open = true; }
-            }
-            Tooltip {
-                text: "Hovers reveal me";
-                side: TooltipSide.top;
-                Button { variant: ButtonVariant.ghost; text: "Hover me"; }
-            }
-        }
+                SectionHeading {
+                    title: "Buttons";
+                    subtitle: "8 variants × 4 text sizes, plus 4 icon sizes. Enter / Space activate the focused button.";
+                }
 
-        HorizontalLayout {
-            spacing: 8px;
-            Button {
-                variant: ButtonVariant.outline;
-                text: "Toast";
-                clicked => { ToastQueue.show("Saved your changes.", ToastVariant.default); }
+                Label { text: "Variants"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    Button { variant: ButtonVariant.default;     text: "Default"; }
+                    Button { variant: ButtonVariant.secondary;   text: "Secondary"; }
+                    Button { variant: ButtonVariant.outline;     text: "Outline"; }
+                    Button { variant: ButtonVariant.ghost;       text: "Ghost"; }
+                }
+                HorizontalLayout {
+                    spacing: 8px;
+                    Button { variant: ButtonVariant.glass;       text: "Glass"; }
+                    Button { variant: ButtonVariant.glow;        text: "Glow CTA"; }
+                    Button { variant: ButtonVariant.destructive; text: "Destructive"; }
+                    Button { variant: ButtonVariant.link;        text: "Link"; }
+                }
+
+                Label { text: "Sizes"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    Button { variant: ButtonVariant.default; size: ButtonSize.xs;      text: "Extra small"; }
+                    Button { variant: ButtonVariant.default; size: ButtonSize.sm;      text: "Small"; }
+                    Button { variant: ButtonVariant.default; size: ButtonSize.default; text: "Default"; }
+                    Button { variant: ButtonVariant.default; size: ButtonSize.lg;      text: "Large"; }
+                }
+
+                Label { text: "State"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    Button { variant: ButtonVariant.default; text: "Enabled"; }
+                    Button { variant: ButtonVariant.default; text: "Disabled"; disabled: true; }
+                    Button { variant: ButtonVariant.destructive; text: "Destructive disabled"; disabled: true; }
+                }
             }
-            Button {
-                variant: ButtonVariant.outline;
-                text: "Toast (success)";
-                clicked => { ToastQueue.show("Profile updated.", ToastVariant.success); }
+
+            // (1) Form gallery
+            if root.active-section == 1: VerticalLayout {
+                spacing: 20px;
+                alignment: start;
+
+                SectionHeading {
+                    title: "Form";
+                    subtitle: "Input, Label, Checkbox, Switch, Badge — wired with a Card surface.";
+                }
+
+                Card {
+                    variant: CardVariant.glass;
+                    width: 100%;
+                    height: 320px;
+
+                    VerticalLayout {
+                        padding: parent.padding-l;
+                        spacing: parent.gap-l;
+
+                        HorizontalLayout {
+                            spacing: 8px;
+                            alignment: start;
+                            Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
+                            Badge { text: "v0.3"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                        }
+
+                        VerticalLayout {
+                            spacing: 8px;
+                            Label { text: "Email"; variant: LabelVariant.required; }
+                            Input { width: 100%; placeholder: "you@example.com"; }
+                        }
+                        VerticalLayout {
+                            spacing: 8px;
+                            Label { text: "Password"; variant: LabelVariant.required; }
+                            Input { width: 100%; placeholder: "••••••••"; password: true; }
+                        }
+
+                        Separator { orientation: SeparatorOrientation.horizontal; }
+
+                        HorizontalLayout {
+                            spacing: 24px;
+                            alignment: start;
+                            Checkbox {
+                                label: "Email me product updates";
+                                checked <=> root.setting-notifications;
+                            }
+                            Switch {
+                                label: "Dark mode";
+                                checked <=> root.setting-dark-mode;
+                            }
+                        }
+                    }
+                }
             }
-            Button {
-                variant: ButtonVariant.outline;
-                text: "Toast (error)";
-                clicked => { ToastQueue.show("Network unreachable.", ToastVariant.error); }
+
+            // (2) Overlays gallery
+            if root.active-section == 2: VerticalLayout {
+                spacing: 20px;
+                alignment: start;
+
+                SectionHeading {
+                    title: "Overlays";
+                    subtitle: "Dialog · AlertDialog · Sheet · Tooltip · Toast — Escape closes modals.";
+                }
+
+                Label { text: "Modals"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    Button {
+                        variant: ButtonVariant.glow;
+                        text: "Open Dialog";
+                        clicked => { root.dialog-open = true; }
+                    }
+                    Button {
+                        variant: ButtonVariant.destructive;
+                        text: "Delete account";
+                        clicked => { root.alert-open = true; }
+                    }
+                    Button {
+                        variant: ButtonVariant.outline;
+                        text: "Open Sheet (right)";
+                        clicked => { root.sheet-open = true; }
+                    }
+                }
+
+                Label { text: "Tooltip + Toast"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    Tooltip {
+                        text: "Hovers reveal me";
+                        side: TooltipSide.top;
+                        Button { variant: ButtonVariant.ghost; text: "Hover me"; }
+                    }
+                    Button {
+                        variant: ButtonVariant.outline;
+                        text: "Default toast";
+                        clicked => { ToastQueue.show("Saved your changes.", ToastVariant.default); }
+                    }
+                    Button {
+                        variant: ButtonVariant.outline;
+                        text: "Success toast";
+                        clicked => { ToastQueue.show("Profile updated.", ToastVariant.success); }
+                    }
+                    Button {
+                        variant: ButtonVariant.outline;
+                        text: "Error toast";
+                        clicked => { ToastQueue.show("Network unreachable.", ToastVariant.error); }
+                    }
+                }
+            }
+
+            // (3) Tabs demo
+            if root.active-section == 3: VerticalLayout {
+                spacing: 20px;
+                alignment: start;
+
+                SectionHeading {
+                    title: "Tabs";
+                    subtitle: "Visual navigation strip. Consumer renders content per current index.";
+                }
+
+                Tabs {
+                    items: [
+                        { label: "Overview" },
+                        { label: "Activity" },
+                        { label: "Notifications" },
+                    ];
+                    current <=> root.tabs-demo;
+                }
+
+                Card {
+                    variant: CardVariant.solid;
+                    width: 100%;
+                    height: 200px;
+
+                    VerticalLayout {
+                        padding: parent.padding-l;
+                        spacing: parent.gap-l;
+
+                        if root.tabs-demo == 0: VerticalLayout {
+                            spacing: 6px;
+                            Label { text: "Overview"; }
+                            Text {
+                                text: "Tabs is a visual strip. Render content yourself with `if current == N`.";
+                                color: Tokens.color-muted-foreground;
+                                font-size: Tokens.typography-body-size;
+                                wrap: word-wrap;
+                            }
+                        }
+                        if root.tabs-demo == 1: VerticalLayout {
+                            spacing: 6px;
+                            Label { text: "Activity"; }
+                            Text {
+                                text: "Each tab triggers a render swap reactively. No content state is lost between switches.";
+                                color: Tokens.color-muted-foreground;
+                                font-size: Tokens.typography-body-size;
+                                wrap: word-wrap;
+                            }
+                        }
+                        if root.tabs-demo == 2: VerticalLayout {
+                            spacing: 6px;
+                            Label { text: "Notifications"; }
+                            Text {
+                                text: "Keyboard: Tab focuses a trigger, Enter / Space activates it.";
+                                color: Tokens.color-muted-foreground;
+                                font-size: Tokens.typography-body-size;
+                                wrap: word-wrap;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // (4) Sign-in composed example
+            if root.active-section == 4: VerticalLayout {
+                spacing: 20px;
+                alignment: start;
+
+                SectionHeading {
+                    title: "Sign-in";
+                    subtitle: "Card + Label + Input + Checkbox + Button — a complete authentication surface.";
+                }
+
+                Rectangle {
+                    background: transparent;
+                    width: 100%;
+                    height: 460px;
+
+                    Card {
+                        variant: CardVariant.raised;
+                        width: 380px;
+                        height: 420px;
+                        x: (parent.width - self.width) / 2;
+                        y: 0;
+
+                        VerticalLayout {
+                            padding: parent.padding-l;
+                            spacing: parent.gap-l;
+
+                            VerticalLayout {
+                                spacing: 6px;
+                                Text {
+                                    text: "Welcome back";
+                                    color: Tokens.color-foreground;
+                                    font-size: 22px;
+                                    font-weight: Tokens.typography-weight-semibold;
+                                }
+                                Text {
+                                    text: "Sign in to your slintcn account.";
+                                    color: Tokens.color-muted-foreground;
+                                    font-size: Tokens.typography-body-size;
+                                }
+                            }
+
+                            VerticalLayout {
+                                spacing: 8px;
+                                Label { text: "Email"; variant: LabelVariant.required; }
+                                Input { width: 100%; placeholder: "you@example.com"; }
+                            }
+                            VerticalLayout {
+                                spacing: 8px;
+                                Label { text: "Password"; variant: LabelVariant.required; }
+                                Input { width: 100%; placeholder: "••••••••"; password: true; }
+                            }
+
+                            HorizontalLayout {
+                                alignment: space-between;
+                                Checkbox {
+                                    label: "Remember me";
+                                    checked <=> root.remember-me;
+                                }
+                                Button {
+                                    variant: ButtonVariant.link;
+                                    text: "Forgot password?";
+                                }
+                            }
+
+                            Button {
+                                variant: ButtonVariant.glow;
+                                text: "Sign in";
+                                size: ButtonSize.lg;
+                                clicked => { ToastQueue.show("Signed in.", ToastVariant.success); }
+                            }
+
+                            HorizontalLayout {
+                                alignment: center;
+                                spacing: 4px;
+                                Text {
+                                    text: "Don't have an account?";
+                                    color: Tokens.color-muted-foreground;
+                                    font-size: Tokens.typography-body-size;
+                                }
+                                Button {
+                                    variant: ButtonVariant.link;
+                                    text: "Create one";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // (5) Settings composed example
+            if root.active-section == 5: VerticalLayout {
+                spacing: 20px;
+                alignment: start;
+
+                SectionHeading {
+                    title: "Settings";
+                    subtitle: "Tabs + Inputs + Switches composed into a realistic preferences surface.";
+                }
+
+                Tabs {
+                    items: [
+                        { label: "Account" },
+                        { label: "Notifications" },
+                        { label: "Appearance" },
+                    ];
+                    current <=> root.settings-tab;
+                }
+
+                Card {
+                    variant: CardVariant.solid;
+                    width: 100%;
+                    height: 360px;
+
+                    VerticalLayout {
+                        padding: parent.padding-l;
+                        spacing: parent.gap-l;
+
+                        if root.settings-tab == 0: VerticalLayout {
+                            spacing: 12px;
+                            Text {
+                                text: "Profile";
+                                color: Tokens.color-foreground;
+                                font-size: 16px;
+                                font-weight: Tokens.typography-weight-semibold;
+                            }
+                            VerticalLayout {
+                                spacing: 6px;
+                                Label { text: "Display name"; }
+                                Input { width: 100%; placeholder: "Steve Kwon"; }
+                            }
+                            VerticalLayout {
+                                spacing: 6px;
+                                Label { text: "Email"; variant: LabelVariant.required; }
+                                Input { width: 100%; placeholder: "you@example.com"; }
+                            }
+                            HorizontalLayout {
+                                alignment: end;
+                                Button {
+                                    variant: ButtonVariant.default;
+                                    text: "Save changes";
+                                    clicked => { ToastQueue.show("Profile saved.", ToastVariant.success); }
+                                }
+                            }
+                        }
+
+                        if root.settings-tab == 1: VerticalLayout {
+                            spacing: 14px;
+                            Text {
+                                text: "Email";
+                                color: Tokens.color-foreground;
+                                font-size: 16px;
+                                font-weight: Tokens.typography-weight-semibold;
+                            }
+                            Switch {
+                                label: "Product updates";
+                                checked <=> root.setting-notifications;
+                            }
+                            Switch {
+                                label: "Weekly digest";
+                                checked <=> root.setting-marketing;
+                            }
+                            Separator { orientation: SeparatorOrientation.horizontal; }
+                            Text {
+                                text: "Push";
+                                color: Tokens.color-foreground;
+                                font-size: 16px;
+                                font-weight: Tokens.typography-weight-semibold;
+                            }
+                            Checkbox { label: "Mentions and replies"; checked: true; }
+                            Checkbox { label: "Marketing"; checked: false; }
+                        }
+
+                        if root.settings-tab == 2: VerticalLayout {
+                            spacing: 14px;
+                            Text {
+                                text: "Theme";
+                                color: Tokens.color-foreground;
+                                font-size: 16px;
+                                font-weight: Tokens.typography-weight-semibold;
+                            }
+                            Switch {
+                                label: "Dark mode";
+                                checked <=> root.setting-dark-mode;
+                            }
+                            Separator { orientation: SeparatorOrientation.horizontal; }
+                            Text {
+                                text: "Density";
+                                color: Tokens.color-foreground;
+                                font-size: 16px;
+                                font-weight: Tokens.typography-weight-semibold;
+                            }
+                            Text {
+                                text: "Density controls land in v0.4 once RadioGroup ships.";
+                                color: Tokens.color-muted-foreground;
+                                font-size: Tokens.typography-body-size;
+                                wrap: word-wrap;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // (6) Dashboard composed example
+            if root.active-section == 6: VerticalLayout {
+                spacing: 20px;
+                alignment: start;
+
+                SectionHeading {
+                    title: "Dashboard";
+                    subtitle: "Metric cards + activity feed using Card, Badge, Separator, Label.";
+                }
+
+                HorizontalLayout {
+                    spacing: 16px;
+                    alignment: stretch;
+
+                    Card {
+                        variant: CardVariant.raised;
+                        width: 32%;
+                        height: 120px;
+                        VerticalLayout {
+                            padding: parent.padding-l;
+                            spacing: 6px;
+                            Label { text: "Revenue"; variant: LabelVariant.muted; }
+                            Text {
+                                text: "$ 42,580";
+                                color: Tokens.color-foreground;
+                                font-size: 26px;
+                                font-weight: Tokens.typography-weight-semibold;
+                            }
+                            Badge { text: "+12.4% MoM"; variant: BadgeVariant.default; size: BadgeSize.sm; }
+                        }
+                    }
+                    Card {
+                        variant: CardVariant.raised;
+                        width: 32%;
+                        height: 120px;
+                        VerticalLayout {
+                            padding: parent.padding-l;
+                            spacing: 6px;
+                            Label { text: "Active users"; variant: LabelVariant.muted; }
+                            Text {
+                                text: "1,284";
+                                color: Tokens.color-foreground;
+                                font-size: 26px;
+                                font-weight: Tokens.typography-weight-semibold;
+                            }
+                            Badge { text: "+3.1% WoW"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                        }
+                    }
+                    Card {
+                        variant: CardVariant.raised;
+                        width: 32%;
+                        height: 120px;
+                        VerticalLayout {
+                            padding: parent.padding-l;
+                            spacing: 6px;
+                            Label { text: "Bounce rate"; variant: LabelVariant.muted; }
+                            Text {
+                                text: "27.8%";
+                                color: Tokens.color-foreground;
+                                font-size: 26px;
+                                font-weight: Tokens.typography-weight-semibold;
+                            }
+                            Badge { text: "−1.4% MoM"; variant: BadgeVariant.destructive; size: BadgeSize.sm; }
+                        }
+                    }
+                }
+
+                Card {
+                    variant: CardVariant.solid;
+                    width: 100%;
+                    height: 240px;
+
+                    VerticalLayout {
+                        padding: parent.padding-l;
+                        spacing: parent.gap-l;
+
+                        HorizontalLayout {
+                            alignment: space-between;
+                            Label { text: "Recent activity"; }
+                            Button { variant: ButtonVariant.link; text: "View all"; }
+                        }
+                        Separator { orientation: SeparatorOrientation.horizontal; }
+
+                        HorizontalLayout {
+                            spacing: 12px;
+                            alignment: start;
+                            Badge { text: "DEPLOY"; variant: BadgeVariant.default; size: BadgeSize.sm; }
+                            Text {
+                                text: "Production deploy succeeded";
+                                color: Tokens.color-foreground;
+                                font-size: Tokens.typography-body-size;
+                                vertical-alignment: center;
+                            }
+                            Rectangle { horizontal-stretch: 1; background: transparent; }
+                            Text {
+                                text: "2m ago";
+                                color: Tokens.color-muted-foreground;
+                                font-size: Tokens.typography-body-sm-size;
+                                vertical-alignment: center;
+                            }
+                        }
+                        HorizontalLayout {
+                            spacing: 12px;
+                            alignment: start;
+                            Badge { text: "USER"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Text {
+                                text: "12 new sign-ups in the last hour";
+                                color: Tokens.color-foreground;
+                                font-size: Tokens.typography-body-size;
+                                vertical-alignment: center;
+                            }
+                            Rectangle { horizontal-stretch: 1; background: transparent; }
+                            Text {
+                                text: "14m ago";
+                                color: Tokens.color-muted-foreground;
+                                font-size: Tokens.typography-body-sm-size;
+                                vertical-alignment: center;
+                            }
+                        }
+                        HorizontalLayout {
+                            spacing: 12px;
+                            alignment: start;
+                            Badge { text: "ALERT"; variant: BadgeVariant.destructive; size: BadgeSize.sm; }
+                            Text {
+                                text: "API latency spike — 99p over 800 ms";
+                                color: Tokens.color-foreground;
+                                font-size: Tokens.typography-body-size;
+                                vertical-alignment: center;
+                            }
+                            Rectangle { horizontal-stretch: 1; background: transparent; }
+                            Text {
+                                text: "1h ago";
+                                color: Tokens.color-muted-foreground;
+                                font-size: Tokens.typography-body-sm-size;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
-    // Overlays must be the LAST children of Window so they render on top.
+    // ─── Window-level overlays — always mounted, last children. ─────
     Dialog {
         width: parent.width;
         height: parent.height;
