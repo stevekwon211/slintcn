@@ -13,7 +13,10 @@ export enum CardSize    { sm, default }
 export component Card inherits Rectangle {
     in property <CardVariant> variant: CardVariant.solid;
     in property <CardSize>    size:    CardSize.default;
-    in property <bool> hovered: false;
+
+    // Read-only hover signal — driven by the internal TouchArea below.
+    // Consumers can read it (e.g. to drive header chip styling) but never set it.
+    out property <bool> hovered <=> touch.has-hover;
 
     background:
         variant == CardVariant.glass || variant == CardVariant.glass-interactive ?
@@ -51,6 +54,10 @@ export component Card inherits Rectangle {
         size == CardSize.sm ? Tokens.spacing-md : Tokens.spacing-lg;
     out property <length> gap-l:
         size == CardSize.sm ? Tokens.spacing-sm : Tokens.spacing-md;
+
+    // Hover tracker. Placed before @children so child interactive controls
+    // (Buttons, Inputs) sit z-above and receive their own click events.
+    touch := TouchArea { }
 
     @children
 }
