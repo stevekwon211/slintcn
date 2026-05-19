@@ -16,7 +16,8 @@ you copy into your repo and customize.
 | **v0.2** | Shell + overlays — Label, Separator, Dialog, AlertDialog, Sheet, Tooltip, Toast | ✅ |
 | **v0.3** | Selection primitives + docs-style showcase — Tabs, Checkbox, Switch + Sign-in / Settings / Dashboard examples | ✅ |
 | **v0.4** | Select / RadioGroup / Icon + stacked Toast + runtime light/dark `Theme.mode` swap | ✅ |
-| **v0.5** | DX — real focus trap, PopupWindow-based Tooltip, npm publish, visual-regression CI, fonts | upcoming |
+| **v0.5** | Arrow-key nav, horizontal RadioGroup, modal focus trap, build.rs scaffold hint | ✅ |
+| **v0.6** | PopupWindow-based Tooltip + outside-click-close, `slint-viewer` snapshot CI, `npx slintcn` npm publish | upcoming |
 | **v1.0** | Game HUD registry — hotbar, reticle, keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
@@ -83,8 +84,8 @@ silently falling through to the default styling.
 | **Tabs** | (horizontal nav strip) | `items: [TabItem]`, `current: int`, `changed(int)` |
 | **Checkbox** | (Path-drawn check) | `checked`, `label`, `disabled`, `toggled(bool)` |
 | **Switch** | (sliding knob, 36 × 20 track) | `checked`, `label`, `disabled`, `toggled(bool)` |
-| **RadioGroup** | (vertical list) | `items: [RadioItem]`, `selected: int`, `changed(int)` |
-| **Select** | (trigger + in-tree dropdown) | `items: [SelectItem]`, `selected-index: int`, `placeholder`, `changed(int)` |
+| **RadioGroup** | vertical · horizontal | `items: [RadioItem]`, `selected: int`, `orientation: RadioOrientation`, `changed(int)` |
+| **Select** | (trigger + in-tree dropdown) | `items: [SelectItem]`, `selected-index: int`, `highlighted-index: int`, `placeholder`, `changed(int)` |
 
 ### Iconography & theming
 | Component | Purpose | Notable props |
@@ -104,7 +105,13 @@ silently falling through to the default styling.
 
 Keyboard activation (Enter / Space) and a visible 2 px focus ring are wired into
 every interactive primitive. Modals close on Escape; Dialog and Sheet close on
-backdrop click (configurable).
+backdrop click (configurable). Arrow-key navigation:
+
+- **Tabs** — ← / → cycle the active tab (wrap-around)
+- **RadioGroup vertical** — ↑ / ↓ move the selection (wrap)
+- **RadioGroup horizontal** — ← / → move the selection (wrap)
+- **Select (open dropdown)** — ↑ / ↓ move highlight, Enter commits, Escape closes
+- **Dialog / AlertDialog** — Tab trapped inside; AlertDialog cycles Cancel ↔ Action
 
 ### Composed examples (showcase)
 

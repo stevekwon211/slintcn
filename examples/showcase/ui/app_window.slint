@@ -22,7 +22,7 @@ import { Toaster, ToastQueue, ToastVariant }    from "slintcn/components/toast.s
 import { Tabs, TabItem }                        from "slintcn/components/tabs.slint";
 import { Checkbox }                             from "slintcn/components/checkbox.slint";
 import { Switch }                               from "slintcn/components/switch.slint";
-import { RadioGroup, RadioItem }                from "slintcn/components/radio-group.slint";
+import { RadioGroup, RadioItem, RadioOrientation } from "slintcn/components/radio-group.slint";
 import { Select, SelectItem }                   from "slintcn/components/select.slint";
 import { Icon }                                 from "slintcn/components/icon.slint";
 import { LucidePaths }                          from "slintcn/components/lucide-paths.slint";
@@ -94,6 +94,7 @@ export component AppWindow inherits Window {
     in-out property <bool> sheet-open: false;
     in-out property <int>  plan-index: 1;
     in-out property <int>  size-radio: 1;
+    in-out property <int>  density-radio: 1;
     in-out property <int>  settings-tab: 0;
     in-out property <int>  tabs-demo: 0;
     in-out property <bool> remember-me: true;
@@ -844,11 +845,25 @@ export component AppWindow inherits Window {
                 Card {
                     variant: CardVariant.glass;
                     width: 100%;
-                    height: 110px;
+                    height: 160px;
 
                     VerticalLayout {
                         padding: parent.padding-l;
                         spacing: 8px;
+
+                        Label { text: "Density (horizontal RadioGroup, ← / → to move)"; variant: LabelVariant.muted; }
+                        RadioGroup {
+                            items: [
+                                { value: "compact",  label: "Compact" },
+                                { value: "default",  label: "Default" },
+                                { value: "spacious", label: "Spacious" },
+                            ];
+                            selected <=> root.density-radio;
+                            orientation: RadioOrientation.horizontal;
+                            changed(i) => {
+                                ToastQueue.show("Density updated.", ToastVariant.default);
+                            }
+                        }
 
                         Label { text: "Icons"; variant: LabelVariant.muted; }
                         HorizontalLayout {

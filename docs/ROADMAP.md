@@ -86,7 +86,7 @@ realistic composed examples.
       works inside layouts that own placement; press feedback moves
       to the label.
 
-## v0.4 — Select, RadioGroup, Icon, runtime theme (current)
+## v0.4 — Select, RadioGroup, Icon, runtime theme
 
 - [x] **Select** primitive — trigger + in-tree dropdown card; chevron
       from `Icon` + `LucidePaths.chevron-down`; Enter / Space toggles,
@@ -108,22 +108,61 @@ realistic composed examples.
       reactively. Light palette adds `alpha-b-*-on-light`
       counterparts to the existing dark alphas
 
-### Still pending for v0.5
+## v0.5 — keyboard polish + modal focus trap (current)
 
-- [ ] Real focus trap inside modal overlays (Tab cycling) — needs
-      consumer-supplied list of focusable children, since Slint
-      FocusScope doesn't cycle-bound natively
-- [ ] PopupWindow-based Tooltip + Select dropdown (edge-aware
-      positioning that escapes the parent's bounds)
-- [ ] Growable Toast queue (Rust-side model, since in-Slint array
-      mutation is too limited)
-- [ ] `slintcn init` scaffolds Rust `build.rs` import paths
-- [ ] Font guide (Inter / Geist embedding in Slint)
-- [ ] `npx slintcn@latest` published package
-- [ ] Registry index on GitHub (raw URL like shadcn)
-- [ ] Visual regression: render showcase frames in CI
-- [ ] Horizontal RadioGroup orientation
-- [ ] Arrow-key navigation inside Tabs / Select / RadioGroup
+This wave closes the keyboard-accessibility gaps that v0.2–v0.4 left
+visible, and adds the small DX hint that makes `slintcn init` useful
+in real Rust crates.
+
+- [x] **Arrow-key navigation** wired into Tabs (← / →),
+      RadioGroup (↑ / ↓ vertical, ← / → horizontal), and Select
+      (↑ / ↓ highlight inside an open dropdown, Enter commits,
+      ↓ also opens a closed dropdown). Each component restructured
+      around a single root-level FocusScope so the focus ring follows
+      the active item and key events have one handler instead of one
+      per for-loop iteration.
+- [x] **Horizontal RadioGroup orientation** — adds
+      `RadioOrientation { vertical, horizontal }` enum and conditional
+      layout dispatch.
+- [x] **Modal focus trap** — Dialog and AlertDialog intercept Tab in
+      their root FocusScope; Dialog traps to its single Close button
+      (effectively a no-op Tab), AlertDialog cycles Cancel ↔ Action
+      via an internal `trap-index`. `changed open` callback moves
+      focus into the dialog on open. Slint 1.16's lack of
+      cycle-bound FocusScope is worked around with explicit
+      `.focus()` calls on the named buttons.
+- [x] **`slintcn init` build.rs hint** — when init detects a
+      Cargo.toml in the working directory it prints a copy-pasteable
+      build.rs snippet showing the CLI invocation pattern. The CLI
+      never writes to the host Rust crate, just educates.
+
+### Sheet focus trap (limitation, intentional)
+
+Sheet has a `@children` body slot so its focusables are arbitrary.
+Trapping Tab there would require the consumer to declare its
+focusable children to the Sheet — pushed to v0.6 with the larger
+PopupWindow rework.
+
+## v0.6 — pending
+
+- [ ] **PopupWindow-based Tooltip** — edge-aware positioning that
+      escapes the parent component's bounds. Needs a probe of Slint
+      1.16's PopupWindow API: positioning semantics, parent-window
+      clipping behavior, close-policy reliability.
+- [ ] **PopupWindow-based Select dropdown** — same investigation,
+      plus outside-click-to-close.
+- [ ] **Generalized modal focus trap** (Sheet @children + Dialog
+      with body inputs) — likely a `focusables: [length]` prop on
+      modals so consumers register their controls.
+- [ ] **`slint-viewer` headless snapshot CI** — probe whether Slint
+      1.16's tooling supports rendering to PNG without a display.
+- [ ] **`npx slintcn@latest` published package** + registry raw-URL
+      install — one-way door, awaits author approval.
+- [ ] **Growable Toast queue** — Rust-side model (the 3-slot ring
+      buffer is the ceiling of pure-Slint array mutation in 1.16).
+- [ ] **Font embedding guide** — Inter / Geist registration via
+      Rust + import in Slint.
+- [ ] Tab focusable detection inside Sheet body / Dialog body.
 
 ## v1.0 — expand beyond SaaS
 
