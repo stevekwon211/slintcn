@@ -4,6 +4,22 @@
 // `width: parent.width; height: parent.height`. `side` controls anchor edge
 // and slide direction. Panel uses fixed cross-axis dimension (360 / 320 px);
 // resize via `panel-extent` if you need a different drawer width.
+//
+// Focus trap policy (v0.8):
+//
+// Sheet does NOT trap Tab — its @children body is consumer-supplied and
+// often contains its own focusables (Inputs, Buttons). A blanket Tab trap
+// would break intra-body keyboard navigation. Consumers needing a true
+// trap should:
+//
+//   1. Place a final FocusScope wrapping their @children content, and
+//   2. Intercept `event.text == "\u{9}"` (Tab) on its boundary, calling
+//      `.focus()` on the first child to cycle.
+//
+// Slint 1.16 doesn't expose enough introspection (no "focusable
+// descendants" iterator) for the modal itself to do this generically.
+// Dialog and AlertDialog can trap because they own a fixed set of focusables
+// (Close button; Cancel + Action buttons respectively).
 
 import { Tokens } from "../theme/tokens.slint";
 import { Scrim } from "popup-helpers.slint";
