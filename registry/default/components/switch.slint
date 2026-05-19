@@ -1,0 +1,97 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Two-state toggle. 36 x 20 px track with a 16 x 16 knob that slides
+// between off (left) and on (right). Space toggles; 2 px focus ring.
+export component Switch {
+    in-out property <bool> checked: false;
+    in property <string> label;
+    in property <bool> disabled: false;
+    callback toggled(bool);
+
+    HorizontalLayout {
+        spacing: 8px;
+        alignment: start;
+
+        track := Rectangle {
+            width:  36px;
+            height: 20px;
+            background: root.checked
+                ? Tokens.color-primary
+                : Tokens.color-surface-2;
+            border-color: root.checked
+                ? Tokens.color-primary
+                : Tokens.color-border-hairline-strong;
+            border-width: 1px;
+            border-radius: 10px;
+
+            knob := Rectangle {
+                width:  16px;
+                height: 16px;
+                y: (parent.height - self.height) / 2;
+                x: root.checked ? parent.width - self.width - 2px : 2px;
+                background: root.checked
+                    ? Tokens.color-primary-foreground
+                    : Tokens.color-foreground;
+                border-radius: 8px;
+
+                animate x, background {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
+                }
+            }
+
+            if focus-scope.has-focus: Rectangle {
+                x: -2px;
+                y: -2px;
+                width:  parent.width  + 4px;
+                height: parent.height + 4px;
+                border-width: 2px;
+                border-color: Tokens.color-ring;
+                border-radius: 12px;
+                background: transparent;
+            }
+
+            animate background, border-color {
+                duration: Tokens.motion-fast;
+                easing: Tokens.motion-easing-standard;
+            }
+        }
+
+        if root.label != "": Text {
+            text: root.label;
+            color: root.disabled
+                ? Tokens.color-muted-foreground
+                : Tokens.color-foreground;
+            font-size: Tokens.typography-body-size;
+            vertical-alignment: center;
+        }
+    }
+
+    opacity: root.disabled ? 0.5 : 1.0;
+
+    TouchArea {
+        mouse-cursor: root.disabled ? default : pointer;
+        clicked => {
+            if (!root.disabled) {
+                root.checked = !root.checked;
+                root.toggled(root.checked);
+                focus-scope.focus();
+            }
+        }
+    }
+
+    forward-focus: focus-scope;
+    focus-scope := FocusScope {
+        enabled: !root.disabled;
+        key-pressed(event) => {
+            if (event.text == " " || event.text == "\n") {
+                if (!root.disabled) {
+                    root.checked = !root.checked;
+                    root.toggled(root.checked);
+                }
+                return accept;
+            }
+            return reject;
+        }
+    }
+}

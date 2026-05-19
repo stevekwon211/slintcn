@@ -54,6 +54,18 @@
     "toast": {
       "files": ["components/toast.slint"],
       "requires": ["theme"]
+    },
+    "tabs": {
+      "files": ["components/tabs.slint"],
+      "requires": ["theme"]
+    },
+    "checkbox": {
+      "files": ["components/checkbox.slint"],
+      "requires": ["theme"]
+    },
+    "switch": {
+      "files": ["components/switch.slint"],
+      "requires": ["theme"]
     }
   }
 }

@@ -105,25 +105,20 @@ export component Button inherits Rectangle {
     drop-shadow-blur:  interactive-hover ? shadow-hover-blur   : shadow-rest-blur;
     drop-shadow-color: interactive-hover ? shadow-hover-color  : shadow-rest-color;
 
-    y: 0px;
-    opacity: 1.0;
-    states [
-        is-disabled when root.disabled: {
-            opacity: 0.5;
-        }
-        is-pressed when touch.pressed && !root.disabled: {
-            y: 1px;
-        }
-    ]
+    // The button's root y is owned by the parent layout; press feedback is
+    // expressed as a 1 px label-only shift so we don't fight layout placement.
+    opacity: root.disabled ? 0.5 : 1.0;
 
-    animate y, opacity, background, border-color, drop-shadow-blur, drop-shadow-color {
+    animate opacity, background, border-color, drop-shadow-blur, drop-shadow-color {
         duration: Tokens.motion-fast;
         easing: Tokens.motion-easing-standard;
     }
 
     label := Text {
         x: (parent.width - self.preferred-width) / 2;
-        y: (parent.height - self.preferred-height) / 2;
+        y: (parent.height - self.preferred-height) / 2
+            + (touch.pressed && !root.disabled ? 1px : 0px);
+        animate y { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
         text: root.text;
         color: interactive-hover ? fg-hover : fg-rest;
         font-size:

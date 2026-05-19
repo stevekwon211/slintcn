@@ -1,0 +1,105 @@
+// slintcn Tabs — horizontal navigation strip.
+//
+// Tabs is intentionally just the visual nav. Slint's @children is a single
+// slot so the shadcn-style TabsList + TabsContent split doesn't translate
+// cleanly. Instead, the consumer drives content visibility from `current`:
+//
+//   in-out property <int> active-tab: 0;
+//   Tabs {
+//       items: [{ label: "Account" }, { label: "Password" }];
+//       current <=> active-tab;
+//   }
+//   if active-tab == 0: VerticalLayout { /* Account content */ }
+//   if active-tab == 1: VerticalLayout { /* Password content */ }
+//
+// Keyboard: Tab walks between triggers; Enter / Space activates the focused
+// one. Arrow-key navigation is v0.4 polish.
+
+import { Tokens } from "../theme/tokens.slint";
+
+export struct TabItem { label: string }
+
+export component Tabs inherits Rectangle {
+    in property <[TabItem]> items;
+    in-out property <int> current: 0;
+    callback changed(int);
+
+    background: transparent;
+    height: 40px;
+
+    HorizontalLayout {
+        spacing: 4px;
+        alignment: start;
+
+        for item[idx] in items: trigger := Rectangle {
+            property <bool> active: idx == root.current;
+
+            background: touch.has-hover && !active
+                ? Tokens.color-surface-1
+                : transparent;
+            border-radius: Tokens.radius-sm;
+
+            min-width: label-text.preferred-width + 24px;
+            preferred-height: 36px;
+
+            label-text := Text {
+                x: (parent.width - self.preferred-width) / 2;
+                y: (parent.height - self.preferred-height) / 2;
+                text: item.label;
+                color: active
+                    ? Tokens.color-foreground
+                    : Tokens.color-muted-foreground;
+                font-size: Tokens.typography-body-size;
+                font-weight: active
+                    ? Tokens.typography-weight-semibold
+                    : Tokens.typography-weight-medium;
+            }
+
+            // Underline indicator for the active tab.
+            if active: Rectangle {
+                x: 10px;
+                y: parent.height - 2px;
+                width: parent.width - 20px;
+                height: 2px;
+                background: Tokens.color-foreground;
+                border-radius: 1px;
+            }
+
+            touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => {
+                    root.current = idx;
+                    root.changed(idx);
+                    focus-scope.focus();
+                }
+            }
+
+            focus-scope := FocusScope {
+                key-pressed(event) => {
+                    if (event.text == "\n" || event.text == " ") {
+                        root.current = idx;
+                        root.changed(idx);
+                        return accept;
+                    }
+                    return reject;
+                }
+            }
+
+            if focus-scope.has-focus: Rectangle {
+                x: -2px;
+                y: -2px;
+                width: parent.width + 4px;
+                height: parent.height + 4px;
+                border-width: 2px;
+                border-color: Tokens.color-ring;
+                border-radius: Tokens.radius-sm + 2px;
+                background: transparent;
+            }
+
+            animate background {
+                duration: Tokens.motion-fast;
+                easing: Tokens.motion-easing-standard;
+            }
+        }
+    }
+}

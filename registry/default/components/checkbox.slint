@@ -1,0 +1,99 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Checkbox with optional trailing label. Space toggles; 2 px focus ring
+// matches the rest of slintcn's keyboard accessibility contract.
+export component Checkbox {
+    in-out property <bool> checked: false;
+    in property <string> label;
+    in property <bool> disabled: false;
+    callback toggled(bool);
+
+    HorizontalLayout {
+        spacing: 8px;
+        alignment: start;
+
+        // 20 px wrapper so the 16 px box aligns vertically with the label
+        // baseline without forcing the whole row to be 16 px tall.
+        Rectangle {
+            width:  16px;
+            height: 20px;
+            background: transparent;
+
+            box := Rectangle {
+                y: 2px;
+                width: 16px;
+                height: 16px;
+                background: root.checked
+                    ? Tokens.color-primary
+                    : Tokens.color-surface-1;
+                border-color: root.checked
+                    ? Tokens.color-primary
+                    : Tokens.color-border-hairline-strong;
+                border-width: 1px;
+                border-radius: Tokens.radius-sm;
+
+                if root.checked: Path {
+                    width: 16px;
+                    height: 16px;
+                    stroke: Tokens.color-primary-foreground;
+                    stroke-width: 2px;
+                    fill: transparent;
+                    commands: "M 4 8 L 7 12 L 13 4";
+                }
+
+                if focus-scope.has-focus: Rectangle {
+                    x: -2px;
+                    y: -2px;
+                    width:  parent.width  + 4px;
+                    height: parent.height + 4px;
+                    border-width: 2px;
+                    border-color: Tokens.color-ring;
+                    border-radius: Tokens.radius-sm + 2px;
+                    background: transparent;
+                }
+
+                animate background, border-color {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
+                }
+            }
+        }
+
+        if root.label != "": Text {
+            text: root.label;
+            color: root.disabled
+                ? Tokens.color-muted-foreground
+                : Tokens.color-foreground;
+            font-size: Tokens.typography-body-size;
+            vertical-alignment: center;
+        }
+    }
+
+    opacity: root.disabled ? 0.5 : 1.0;
+
+    TouchArea {
+        mouse-cursor: root.disabled ? default : pointer;
+        clicked => {
+            if (!root.disabled) {
+                root.checked = !root.checked;
+                root.toggled(root.checked);
+                focus-scope.focus();
+            }
+        }
+    }
+
+    forward-focus: focus-scope;
+    focus-scope := FocusScope {
+        enabled: !root.disabled;
+        key-pressed(event) => {
+            if (event.text == " " || event.text == "\n") {
+                if (!root.disabled) {
+                    root.checked = !root.checked;
+                    root.toggled(root.checked);
+                }
+                return accept;
+            }
+            return reject;
+        }
+    }
+}
