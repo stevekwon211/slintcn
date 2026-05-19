@@ -116,6 +116,33 @@ async function cmdInit(cwd) {
   const template = await readFile(path.join(ROOT, "templates", "slintcn.json"), "utf8");
   await writeFile(configPath, template);
   console.log("Created slintcn.json");
+
+  // If this looks like a Rust crate, print a copy-pasteable build.rs
+  // snippet so the user can wire slint_build to invoke slintcn add on
+  // every cargo build. We deliberately don't write to their crate.
+  if (await exists(path.join(cwd, "Cargo.toml"))) {
+    const slintcnPath = path.relative(cwd, path.join(ROOT, "bin", "slintcn.mjs"));
+    console.log(`
+Detected a Rust crate. Paste this into build.rs to keep the registry in sync
+with every cargo build:
+
+  use std::fs;
+  use std::process::Command;
+  fn main() {
+      let _ = fs::remove_dir_all("ui/slintcn");
+      let status = Command::new("node")
+          .arg("${slintcnPath}")
+          .args(["add", "button", "input", "dialog"])  // your components
+          .status()
+          .expect("need Node 20+ on PATH for the slintcn CLI");
+      assert!(status.success(), "slintcn add failed");
+      println!("cargo:rerun-if-changed=${path.dirname(slintcnPath)}/../registry/default");
+      println!("cargo:rerun-if-changed=slintcn.json");
+      slint_build::compile("ui/app_window.slint").unwrap();
+  }
+`);
+  }
+
   return resolveConfig(JSON.parse(template), cwd);
 }
 
