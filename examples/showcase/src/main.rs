@@ -16,6 +16,10 @@ fn main() -> Result<(), slint::PlatformError> {
     let items: Rc<VecModel<ToastItem>> = Rc::new(VecModel::default());
     let next_id = Rc::new(RefCell::new(1i32));
     let timers: Rc<RefCell<HashMap<i32, Timer>>> = Rc::default();
+    // Second-phase dismiss timers — once an item is marked dismissed, this
+    // map holds the Timer that actually removes it from the model after the
+    // fade-out animation lands.
+    let removal_timers: Rc<RefCell<HashMap<i32, Timer>>> = Rc::default();
 
     let queue = ui.global::<ToastQueue>();
     queue.set_items(ModelRc::from(items.clone()));
@@ -32,10 +36,13 @@ fn main() -> Result<(), slint::PlatformError> {
                 *n += 1;
                 id
             };
-            items.push(ToastItem { id, text, variant });
+            items.push(ToastItem {
+                id,
+                text,
+                variant,
+                dismissed: false,
+            });
 
-            // Per-toast auto-dismiss after 3 s. Holding the Timer in a map
-            // keyed by id so an explicit dismiss can also cancel it.
             let timer = Timer::default();
             let ui_weak = ui_weak.clone();
             timer.start(
@@ -52,16 +59,48 @@ fn main() -> Result<(), slint::PlatformError> {
     }
 
     {
-        let items = items.clone();
+        let items_outer = items.clone();
         let timers = timers.clone();
+        let removal_outer = removal_timers.clone();
         queue.on_dismiss(move |id: i32| {
-            for i in (0..items.row_count()).rev() {
-                if items.row_data(i).map(|t| t.id == id).unwrap_or(false) {
-                    items.remove(i);
-                    break;
+            // Phase 1: mark the matching item dismissed so its ToastView
+            // animates out (opacity → 0, slight y slide).
+            let mut found = false;
+            for i in 0..items_outer.row_count() {
+                if let Some(mut item) = items_outer.row_data(i) {
+                    if item.id == id && !item.dismissed {
+                        item.dismissed = true;
+                        items_outer.set_row_data(i, item);
+                        found = true;
+                        break;
+                    }
                 }
             }
+            // Cancel any pending auto-dismiss timer so it doesn't fire again
+            // after the user dismissed manually (or vice-versa).
             timers.borrow_mut().remove(&id);
+            if !found {
+                return;
+            }
+
+            // Phase 2: after motion-base + a small overshoot, drop the row.
+            let items = items_outer.clone();
+            let removal_map = removal_outer.clone();
+            let removal = Timer::default();
+            removal.start(
+                TimerMode::SingleShot,
+                Duration::from_millis(220),
+                move || {
+                    for j in (0..items.row_count()).rev() {
+                        if items.row_data(j).map(|t| t.id == id).unwrap_or(false) {
+                            items.remove(j);
+                            break;
+                        }
+                    }
+                    removal_map.borrow_mut().remove(&id);
+                },
+            );
+            removal_outer.borrow_mut().insert(id, removal);
         });
     }
 

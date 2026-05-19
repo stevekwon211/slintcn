@@ -36,6 +36,11 @@ export struct ToastItem {
     id: int,
     text: string,
     variant: ToastVariant,
+    // Two-phase dismiss: setting this to true on the Rust side triggers a
+    // fade-out animation, then a follow-up timer actually removes the item
+    // from the VecModel ~220 ms later (one motion-base duration + a small
+    // overshoot).
+    dismissed: bool,
 }
 
 export global ToastQueue {
@@ -66,11 +71,18 @@ component ToastView inherits Rectangle {
     width:  toast-text.preferred-width + 28px;
     height: 36px;
 
-    // Bottom-right anchored, stacked upward by stack-index. v0.7 ships
-    // instant removal — fade-out animation needs a 2-phase Rust dismiss
-    // (set `dismissed: true`, animate, then remove from model) — v0.8.
+    // Bottom-right anchored, stacked upward by stack-index. Items mark
+    // dismissed first (fade-out + slide-down 6 px), then the Rust side
+    // removes them from the model after the animation lands.
     x: available-width  - self.width  - 16px;
-    y: available-height - self.height - 16px - (stack-index * 44px);
+    y: available-height - self.height - 16px - (stack-index * 44px)
+        + (item.dismissed ? 6px : 0px);
+
+    opacity: item.dismissed ? 0.0 : 1.0;
+    animate opacity, y {
+        duration: Tokens.motion-base;
+        easing: Tokens.motion-easing-standard;
+    }
 
     toast-text := Text {
         x: 14px;
