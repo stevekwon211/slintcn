@@ -1,0 +1,126 @@
+// slintcn Dialog — modal overlay (Scrim + glass panel).
+//
+// Mount as the LAST child of Window (see popup-helpers.slint for the pattern)
+// and size to the full window via `width: parent.width; height: parent.height`.
+//
+// Public API:
+//   in-out property <bool> open
+//   in property <string> title
+//   in property <string> description
+//   in property <bool> dismiss-on-backdrop: true
+//   callback dismissed()    // fired when backdrop click or Close button closes
+//
+// Body content goes via `@children` between header and footer.
+//
+// Keyboard: Escape closes when open. Tab moves between focusable items inside
+// the panel; on v0.2 Tab is not fully trapped — focus may escape if the
+// underlying UI also has focusable elements. Tracked for v0.3.
+
+import { Tokens } from "../theme/tokens.slint";
+import { Scrim } from "popup-helpers.slint";
+import { Button, ButtonVariant } from "button.slint";
+import { Separator, SeparatorOrientation } from "separator.slint";
+
+export component Dialog inherits Rectangle {
+    in-out property <bool> open: false;
+    in property <string> title;
+    in property <string> description;
+    in property <bool>   dismiss-on-backdrop: true;
+    in property <string> close-label: "Close";
+    callback dismissed();
+
+    background: transparent;
+
+    Scrim {
+        x: 0; y: 0;
+        width:  root.width;
+        height: root.height;
+        shown: root.open;
+        clicked => {
+            if (root.dismiss-on-backdrop) {
+                root.open = false;
+                root.dismissed();
+            }
+        }
+    }
+
+    panel := Rectangle {
+        background: Tokens.color-card;
+        border-color: Tokens.color-border-hairline;
+        border-width: 1px;
+        border-radius: Tokens.radius-xl;
+        drop-shadow-blur:     Tokens.shadow-e3-blur;
+        drop-shadow-offset-y: Tokens.shadow-e3-offset-y;
+        drop-shadow-color:    Tokens.shadow-e3-color;
+
+        width: 420px;
+        height: layout.preferred-height;
+        x: (root.width - self.width) / 2;
+        // Slight slide-up on open (offset-y 8px → 0) for a less-flat feel.
+        y: root.open
+            ? (root.height - self.height) / 2
+            : (root.height - self.height) / 2 + 8px;
+
+        opacity: root.open ? 1.0 : 0.0;
+
+        animate opacity, y {
+            duration: Tokens.motion-base;
+            easing: Tokens.motion-easing-standard;
+        }
+
+        layout := VerticalLayout {
+            padding: Tokens.spacing-lg;
+            spacing: Tokens.spacing-md;
+
+            // Header
+            VerticalLayout {
+                spacing: 4px;
+                if root.title != "": Text {
+                    text: root.title;
+                    color: Tokens.color-foreground;
+                    font-size: 18px;
+                    font-weight: Tokens.typography-weight-semibold;
+                }
+                if root.description != "": Text {
+                    text: root.description;
+                    color: Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-body-size;
+                    wrap: word-wrap;
+                }
+            }
+
+            // Body slot
+            @children
+
+            Separator { orientation: SeparatorOrientation.horizontal; }
+
+            // Default footer — a single Close button at the trailing edge.
+            HorizontalLayout {
+                alignment: end;
+                Button {
+                    variant: ButtonVariant.default;
+                    text: root.close-label;
+                    clicked => {
+                        root.open = false;
+                        root.dismissed();
+                    }
+                }
+            }
+        }
+    }
+
+    // Escape closes when the dialog is open. We focus the panel area on open
+    // so the FocusScope is the active key target.
+    forward-focus: focus-scope;
+    focus-scope := FocusScope {
+        enabled: root.open;
+        key-pressed(event) => {
+            if (event.text == "\u{1b}") {
+                root.open = false;
+                root.dismissed();
+                return accept;
+            }
+            return reject;
+        }
+    }
+}

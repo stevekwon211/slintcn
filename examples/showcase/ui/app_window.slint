@@ -1,6 +1,5 @@
 // Imports use the *generated* layout under ui/slintcn/ — produced by the
-// `slintcn add …` invocation in build.rs. This makes the showcase a faithful
-// preview of what users see after running the CLI in their own projects.
+// `slintcn add …` invocation in build.rs.
 
 import { Tokens } from "slintcn/theme/tokens.slint";
 import { Button, ButtonVariant, ButtonSize } from "slintcn/components/button.slint";
@@ -9,12 +8,15 @@ import { Input } from "slintcn/components/input.slint";
 import { Badge, BadgeVariant } from "slintcn/components/badge.slint";
 import { Separator, SeparatorOrientation } from "slintcn/components/separator.slint";
 import { Label, LabelVariant } from "slintcn/components/label.slint";
+import { Dialog } from "slintcn/components/dialog.slint";
 
 export component AppWindow inherits Window {
     title: "slintcn showcase";
     preferred-width: 720px;
     preferred-height: 760px;
     background: Tokens.color-background;
+
+    in-out property <bool> dialog-open: false;
 
     VerticalLayout {
         padding: 24px;
@@ -65,5 +67,28 @@ export component AppWindow inherits Window {
                 Input { width: 100%; placeholder: "••••••••"; password: true; }
             }
         }
+
+        Separator { orientation: SeparatorOrientation.horizontal; }
+
+        Label { text: "Overlays"; variant: LabelVariant.muted; }
+
+        HorizontalLayout {
+            spacing: 8px;
+            Button {
+                variant: ButtonVariant.glow;
+                text: "Open Dialog";
+                clicked => { root.dialog-open = true; }
+            }
+        }
+    }
+
+    // Dialog must be the LAST child of Window so it renders on top.
+    Dialog {
+        width: parent.width;
+        height: parent.height;
+        open <=> root.dialog-open;
+        title: "Confirm your action";
+        description: "This is a slintcn Dialog primitive. Press Escape or click the backdrop to dismiss.";
+        close-label: "Got it";
     }
 }
