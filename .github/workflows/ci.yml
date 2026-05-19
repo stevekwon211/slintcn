@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel in-progress runs of the same workflow + ref to keep PR feedback fast.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  verify:
+    name: make verify (node tests + cargo build + clippy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Slint system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libfontconfig1-dev \
+            libfreetype6-dev \
+            libxkbcommon-dev \
+            libgl1-mesa-dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: examples/showcase
+
+      - name: make verify
+        run: make verify
+
+  snapshot:
+    name: make snapshot (headless SoftwareRenderer)
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Slint system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libfontconfig1-dev \
+            libfreetype6-dev \
+            libxkbcommon-dev \
+            libgl1-mesa-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: examples/showcase
+
+      - name: make snapshot
+        run: make snapshot
+
+      - name: Diff against committed baselines
+        id: diff
+        run: |
+          set -e
+          # The snapshot run regenerated docs/img/snapshots/*.png.
+          # If any differ from the committed baseline, fail the job and
+          # upload the new PNGs as artifacts for human review.
+          if git diff --quiet -- docs/img/snapshots/; then
+            echo "No visual changes vs baseline."
+          else
+            echo "Visual diff detected:" >&2
+            git --no-pager diff --stat -- docs/img/snapshots/ >&2
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+      - name: Upload regenerated snapshots
+        if: failure() && steps.diff.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-diff
+          path: docs/img/snapshots/
+          retention-days: 14
