@@ -15,5 +15,5 @@ yarn-error.log
 .vscode/
 *.swp
 
-# slintcn user installs (local test sandboxes)
-ui/slintcn/
+# slintcn generated installs (CLI output — never committed)
+**/ui/slintcn/

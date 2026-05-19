@@ -1,0 +1,5 @@
+{
+  "$schema": "https://slintcn.dev/schema/slintcn.json",
+  "style": "default",
+  "outDir": "ui/slintcn"
+}

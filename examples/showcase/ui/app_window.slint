@@ -1,8 +1,12 @@
-import { Tokens } from "../../../registry/default/theme/tokens.slint";
-import { Button, ButtonVariant, ButtonSize } from "../../../registry/default/components/button.slint";
-import { Card, CardVariant } from "../../../registry/default/components/card.slint";
-import { Input } from "../../../registry/default/components/input.slint";
-import { Badge, BadgeVariant } from "../../../registry/default/components/badge.slint";
+// Imports use the *generated* layout under ui/slintcn/ — produced by the
+// `slintcn add …` invocation in build.rs. This makes the showcase a faithful
+// preview of what users see after running the CLI in their own projects.
+
+import { Tokens } from "slintcn/theme/tokens.slint";
+import { Button, ButtonVariant, ButtonSize } from "slintcn/components/button.slint";
+import { Card, CardVariant } from "slintcn/components/card.slint";
+import { Input } from "slintcn/components/input.slint";
+import { Badge, BadgeVariant } from "slintcn/components/badge.slint";
 
 export component AppWindow inherits Window {
     title: "slintcn showcase";
