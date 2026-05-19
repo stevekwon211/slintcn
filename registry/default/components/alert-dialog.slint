@@ -82,7 +82,7 @@ export component AlertDialog inherits Rectangle {
             HorizontalLayout {
                 alignment: end;
                 spacing: Tokens.spacing-sm;
-                Button {
+                cancel-btn := Button {
                     variant: ButtonVariant.outline;
                     text: root.cancel-label;
                     clicked => {
@@ -90,7 +90,7 @@ export component AlertDialog inherits Rectangle {
                         root.cancelled();
                     }
                 }
-                Button {
+                action-btn := Button {
                     variant: root.action-variant;
                     text: root.action-label;
                     clicked => {
@@ -102,6 +102,16 @@ export component AlertDialog inherits Rectangle {
         }
     }
 
+    // Focus trap state: 0 = Cancel (default on open), 1 = Action.
+    in-out property <int> trap-index: 0;
+
+    changed open => {
+        if (self.open) {
+            self.trap-index = 0;
+            cancel-btn.focus();
+        }
+    }
+
     forward-focus: focus-scope;
     focus-scope := FocusScope {
         enabled: root.open;
@@ -109,6 +119,15 @@ export component AlertDialog inherits Rectangle {
             if (event.text == "\u{1b}") {
                 root.open = false;
                 root.cancelled();
+                return accept;
+            }
+            // Tab / Shift+Tab cycle between Cancel (0) and Action (1).
+            // With two focusables the wrap direction is symmetric — both
+            // Tab and Shift+Tab just flip the index.
+            if (event.text == "\u{9}") {
+                root.trap-index = root.trap-index == 0 ? 1 : 0;
+                if (root.trap-index == 0) { cancel-btn.focus(); }
+                else                       { action-btn.focus(); }
                 return accept;
             }
             return reject;

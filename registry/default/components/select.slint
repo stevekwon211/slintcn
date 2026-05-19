@@ -1,8 +1,6 @@
 // slintcn Select — trigger + in-tree dropdown.
 //
 // Usage:
-//   import { Select, SelectItem } from "slintcn/components/select.slint";
-//
 //   Select {
 //       items: [
 //           { value: "free",  label: "Free" },
@@ -13,11 +11,19 @@
 //       placeholder: "Choose a plan…";
 //   }
 //
-// v0.4 limitations:
-//   - Dropdown is in-tree, so it can be clipped near window edges.
-//   - No outside-click-to-close (PopupWindow + scrim is v0.5).
-//   - Arrow-key navigation between items is v0.5; Enter/Space toggles
-//     the dropdown today, Escape closes it.
+// Keyboard:
+//   ↓     open the dropdown (closed) | move highlight down (open)
+//   ↑     move highlight up (open)
+//   Enter open the dropdown (closed) | commit highlight + close (open)
+//   Space toggle open
+//   Esc   close without committing
+//
+// `selected-index` is the committed value (drives the trigger label).
+// `highlighted-index` is the keyboard cursor visible inside the dropdown
+// while it's open; it resets to selected-index on open.
+//
+// v0.4 limitations (unchanged from v0.4): no PopupWindow, so the dropdown
+// can be clipped near window edges. No outside-click-close.
 
 import { Tokens } from "../theme/tokens.slint";
 import { Icon } from "icon.slint";
@@ -36,11 +42,11 @@ export component Select {
     callback changed(int);
 
     in-out property <bool> open: false;
+    in-out property <int> highlighted-index: 0;
 
     preferred-width:  220px;
     preferred-height: 36px;
 
-    // Trigger
     trigger := Rectangle {
         x: 0;
         y: 0;
@@ -100,15 +106,16 @@ export component Select {
             clicked => {
                 if (!root.disabled) {
                     root.open = !root.open;
+                    if (root.open) {
+                        root.highlighted-index = root.selected-index >= 0
+                            ? root.selected-index : 0;
+                    }
                     focus.focus();
                 }
             }
         }
     }
 
-    // Dropdown — extends below trigger when open. Not clipped by surrounding
-    // layout (we accept overflow), but can be clipped by the Window if the
-    // Select sits near the bottom edge.
     if root.open: Rectangle {
         x: 0;
         y: 40px;
@@ -128,9 +135,12 @@ export component Select {
 
             for item[idx] in root.items: Rectangle {
                 height: 30px;
-                background: row-touch.has-hover
-                    ? Tokens.color-surface-1
-                    : transparent;
+                background:
+                    idx == root.highlighted-index
+                        ? Tokens.color-surface-2 :
+                    row-touch.has-hover
+                        ? Tokens.color-surface-1 :
+                        transparent;
                 border-radius: Tokens.radius-sm;
 
                 HorizontalLayout {
@@ -177,14 +187,47 @@ export component Select {
         enabled: !root.disabled;
         key-pressed(event) => {
             if (event.text == "\u{1b}") {
-                if (root.open) {
-                    root.open = false;
-                    return accept;
-                }
+                if (root.open) { root.open = false; return accept; }
                 return reject;
             }
-            if (event.text == " " || event.text == "\n") {
+            if (event.text == " ") {
                 root.open = !root.open;
+                if (root.open) {
+                    root.highlighted-index = root.selected-index >= 0
+                        ? root.selected-index : 0;
+                }
+                return accept;
+            }
+            if (event.text == "\n") {
+                if (root.open && root.items.length > 0) {
+                    root.selected-index = root.highlighted-index;
+                    root.changed(root.selected-index);
+                    root.open = false;
+                } else {
+                    root.open = true;
+                    if (root.items.length > 0) {
+                        root.highlighted-index = root.selected-index >= 0
+                            ? root.selected-index : 0;
+                    }
+                }
+                return accept;
+            }
+            if (event.text == Key.DownArrow) {
+                if (!root.open) {
+                    root.open = true;
+                    if (root.items.length > 0) {
+                        root.highlighted-index = root.selected-index >= 0
+                            ? root.selected-index : 0;
+                    }
+                } else if (root.items.length > 0) {
+                    root.highlighted-index = mod(root.highlighted-index + 1, root.items.length);
+                }
+                return accept;
+            }
+            if (event.text == Key.UpArrow) {
+                if (root.open && root.items.length > 0) {
+                    root.highlighted-index = mod(root.highlighted-index + root.items.length - 1, root.items.length);
+                }
                 return accept;
             }
             return reject;

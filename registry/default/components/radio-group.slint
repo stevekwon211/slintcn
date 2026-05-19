@@ -1,8 +1,6 @@
-// slintcn RadioGroup — single-selection vertical list.
+// slintcn RadioGroup — single-selection list, vertical or horizontal.
 //
 // Usage:
-//   import { RadioGroup, RadioItem } from "slintcn/components/radio-group.slint";
-//
 //   RadioGroup {
 //       items: [
 //           { value: "small",  label: "Small" },
@@ -10,9 +8,12 @@
 //           { value: "large",  label: "Large" },
 //       ];
 //       selected <=> size-index;
+//       orientation: RadioOrientation.horizontal;   // default: vertical
 //   }
 //
-// v0.4: vertical orientation only — horizontal is v0.5.
+// Keyboard: ↑/↓ (vertical) or ←/→ (horizontal) move the selection with
+// wrap-around. Tab focuses the group as a whole; Space is a no-op since
+// arrow movement already commits.
 
 import { Tokens } from "../theme/tokens.slint";
 
@@ -21,98 +22,153 @@ export struct RadioItem {
     label: string,
 }
 
+export enum RadioOrientation { vertical, horizontal }
+
+// Local helper — one circle + label row. Active state and disabled flow
+// down from the surrounding group; clicking notifies via callback.
+component RadioRow inherits Rectangle {
+    in property <string> label;
+    in property <bool> active: false;
+    in property <bool> show-focus: false;
+    in property <bool> disabled: false;
+    callback clicked();
+
+    background: transparent;
+    height: 22px;
+
+    HorizontalLayout {
+        spacing: 10px;
+        alignment: start;
+
+        circle := Rectangle {
+            width:  16px;
+            height: 16px;
+            y: (parent.height - self.height) / 2;
+            background: root.active
+                ? Tokens.color-primary
+                : Tokens.color-surface-1;
+            border-color: root.active
+                ? Tokens.color-primary
+                : Tokens.color-border-hairline-strong;
+            border-width: 1px;
+            border-radius: 8px;
+
+            if root.active: Rectangle {
+                width:  6px;
+                height: 6px;
+                x: (parent.width  - self.width)  / 2;
+                y: (parent.height - self.height) / 2;
+                background: Tokens.color-primary-foreground;
+                border-radius: 3px;
+            }
+
+            if root.show-focus: Rectangle {
+                x: -2px;
+                y: -2px;
+                width:  parent.width  + 4px;
+                height: parent.height + 4px;
+                border-width: 2px;
+                border-color: Tokens.color-ring;
+                border-radius: 10px;
+                background: transparent;
+            }
+
+            animate background, border-color {
+                duration: Tokens.motion-fast;
+                easing: Tokens.motion-easing-standard;
+            }
+        }
+
+        Text {
+            text: root.label;
+            color: root.disabled
+                ? Tokens.color-muted-foreground
+                : Tokens.color-foreground;
+            font-size: Tokens.typography-body-size;
+            vertical-alignment: center;
+        }
+    }
+
+    opacity: root.disabled ? 0.5 : 1.0;
+
+    TouchArea {
+        mouse-cursor: root.disabled ? default : pointer;
+        clicked => { if (!root.disabled) { root.clicked(); } }
+    }
+}
+
 export component RadioGroup {
     in property <[RadioItem]> items;
     in-out property <int> selected: 0;
     in property <bool> disabled: false;
+    in property <RadioOrientation> orientation: RadioOrientation.vertical;
     callback changed(int);
 
-    VerticalLayout {
+    forward-focus: nav;
+    nav := FocusScope {
+        enabled: !root.disabled;
+        key-pressed(event) => {
+            if (root.items.length <= 0) { return reject; }
+
+            if (root.orientation == RadioOrientation.vertical) {
+                if (event.text == Key.UpArrow) {
+                    root.selected = mod(root.selected + root.items.length - 1, root.items.length);
+                    root.changed(root.selected);
+                    return accept;
+                }
+                if (event.text == Key.DownArrow) {
+                    root.selected = mod(root.selected + 1, root.items.length);
+                    root.changed(root.selected);
+                    return accept;
+                }
+            } else {
+                if (event.text == Key.LeftArrow) {
+                    root.selected = mod(root.selected + root.items.length - 1, root.items.length);
+                    root.changed(root.selected);
+                    return accept;
+                }
+                if (event.text == Key.RightArrow) {
+                    root.selected = mod(root.selected + 1, root.items.length);
+                    root.changed(root.selected);
+                    return accept;
+                }
+            }
+            return reject;
+        }
+    }
+
+    if orientation == RadioOrientation.vertical: VerticalLayout {
         spacing: 10px;
         alignment: start;
-
-        for item[idx] in items: Rectangle {
-            background: transparent;
-            height: 22px;
-
-            HorizontalLayout {
-                spacing: 10px;
-                alignment: start;
-
-                circle := Rectangle {
-                    width:  16px;
-                    height: 16px;
-                    y: (parent.height - self.height) / 2;
-                    background: idx == root.selected
-                        ? Tokens.color-primary
-                        : Tokens.color-surface-1;
-                    border-color: idx == root.selected
-                        ? Tokens.color-primary
-                        : Tokens.color-border-hairline-strong;
-                    border-width: 1px;
-                    border-radius: 8px;
-
-                    if idx == root.selected: Rectangle {
-                        width:  6px;
-                        height: 6px;
-                        x: (parent.width  - self.width)  / 2;
-                        y: (parent.height - self.height) / 2;
-                        background: Tokens.color-primary-foreground;
-                        border-radius: 3px;
-                    }
-
-                    if focus.has-focus: Rectangle {
-                        x: -2px;
-                        y: -2px;
-                        width:  parent.width  + 4px;
-                        height: parent.height + 4px;
-                        border-width: 2px;
-                        border-color: Tokens.color-ring;
-                        border-radius: 10px;
-                        background: transparent;
-                    }
-
-                    animate background, border-color {
-                        duration: Tokens.motion-fast;
-                        easing: Tokens.motion-easing-standard;
-                    }
+        for item[idx] in items: RadioRow {
+            label: item.label;
+            active: idx == root.selected;
+            show-focus: nav.has-focus && idx == root.selected;
+            disabled: root.disabled;
+            clicked => {
+                if (root.selected != idx) {
+                    root.selected = idx;
+                    root.changed(idx);
                 }
-
-                Text {
-                    text: item.label;
-                    color: root.disabled
-                        ? Tokens.color-muted-foreground
-                        : Tokens.color-foreground;
-                    font-size: Tokens.typography-body-size;
-                    vertical-alignment: center;
-                }
+                nav.focus();
             }
+        }
+    }
 
-            opacity: root.disabled ? 0.5 : 1.0;
-
-            TouchArea {
-                mouse-cursor: root.disabled ? default : pointer;
-                clicked => {
-                    if (!root.disabled && root.selected != idx) {
-                        root.selected = idx;
-                        root.changed(idx);
-                        focus.focus();
-                    }
+    if orientation == RadioOrientation.horizontal: HorizontalLayout {
+        spacing: 20px;
+        alignment: start;
+        for item[idx] in items: RadioRow {
+            label: item.label;
+            active: idx == root.selected;
+            show-focus: nav.has-focus && idx == root.selected;
+            disabled: root.disabled;
+            clicked => {
+                if (root.selected != idx) {
+                    root.selected = idx;
+                    root.changed(idx);
                 }
-            }
-
-            focus := FocusScope {
-                enabled: !root.disabled;
-                key-pressed(event) => {
-                    if (event.text == " " || event.text == "\n") {
-                        if (!root.disabled && root.selected != idx) {
-                            root.selected = idx;
-                            root.changed(idx);
-                        }
-                        return accept;
-                    }
-                    return reject;
-                }
+                nav.focus();
             }
         }
     }

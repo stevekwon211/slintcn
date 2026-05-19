@@ -109,8 +109,17 @@ export component Dialog inherits Rectangle {
         }
     }
 
-    // Escape closes when the dialog is open. We focus the panel area on open
-    // so the FocusScope is the active key target.
+    // When `open` flips true, move focus into the dialog so the Escape /
+    // Tab interceptors in the outer FocusScope receive keyboard events.
+    // The default close button is the only focusable element in v0.5
+    // Dialog; consumers with body inputs should call `.focus()` on their
+    // own element after setting `open = true` (documented in README).
+    changed open => {
+        if (self.open) {
+            focus-scope.focus();
+        }
+    }
+
     forward-focus: focus-scope;
     focus-scope := FocusScope {
         enabled: root.open;
@@ -118,6 +127,12 @@ export component Dialog inherits Rectangle {
             if (event.text == "\u{1b}") {
                 root.open = false;
                 root.dismissed();
+                return accept;
+            }
+            // Tab and Shift+Tab are trapped — v0.5 Dialog has a single
+            // focusable (the Close button) so Tab is effectively a no-op
+            // rather than a route out into the underlying UI.
+            if (event.text == "\u{9}") {
                 return accept;
             }
             return reject;
