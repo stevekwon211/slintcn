@@ -1,28 +1,43 @@
-// slintcn default theme — dark glass (shadcn-adjacent, not tied to any product).
-// Copy into your project via `slintcn init` / `slintcn add`.
-// Customize values here; components read only from `Tokens`.
+// slintcn default theme — dark glass (shadcn-adjacent semantics).
+//
+// This is the semantic layer. Components read ONLY from `Tokens`; they
+// never reach into `Palette` directly. To retune the theme:
+//   - to change a color VALUE: edit palette.slint
+//   - to change a SEMANTIC role: remap a Tokens property to a different
+//     palette entry below
+//
+// A future light theme (v0.3) ships as `palette-light.slint` plus a
+// swap of the import on the line below — no token rename needed.
+
+import { Palette } from "palette.slint";
 
 export global Tokens {
-    // colors
-    out property <color> color-background: #0a0a0a;
-    out property <color> color-foreground: #fafafa;
-    out property <color> color-card: #171717;
-    out property <color> color-card-foreground: #fafafa;
-    out property <color> color-primary: #e5e5e5;
-    out property <color> color-primary-foreground: #171717;
-    out property <color> color-secondary: #262626;
-    out property <color> color-muted: #262626;
-    out property <color> color-muted-foreground: #a1a1a1;
-    out property <color> color-destructive: #ff6467;
-    out property <color> color-ring: #737373;
+    // surfaces
+    out property <color> color-background:         Palette.neutral-950;
+    out property <color> color-foreground:         Palette.neutral-50;
+    out property <color> color-card:               Palette.neutral-900;
+    out property <color> color-card-foreground:    Palette.neutral-50;
 
-    // glass / scrim / borders
-    out property <color> color-surface-1: rgba(255, 255, 255, 0.04);
-    out property <color> color-surface-2: rgba(255, 255, 255, 0.08);
-    out property <color> color-surface-3: rgba(255, 255, 255, 0.12);
-    out property <color> color-scrim-2: rgba(0, 0, 0, 0.6);
-    out property <color> color-border-hairline: rgba(255, 255, 255, 0.1);
-    out property <color> color-border-hairline-strong: rgba(255, 255, 255, 0.2);
+    // intent
+    out property <color> color-primary:            Palette.neutral-200;
+    out property <color> color-primary-foreground: Palette.neutral-900;
+    out property <color> color-secondary:          Palette.neutral-800;
+    out property <color> color-muted:              Palette.neutral-800;
+    out property <color> color-muted-foreground:   Palette.neutral-400;
+    out property <color> color-destructive:        Palette.red-400;
+
+    // focus / interaction
+    out property <color>  color-ring:               Palette.neutral-500;
+    out property <length> focus-ring-width:         2px;
+    out property <length> focus-ring-offset:        2px;
+
+    // glass / scrim / hairline borders
+    out property <color> color-surface-1:           Palette.alpha-w-04;
+    out property <color> color-surface-2:           Palette.alpha-w-08;
+    out property <color> color-surface-3:           Palette.alpha-w-12;
+    out property <color> color-scrim-2:             Palette.alpha-b-60;
+    out property <color> color-border-hairline:         Palette.alpha-w-10;
+    out property <color> color-border-hairline-strong:  Palette.alpha-w-20;
 
     // radius
     out property <length> radius-sm: 6px;
@@ -33,34 +48,39 @@ export global Tokens {
     // motion
     out property <duration> motion-fast: 150ms;
     out property <duration> motion-base: 200ms;
-    out property <easing> motion-easing-standard: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+    out property <easing>   motion-easing-standard:    cubic-bezier(0.2, 0.0, 0.0, 1.0);
+    out property <easing>   motion-easing-emphasized:  cubic-bezier(0.05, 0.7, 0.1, 1.0);
 
-    // shadows
-    out property <length> shadow-e2-blur: 8px;
+    // elevation shadows
+    out property <length> shadow-e2-blur:     8px;
     out property <length> shadow-e2-offset-y: 2px;
-    out property <color> shadow-e2-color: rgba(0, 0, 0, 0.32);
-    out property <length> shadow-e3-blur: 24px;
+    out property <color>  shadow-e2-color:    Palette.alpha-b-32;
+    out property <length> shadow-e3-blur:     24px;
     out property <length> shadow-e3-offset-y: 8px;
-    out property <color> shadow-e3-color: rgba(0, 0, 0, 0.38);
-    out property <length> shadow-glow-md-blur: 16px;
-    out property <color> shadow-glow-md-color: rgba(255, 255, 255, 0.25);
-    out property <length> shadow-glow-lg-blur: 24px;
-    out property <color> shadow-glow-lg-color: rgba(255, 255, 255, 0.35);
+    out property <color>  shadow-e3-color:    Palette.alpha-b-38;
+
+    // glow effects
+    out property <length> shadow-glow-md-blur:  16px;
+    out property <color>  shadow-glow-md-color: Palette.alpha-w-25;
+    out property <length> shadow-glow-lg-blur:  24px;
+    out property <color>  shadow-glow-lg-color: Palette.alpha-w-35;
 
     // typography
-    out property <int> typography-weight-medium: 500;
-    out property <int> typography-weight-semibold: 600;
-    out property <length> typography-body-sm-size: 13px;
-    out property <length> typography-body-size: 14px;
-    out property <length> typography-label-size: 12px;
+    out property <int>    typography-weight-medium:     500;
+    out property <int>    typography-weight-semibold:   600;
+    out property <length> typography-body-sm-size:      13px;
+    out property <length> typography-body-size:         14px;
+    out property <length> typography-label-size:        12px;
 
-    // spacing + control sizes
+    // spacing
     out property <length> spacing-xs: 4px;
     out property <length> spacing-sm: 8px;
     out property <length> spacing-md: 12px;
     out property <length> spacing-lg: 16px;
-    out property <length> density-button-xs: 24px;
-    out property <length> density-button-sm: 28px;
+
+    // control density (button heights)
+    out property <length> density-button-xs:      24px;
+    out property <length> density-button-sm:      28px;
     out property <length> density-button-default: 32px;
-    out property <length> density-button-lg: 40px;
+    out property <length> density-button-lg:      40px;
 }

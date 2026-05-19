@@ -4,7 +4,7 @@
   "description": "Dark glass theme — shadcn-adjacent primitives for Slint",
   "slintVersion": ">=1.16",
   "theme": {
-    "files": ["theme/tokens.slint"]
+    "files": ["theme/palette.slint", "theme/tokens.slint"]
   },
   "components": {
     "button": {
