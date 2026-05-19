@@ -1,103 +1,134 @@
-// slintcn Toast — imperative single-active notification, Sonner-shaped API.
+// slintcn Toast — Sonner-shaped imperative API with a 3-slot ring buffer.
 //
 // Usage:
 //   import { Toaster, ToastQueue, ToastVariant } from "slintcn/components/toast.slint";
 //
-//   // Mount Toaster once at the Window root (last child, like Dialog):
+//   // Mount once at Window root (last child, like Dialog):
 //   Toaster { width: parent.width; height: parent.height; }
 //
 //   // Fire from anywhere:
-//   Button {
-//       clicked => { ToastQueue.show("Saved.", ToastVariant.success); }
-//   }
+//   ToastQueue.show("Saved.", ToastVariant.success);
 //
-// v0.2 scope: only one active toast at a time. Calling show() while a toast
-// is visible replaces it. A 3 s Timer dismisses automatically. Stacked queue
-// + per-toast dismiss timing is v0.3 work — Slint's in-Slint array mutation
-// is too limited to express it cleanly today.
+// Stacks up to 3 simultaneous toasts. A 4th show() overwrites the oldest
+// slot (drop-oldest policy). Each slot has its own 3 s auto-dismiss Timer.
+//
+// The 3-slot ring buffer pattern works around Slint 1.16's limited array
+// mutation — there's no in-Slint `[...items, new]` spread or `.filter()`,
+// so we declare three fixed property slots and rotate writes through them.
+// A real growable queue is v0.5 work (Rust-side model).
 
 import { Tokens } from "../theme/tokens.slint";
 
 export enum ToastVariant { default, success, error }
 
+export struct ToastSlot {
+    active: bool,
+    text: string,
+    variant: ToastVariant,
+    id: int,
+}
+
 export global ToastQueue {
-    in-out property <string>       text;
-    in-out property <ToastVariant> variant: ToastVariant.default;
-    in-out property <bool>         shown: false;
+    in-out property <ToastSlot> slot-0: { active: false, text: "", variant: ToastVariant.default, id: 0 };
+    in-out property <ToastSlot> slot-1: { active: false, text: "", variant: ToastVariant.default, id: 0 };
+    in-out property <ToastSlot> slot-2: { active: false, text: "", variant: ToastVariant.default, id: 0 };
+    in-out property <int> next-slot: 0;
+    in-out property <int> next-id:   1;
 
     callback show(string, ToastVariant);
     show(t, v) => {
-        text = t;
-        variant = v;
-        shown = true;
+        if (next-slot == 0) {
+            slot-0 = { active: true, text: t, variant: v, id: next-id };
+        } else if (next-slot == 1) {
+            slot-1 = { active: true, text: t, variant: v, id: next-id };
+        } else {
+            slot-2 = { active: true, text: t, variant: v, id: next-id };
+        }
+        next-slot = mod(next-slot + 1, 3);
+        next-id = next-id + 1;
     }
 
-    callback dismiss();
-    dismiss() => {
-        shown = false;
+    callback dismiss(int);
+    dismiss(id) => {
+        if (slot-0.id == id) {
+            slot-0 = { active: false, text: "", variant: ToastVariant.default, id: 0 };
+        }
+        if (slot-1.id == id) {
+            slot-1 = { active: false, text: "", variant: ToastVariant.default, id: 0 };
+        }
+        if (slot-2.id == id) {
+            slot-2 = { active: false, text: "", variant: ToastVariant.default, id: 0 };
+        }
     }
 }
 
-// Mount once at Window root, sized to fill (Toaster anchors its toast to the
-// bottom-right corner of its own bounds).
+// Single rendered toast at a fixed stack position. Drives its own auto-
+// dismiss Timer bound to its slot's `active` flag.
+component ToastView inherits Rectangle {
+    in property <ToastSlot> slot;
+    in property <int> stack-index;
+    // Parent dims are passed in explicitly — Slint forbids `parent.*` on a
+    // component's own root bindings since the parent isn't known until the
+    // component is instantiated.
+    in property <length> available-width;
+    in property <length> available-height;
+
+    Timer {
+        interval: 3s;
+        running: slot.active;
+        triggered => { ToastQueue.dismiss(slot.id); }
+    }
+
+    background:
+        slot.variant == ToastVariant.success
+            ? Tokens.color-primary :
+        slot.variant == ToastVariant.error
+            ? Tokens.color-destructive.with-alpha(0.95) :
+            Tokens.color-card;
+    border-color: Tokens.color-border-hairline-strong;
+    border-width: 1px;
+    border-radius: Tokens.radius-md;
+    drop-shadow-blur:     Tokens.shadow-e3-blur;
+    drop-shadow-offset-y: Tokens.shadow-e3-offset-y;
+    drop-shadow-color:    Tokens.shadow-e3-color;
+
+    width:  toast-text.preferred-width + 28px;
+    height: 36px;
+
+    // Stacked from the bottom — slot 0 sits closest to the bottom-right
+    // gutter, slot 1 sits one row up, slot 2 two rows up.
+    x: available-width - self.width - 16px;
+    y: slot.active
+        ? available-height - self.height - 16px - (stack-index * 44px)
+        : available-height - self.height -  8px - (stack-index * 44px);
+
+    opacity: slot.active ? 1.0 : 0.0;
+    animate opacity, y {
+        duration: Tokens.motion-base;
+        easing: Tokens.motion-easing-standard;
+    }
+
+    toast-text := Text {
+        x: 14px;
+        y: (parent.height - self.preferred-height) / 2;
+        text: slot.text;
+        color: slot.variant == ToastVariant.success
+            ? Tokens.color-primary-foreground
+            : Tokens.color-foreground;
+        font-size: Tokens.typography-body-size;
+        font-weight: Tokens.typography-weight-medium;
+    }
+
+    TouchArea {
+        mouse-cursor: pointer;
+        clicked => { ToastQueue.dismiss(slot.id); }
+    }
+}
+
 export component Toaster inherits Rectangle {
     background: transparent;
 
-    // Auto-dismiss after 3s. The Timer is bound to `shown`, so it stops on
-    // dismissal. A second show() while still shown reuses the in-flight timer
-    // (acceptable v0.2 — accurate per-toast scheduling is v0.3).
-    auto-dismiss := Timer {
-        interval: 3s;
-        running: ToastQueue.shown;
-        triggered => { ToastQueue.dismiss(); }
-    }
-
-    toast := Rectangle {
-        background:
-            ToastQueue.variant == ToastVariant.success
-                ? Tokens.color-primary :
-            ToastQueue.variant == ToastVariant.error
-                ? Tokens.color-destructive.with-alpha(0.95) :
-            /* default */
-                Tokens.color-card;
-        border-color: Tokens.color-border-hairline-strong;
-        border-width: 1px;
-        border-radius: Tokens.radius-md;
-        drop-shadow-blur:     Tokens.shadow-e3-blur;
-        drop-shadow-offset-y: Tokens.shadow-e3-offset-y;
-        drop-shadow-color:    Tokens.shadow-e3-color;
-
-        width:  toast-text.preferred-width + 28px;
-        height: 36px;
-
-        // Bottom-right anchored, with a 16 px gutter and an 8 px slide-up on
-        // show. (Per-position config is v0.3.)
-        x: root.width  - self.width  - 16px;
-        y: ToastQueue.shown
-            ? root.height - self.height - 16px
-            : root.height - self.height -  8px;
-
-        opacity: ToastQueue.shown ? 1.0 : 0.0;
-        animate opacity, y {
-            duration: Tokens.motion-base;
-            easing: Tokens.motion-easing-standard;
-        }
-
-        toast-text := Text {
-            x: 14px;
-            y: (parent.height - self.preferred-height) / 2;
-            text: ToastQueue.text;
-            color:
-                ToastQueue.variant == ToastVariant.success
-                    ? Tokens.color-primary-foreground
-                    : Tokens.color-foreground;
-            font-size: Tokens.typography-body-size;
-            font-weight: Tokens.typography-weight-medium;
-        }
-
-        TouchArea {
-            mouse-cursor: pointer;
-            clicked => { ToastQueue.dismiss(); }
-        }
-    }
+    ToastView { slot: ToastQueue.slot-0; stack-index: 0; available-width: root.width; available-height: root.height; }
+    ToastView { slot: ToastQueue.slot-1; stack-index: 1; available-width: root.width; available-height: root.height; }
+    ToastView { slot: ToastQueue.slot-2; stack-index: 2; available-width: root.width; available-height: root.height; }
 }

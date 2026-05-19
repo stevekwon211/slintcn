@@ -1,43 +1,65 @@
-// slintcn default theme — dark glass (shadcn-adjacent semantics).
+// slintcn default theme — dark + light, switchable at runtime.
 //
-// This is the semantic layer. Components read ONLY from `Tokens`; they
-// never reach into `Palette` directly. To retune the theme:
-//   - to change a color VALUE: edit palette.slint
-//   - to change a SEMANTIC role: remap a Tokens property to a different
-//     palette entry below
+// `Theme.mode` selects which palette slot each semantic role pulls from.
+// Components only read `Tokens.*` — they don't care which mode is active.
+// Mutate `Theme.mode = ThemeMode.light` from Rust or Slint anywhere and
+// every color binding updates reactively.
 //
-// A future light theme (v0.3) ships as `palette-light.slint` plus a
-// swap of the import on the line below — no token rename needed.
+// To retune a VALUE: edit palette.slint.
+// To remap a SEMANTIC ROLE: change the per-mode picks below.
 
 import { Palette } from "palette.slint";
 
+export enum ThemeMode { dark, light }
+
+export global Theme {
+    in-out property <ThemeMode> mode: ThemeMode.dark;
+}
+
 export global Tokens {
     // surfaces
-    out property <color> color-background:         Palette.neutral-950;
-    out property <color> color-foreground:         Palette.neutral-50;
-    out property <color> color-card:               Palette.neutral-900;
-    out property <color> color-card-foreground:    Palette.neutral-50;
+    out property <color> color-background:
+        Theme.mode == ThemeMode.light ? Palette.neutral-50  : Palette.neutral-950;
+    out property <color> color-foreground:
+        Theme.mode == ThemeMode.light ? Palette.neutral-900 : Palette.neutral-50;
+    out property <color> color-card:
+        Theme.mode == ThemeMode.light ? Palette.neutral-100 : Palette.neutral-900;
+    out property <color> color-card-foreground:
+        Theme.mode == ThemeMode.light ? Palette.neutral-900 : Palette.neutral-50;
 
     // intent
-    out property <color> color-primary:            Palette.neutral-200;
-    out property <color> color-primary-foreground: Palette.neutral-900;
-    out property <color> color-secondary:          Palette.neutral-800;
-    out property <color> color-muted:              Palette.neutral-800;
-    out property <color> color-muted-foreground:   Palette.neutral-400;
+    out property <color> color-primary:
+        Theme.mode == ThemeMode.light ? Palette.neutral-900 : Palette.neutral-200;
+    out property <color> color-primary-foreground:
+        Theme.mode == ThemeMode.light ? Palette.neutral-50  : Palette.neutral-900;
+    out property <color> color-secondary:
+        Theme.mode == ThemeMode.light ? Palette.neutral-100 : Palette.neutral-800;
+    out property <color> color-muted:
+        Theme.mode == ThemeMode.light ? Palette.neutral-100 : Palette.neutral-800;
+    out property <color> color-muted-foreground:
+        Theme.mode == ThemeMode.light ? Palette.neutral-500 : Palette.neutral-400;
     out property <color> color-destructive:        Palette.red-400;
 
     // focus / interaction
-    out property <color>  color-ring:               Palette.neutral-500;
-    out property <length> focus-ring-width:         2px;
-    out property <length> focus-ring-offset:        2px;
+    out property <color> color-ring:
+        Theme.mode == ThemeMode.light ? Palette.neutral-700 : Palette.neutral-500;
+    out property <length> focus-ring-width:  2px;
+    out property <length> focus-ring-offset: 2px;
 
-    // glass / scrim / hairline borders
-    out property <color> color-surface-1:           Palette.alpha-w-04;
-    out property <color> color-surface-2:           Palette.alpha-w-08;
-    out property <color> color-surface-3:           Palette.alpha-w-12;
-    out property <color> color-scrim-2:             Palette.alpha-b-60;
-    out property <color> color-border-hairline:         Palette.alpha-w-10;
-    out property <color> color-border-hairline-strong:  Palette.alpha-w-20;
+    // glass / scrim / hairline — overlays invert their tint per mode so the
+    // contrast stays comfortable on either background.
+    out property <color> color-surface-1:
+        Theme.mode == ThemeMode.light ? Palette.alpha-b-04-on-light : Palette.alpha-w-04;
+    out property <color> color-surface-2:
+        Theme.mode == ThemeMode.light ? Palette.alpha-b-08-on-light : Palette.alpha-w-08;
+    out property <color> color-surface-3:
+        Theme.mode == ThemeMode.light ? Palette.alpha-b-12-on-light : Palette.alpha-w-12;
+    // Scrim is always a dim black wash regardless of mode.
+    out property <color> color-scrim-2: Palette.alpha-b-60;
+    out property <color> color-border-hairline:
+        Theme.mode == ThemeMode.light ? Palette.alpha-b-10-on-light : Palette.alpha-w-10;
+    out property <color> color-border-hairline-strong:
+        Theme.mode == ThemeMode.light ? Palette.alpha-b-20-on-light : Palette.alpha-w-20;
 
     // radius
     out property <length> radius-sm: 6px;
@@ -51,7 +73,7 @@ export global Tokens {
     out property <easing>   motion-easing-standard:    cubic-bezier(0.2, 0.0, 0.0, 1.0);
     out property <easing>   motion-easing-emphasized:  cubic-bezier(0.05, 0.7, 0.1, 1.0);
 
-    // elevation shadows
+    // elevation shadows (same shadow tone for both themes — natural)
     out property <length> shadow-e2-blur:     8px;
     out property <length> shadow-e2-offset-y: 2px;
     out property <color>  shadow-e2-color:    Palette.alpha-b-32;
@@ -59,11 +81,13 @@ export global Tokens {
     out property <length> shadow-e3-offset-y: 8px;
     out property <color>  shadow-e3-color:    Palette.alpha-b-38;
 
-    // glow effects
+    // glow effects (subtler tint in light mode)
     out property <length> shadow-glow-md-blur:  16px;
-    out property <color>  shadow-glow-md-color: Palette.alpha-w-25;
+    out property <color>  shadow-glow-md-color:
+        Theme.mode == ThemeMode.light ? Palette.alpha-b-20-on-light : Palette.alpha-w-25;
     out property <length> shadow-glow-lg-blur:  24px;
-    out property <color>  shadow-glow-lg-color: Palette.alpha-w-35;
+    out property <color>  shadow-glow-lg-color:
+        Theme.mode == ThemeMode.light ? Palette.alpha-b-32 : Palette.alpha-w-35;
 
     // typography
     out property <int>    typography-weight-medium:     500;

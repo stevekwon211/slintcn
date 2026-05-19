@@ -37,4 +37,14 @@ export global Palette {
     out property <color> alpha-b-32: rgba(0, 0, 0, 0.32);
     out property <color> alpha-b-38: rgba(0, 0, 0, 0.38);
     out property <color> alpha-b-60: rgba(0, 0, 0, 0.60);
+
+    // Black-on-light overlays mirror alpha-w-* for the light theme — at these
+    // low opacities the visual weight matches white-on-dark closely enough
+    // that the same semantic roles (surface-1/2/3, hairline borders) can swap
+    // tints without retuning thicknesses.
+    out property <color> alpha-b-04-on-light: rgba(0, 0, 0, 0.04);
+    out property <color> alpha-b-08-on-light: rgba(0, 0, 0, 0.08);
+    out property <color> alpha-b-10-on-light: rgba(0, 0, 0, 0.10);
+    out property <color> alpha-b-12-on-light: rgba(0, 0, 0, 0.12);
+    out property <color> alpha-b-20-on-light: rgba(0, 0, 0, 0.20);
 }
