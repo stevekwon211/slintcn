@@ -22,6 +22,14 @@
     "badge": {
       "files": ["components/badge.slint"],
       "requires": ["theme"]
+    },
+    "separator": {
+      "files": ["components/separator.slint"],
+      "requires": ["theme"]
+    },
+    "label": {
+      "files": ["components/label.slint"],
+      "requires": ["theme"]
     }
   }
 }

@@ -7,11 +7,13 @@ import { Button, ButtonVariant, ButtonSize } from "slintcn/components/button.sli
 import { Card, CardVariant } from "slintcn/components/card.slint";
 import { Input } from "slintcn/components/input.slint";
 import { Badge, BadgeVariant } from "slintcn/components/badge.slint";
+import { Separator, SeparatorOrientation } from "slintcn/components/separator.slint";
+import { Label, LabelVariant } from "slintcn/components/label.slint";
 
 export component AppWindow inherits Window {
     title: "slintcn showcase";
     preferred-width: 720px;
-    preferred-height: 640px;
+    preferred-height: 760px;
     background: Tokens.color-background;
 
     VerticalLayout {
@@ -21,15 +23,11 @@ export component AppWindow inherits Window {
         HorizontalLayout {
             spacing: 8px;
             Badge { text: "slintcn"; variant: BadgeVariant.default; }
-            Badge { text: "v0.1"; variant: BadgeVariant.secondary; }
+            Badge { text: "v0.2"; variant: BadgeVariant.secondary; }
             Badge { text: "dark glass"; variant: BadgeVariant.outline; }
         }
 
-        Text {
-            text: "Buttons";
-            color: Tokens.color-muted-foreground;
-            font-size: Tokens.typography-label-size;
-        }
+        Label { text: "Buttons"; variant: LabelVariant.muted; }
 
         HorizontalLayout {
             spacing: 8px;
@@ -47,31 +45,24 @@ export component AppWindow inherits Window {
             Button { variant: ButtonVariant.link;        text: "Learn more"; }
         }
 
-        Text {
-            text: "Card + Input";
-            color: Tokens.color-muted-foreground;
-            font-size: Tokens.typography-label-size;
-        }
+        Separator { orientation: SeparatorOrientation.horizontal; }
+
+        Label { text: "Form"; variant: LabelVariant.muted; }
 
         Card {
             variant: CardVariant.glass;
             width: 100%;
-            height: 140px;
+            height: 180px;
 
             VerticalLayout {
                 padding: parent.padding-l;
                 spacing: parent.gap-l;
 
-                Text {
-                    text: "Glass card on dark background";
-                    color: Tokens.color-foreground;
-                    font-weight: Tokens.typography-weight-semibold;
-                }
+                Label { text: "Email"; variant: LabelVariant.required; }
+                Input { width: 100%; placeholder: "you@example.com"; }
 
-                Input {
-                    width: 100%;
-                    placeholder: "Type here…";
-                }
+                Label { text: "Password"; variant: LabelVariant.required; }
+                Input { width: 100%; placeholder: "••••••••"; password: true; }
             }
         }
     }

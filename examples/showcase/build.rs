@@ -10,7 +10,7 @@ fn main() {
 
     let status = Command::new("node")
         .arg("../../bin/slintcn.mjs")
-        .args(["add", "button", "card", "input", "badge"])
+        .args(["add", "button", "card", "input", "badge", "separator", "label"])
         .status()
         .expect("failed to invoke `node` for the slintcn CLI (need Node 20+ on PATH)");
     assert!(status.success(), "slintcn add failed");
