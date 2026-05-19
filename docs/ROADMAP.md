@@ -8,7 +8,7 @@
 - [x] Showcase app
 - [x] CLI `init` + `add`
 
-## v0.1.1 — foundation hardening (current)
+## v0.1.1 — foundation hardening
 
 Pays down the v0.1 debt that would compound across every overlay
 added in v0.2. No new components — every existing surface upgraded
@@ -29,17 +29,49 @@ to be Slint-idiomatic, accessible, and dogfood-verified.
       `cargo build` — no more bypass of the user code path
 - [x] `make verify` (npm test + cargo build + clippy -D warnings)
 
-## v0.2 — shadcn parity (SaaS shell)
+## v0.2 — shadcn shell (current)
 
-- [ ] Dialog / Sheet (modal scrim + glass panel)
-- [ ] Tabs
-- [ ] Label + Separator
-- [ ] `slintcn init` scaffolds Rust `build.rs` import paths
-- [ ] Font guide (Inter / Geist embedding in Slint)
-- [ ] Icon slot pattern (optional `image` prop + lucide PNG pipeline doc)
+App-chrome overlays. Slint has no portals, so modals mount as the last
+Window child sized to fill via `width: parent.width; height: parent.height`
+(documented in popup-helpers.slint).
+
+- [x] **Label** + **Separator** primitives (form scaffolding for the rest)
+- [x] **popup-helpers.slint** shared module — `Scrim` (full-coverage
+      dimmed backdrop, opacity-animated, click-to-dismiss callback)
+- [x] **Dialog** — title + description + `@children` body + default
+      Close-button footer; Escape closes; backdrop click closes
+      (configurable). Slide-up + fade entrance.
+- [x] **AlertDialog** — destructive-confirm variant; Cancel + Action
+      footer; no backdrop dismissal; Escape fires `cancelled()`
+- [x] **Sheet** — side-anchored drawer (top/right/bottom/left); slide
+      animation matches anchor edge; configurable `panel-extent`
+- [x] **Tooltip** — hover-triggered floating bubble; wraps trigger as
+      `@children`; `side: TooltipSide`
+- [x] **Toast** + **Toaster** — Sonner-shaped imperative API
+      (`ToastQueue.show(text, variant)`); single-active for v0.2;
+      auto-dismiss after 3 s; variants default / success / error
+- [x] CLI: transitive component dependencies — `dialog` resolves
+      `popup-helpers + button + separator + theme` automatically
+
+### v0.2 limitations (tracked for v0.3)
+
+- **Focus trap** inside Dialog/Sheet is not airtight; Tab can escape
+  to the underlying UI. (Slint's FocusScope grabs focus but doesn't
+  cycle-bound it.)
+- **Tooltip clipping** at window edges — the bubble is in-tree, so
+  near-edge triggers can crop. PopupWindow-based positioning would
+  fix this but introduces its own constraints.
+- **Toast queue** is single-active. Stacked toasts + per-toast
+  dismissal timing need richer Slint array mutation than 1.16 ships.
 
 ## v0.3 — developer experience
 
+- [ ] Real focus trap inside modal overlays (Tab cycling)
+- [ ] PopupWindow-based Tooltip + edge-aware positioning
+- [ ] Stacked Toast queue with per-toast lifecycle
+- [ ] `slintcn init` scaffolds Rust `build.rs` import paths
+- [ ] Font guide (Inter / Geist embedding in Slint)
+- [ ] Icon slot pattern (optional `image` prop + lucide PNG pipeline)
 - [ ] `npx slintcn@latest` published package
 - [ ] Registry index on GitHub (raw URL like shadcn)
 - [ ] Visual regression: render showcase frames in CI
