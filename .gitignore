@@ -1,0 +1,19 @@
+# Rust
+target/
+Cargo.lock.bak
+*.rs.bk
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log
+.pnpm-debug.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# slintcn user installs (local test sandboxes)
+ui/slintcn/

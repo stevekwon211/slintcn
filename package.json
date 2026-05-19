@@ -1,0 +1,38 @@
+{
+  "name": "slintcn",
+  "version": "0.1.0",
+  "description": "Beautiful copy-paste Slint components — shadcn for native UI",
+  "keywords": [
+    "slint",
+    "shadcn",
+    "ui",
+    "components",
+    "design-system",
+    "native",
+    "rust",
+    "dark-mode",
+    "glass"
+  ],
+  "license": "MIT",
+  "author": "Steve Kwon <stevekwon211@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stevekwon211/slintcn.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stevekwon211/slintcn/issues"
+  },
+  "homepage": "https://github.com/stevekwon211/slintcn#readme",
+  "type": "module",
+  "bin": {
+    "slintcn": "./bin/slintcn.mjs"
+  },
+  "files": [
+    "bin",
+    "registry",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}

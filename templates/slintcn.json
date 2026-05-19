@@ -1,0 +1,7 @@
+{
+  "$schema": "https://slintcn.dev/schema/slintcn.json",
+  "style": "default",
+  "outDir": "ui/slintcn",
+  "themeDir": "ui/slintcn/theme",
+  "componentsDir": "ui/slintcn/components"
+}

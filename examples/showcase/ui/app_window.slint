@@ -1,0 +1,74 @@
+import { Tokens } from "../../../registry/default/theme/tokens.slint";
+import { Button } from "../../../registry/default/components/button.slint";
+import { Card } from "../../../registry/default/components/card.slint";
+import { Input } from "../../../registry/default/components/input.slint";
+import { Badge } from "../../../registry/default/components/badge.slint";
+
+export component AppWindow inherits Window {
+    title: "slintcn showcase";
+    preferred-width: 720px;
+    preferred-height: 640px;
+    background: Tokens.color-background;
+
+    VerticalLayout {
+        padding: 24px;
+        spacing: 20px;
+
+        HorizontalLayout {
+            spacing: 8px;
+            Badge { text: "slintcn"; variant: "default"; }
+            Badge { text: "v0.1"; variant: "secondary"; }
+            Badge { text: "dark glass"; variant: "outline"; }
+        }
+
+        Text {
+            text: "Buttons";
+            color: Tokens.color-muted-foreground;
+            font-size: Tokens.typography-label-size;
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            Button { variant: "default"; text: "Default"; }
+            Button { variant: "secondary"; text: "Secondary"; }
+            Button { variant: "outline"; text: "Outline"; }
+            Button { variant: "ghost"; text: "Ghost"; }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            Button { variant: "glass"; text: "Glass"; }
+            Button { variant: "glow"; text: "Glow CTA"; size: "lg"; }
+            Button { variant: "destructive"; text: "Delete"; }
+            Button { variant: "link"; text: "Learn more"; }
+        }
+
+        Text {
+            text: "Card + Input";
+            color: Tokens.color-muted-foreground;
+            font-size: Tokens.typography-label-size;
+        }
+
+        Card {
+            variant: "glass";
+            width: 100%;
+            height: 140px;
+
+            VerticalLayout {
+                padding: parent.padding-l;
+                spacing: parent.gap-l;
+
+                Text {
+                    text: "Glass card on dark background";
+                    color: Tokens.color-foreground;
+                    font-weight: Tokens.typography-weight-semibold;
+                }
+
+                Input {
+                    width: 100%;
+                    placeholder: "Type here…";
+                }
+            }
+        }
+    }
+}

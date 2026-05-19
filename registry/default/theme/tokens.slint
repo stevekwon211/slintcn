@@ -1,0 +1,66 @@
+// slintcn default theme — dark glass (shadcn-adjacent, not tied to any product).
+// Copy into your project via `slintcn init` / `slintcn add`.
+// Customize values here; components read only from `Tokens`.
+
+export global Tokens {
+    // colors
+    out property <color> color-background: #0a0a0a;
+    out property <color> color-foreground: #fafafa;
+    out property <color> color-card: #171717;
+    out property <color> color-card-foreground: #fafafa;
+    out property <color> color-primary: #e5e5e5;
+    out property <color> color-primary-foreground: #171717;
+    out property <color> color-secondary: #262626;
+    out property <color> color-muted: #262626;
+    out property <color> color-muted-foreground: #a1a1a1;
+    out property <color> color-destructive: #ff6467;
+    out property <color> color-ring: #737373;
+
+    // glass / scrim / borders
+    out property <color> color-surface-1: rgba(255, 255, 255, 0.04);
+    out property <color> color-surface-2: rgba(255, 255, 255, 0.08);
+    out property <color> color-surface-3: rgba(255, 255, 255, 0.12);
+    out property <color> color-scrim-2: rgba(0, 0, 0, 0.6);
+    out property <color> color-border-hairline: rgba(255, 255, 255, 0.1);
+    out property <color> color-border-hairline-strong: rgba(255, 255, 255, 0.2);
+
+    // radius
+    out property <length> radius-sm: 6px;
+    out property <length> radius-md: 8px;
+    out property <length> radius-lg: 10px;
+    out property <length> radius-xl: 14px;
+
+    // motion
+    out property <duration> motion-fast: 150ms;
+    out property <duration> motion-base: 200ms;
+    out property <easing> motion-easing-standard: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+
+    // shadows
+    out property <length> shadow-e2-blur: 8px;
+    out property <length> shadow-e2-offset-y: 2px;
+    out property <color> shadow-e2-color: rgba(0, 0, 0, 0.32);
+    out property <length> shadow-e3-blur: 24px;
+    out property <length> shadow-e3-offset-y: 8px;
+    out property <color> shadow-e3-color: rgba(0, 0, 0, 0.38);
+    out property <length> shadow-glow-md-blur: 16px;
+    out property <color> shadow-glow-md-color: rgba(255, 255, 255, 0.25);
+    out property <length> shadow-glow-lg-blur: 24px;
+    out property <color> shadow-glow-lg-color: rgba(255, 255, 255, 0.35);
+
+    // typography
+    out property <int> typography-weight-medium: 500;
+    out property <int> typography-weight-semibold: 600;
+    out property <length> typography-body-sm-size: 13px;
+    out property <length> typography-body-size: 14px;
+    out property <length> typography-label-size: 12px;
+
+    // spacing + control sizes
+    out property <length> spacing-xs: 4px;
+    out property <length> spacing-sm: 8px;
+    out property <length> spacing-md: 12px;
+    out property <length> spacing-lg: 16px;
+    out property <length> density-button-xs: 24px;
+    out property <length> density-button-sm: 28px;
+    out property <length> density-button-default: 32px;
+    out property <length> density-button-lg: 40px;
+}

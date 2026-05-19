@@ -1,0 +1,43 @@
+import { Tokens } from "../theme/tokens.slint";
+
+export component Card inherits Rectangle {
+    in property <string> variant: "solid";
+    in property <string> size: "default";
+    in property <bool> hovered: false;
+
+    background:
+        variant == "glass" || variant == "glassInteractive" ?
+            (variant == "glassInteractive" && hovered
+                ? Tokens.color-surface-3
+                : Tokens.color-scrim-2) :
+        Tokens.color-card;
+
+    border-color:
+        variant == "glassInteractive" && hovered
+            ? Tokens.color-border-hairline-strong
+            : Tokens.color-border-hairline;
+    border-width: 1px;
+    border-radius: Tokens.radius-xl;
+
+    drop-shadow-blur:
+        variant == "glass" || variant == "glassInteractive" ? Tokens.shadow-e3-blur :
+        variant == "raised" ? Tokens.shadow-e2-blur : 0px;
+    drop-shadow-offset-y:
+        variant == "glass" || variant == "glassInteractive" ? Tokens.shadow-e3-offset-y :
+        variant == "raised" ? Tokens.shadow-e2-offset-y : 0px;
+    drop-shadow-color:
+        variant == "glass" || variant == "glassInteractive" ? Tokens.shadow-e3-color :
+        variant == "raised" ? Tokens.shadow-e2-color : transparent;
+
+    animate background, border-color {
+        duration: Tokens.motion-base;
+        easing: Tokens.motion-easing-standard;
+    }
+
+    out property <length> padding-l:
+        size == "sm" ? Tokens.spacing-md : Tokens.spacing-lg;
+    out property <length> gap-l:
+        size == "sm" ? Tokens.spacing-sm : Tokens.spacing-md;
+
+    @children
+}

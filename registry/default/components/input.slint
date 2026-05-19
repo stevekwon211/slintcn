@@ -1,0 +1,53 @@
+import { Tokens } from "../theme/tokens.slint";
+
+export component Input inherits Rectangle {
+    in-out property <string> text;
+    in property <string> placeholder;
+    in property <bool> enabled: true;
+    in property <bool> read-only: false;
+    in property <bool> password: false;
+    in property <bool> auto-focus: false;
+    callback edited(string);
+    callback accepted(string);
+
+    forward-focus: input;
+
+    height: 40px;
+    background: Tokens.color-surface-1;
+    border-color: input.has-focus ? Tokens.color-ring : Tokens.color-border-hairline;
+    border-width: 1px;
+    border-radius: Tokens.radius-md;
+    opacity: root.enabled ? 1.0 : 0.5;
+
+    focus-area := TouchArea {
+        clicked => { input.focus(); }
+    }
+
+    input := TextInput {
+        x: 12px;
+        y: 0;
+        width: parent.width - 24px;
+        height: parent.height;
+        text <=> root.text;
+        color: Tokens.color-foreground;
+        font-size: Tokens.typography-body-size;
+        single-line: true;
+        read-only: root.read-only || !root.enabled;
+        input-type: root.password ? InputType.password : InputType.text;
+        vertical-alignment: center;
+        edited => { root.edited(self.text); }
+        accepted => { root.accepted(self.text); }
+        init => { if (root.auto-focus) { self.focus(); } }
+    }
+
+    if root.text == "": Text {
+        x: input.x;
+        y: 0;
+        width: input.width;
+        height: parent.height;
+        text: root.placeholder;
+        color: Tokens.color-muted-foreground;
+        font-size: Tokens.typography-body-size;
+        vertical-alignment: center;
+    }
+}

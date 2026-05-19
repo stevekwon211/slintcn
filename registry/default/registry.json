@@ -1,0 +1,27 @@
+{
+  "$schema": "https://slintcn.dev/schema/registry.json",
+  "name": "default",
+  "description": "Dark glass theme — shadcn-adjacent primitives for Slint",
+  "slintVersion": ">=1.16",
+  "theme": {
+    "files": ["theme/tokens.slint"]
+  },
+  "components": {
+    "button": {
+      "files": ["components/button.slint"],
+      "requires": ["theme"]
+    },
+    "card": {
+      "files": ["components/card.slint"],
+      "requires": ["theme"]
+    },
+    "input": {
+      "files": ["components/input.slint"],
+      "requires": ["theme"]
+    },
+    "badge": {
+      "files": ["components/badge.slint"],
+      "requires": ["theme"]
+    }
+  }
+}

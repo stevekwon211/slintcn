@@ -1,0 +1,117 @@
+// slintcn Button — copy-paste primitive (you own this file after `slintcn add`).
+//
+// Variants: default | outline | secondary | ghost | destructive | link | glow | glass
+// Sizes:    xs | sm | default | lg | icon | icon-xs | icon-sm | icon-lg
+
+import { Tokens } from "../theme/tokens.slint";
+
+export component Button inherits Rectangle {
+    in property <string> variant: "default";
+    in property <string> size: "default";
+    in property <string> text;
+    in property <bool> disabled: false;
+    callback clicked();
+
+    property <length> hpad:
+        size == "xs" ? 8px :
+        size == "sm" ? 10px :
+        size == "lg" ? 12px : 10px;
+
+    height:
+        size == "xs" || size == "icon-xs" ? Tokens.density-button-xs :
+        size == "sm" || size == "icon-sm" ? Tokens.density-button-sm :
+        size == "lg" || size == "icon-lg" ? Tokens.density-button-lg :
+        Tokens.density-button-default;
+
+    width: size == "icon" || size == "icon-xs" || size == "icon-sm" || size == "icon-lg"
+        ? self.height
+        : label.preferred-width + 2 * hpad;
+
+    border-radius: Tokens.radius-md;
+
+    background:
+        variant == "outline" ?
+            (touch.has-hover && !disabled
+                ? Tokens.color-surface-1.with-alpha(0.5)
+                : Tokens.color-surface-1.with-alpha(0.3)) :
+        variant == "ghost" ?
+            (touch.has-hover && !disabled
+                ? Tokens.color-muted.with-alpha(0.5)
+                : transparent) :
+        variant == "link" ? transparent :
+        variant == "secondary" ?
+            (touch.has-hover && !disabled
+                ? Tokens.color-secondary.with-alpha(0.8)
+                : Tokens.color-secondary) :
+        variant == "glass" ?
+            (touch.has-hover && !disabled ? Tokens.color-surface-3 : Tokens.color-scrim-2) :
+        variant == "destructive" ?
+            (touch.has-hover && !disabled
+                ? Tokens.color-destructive.with-alpha(0.3)
+                : Tokens.color-destructive.with-alpha(0.2)) :
+            (touch.has-hover && !disabled
+                ? Tokens.color-foreground.with-alpha(0.95)
+                : Tokens.color-foreground);
+
+    border-width: variant == "outline" || variant == "glass" ? 1px : 0px;
+    border-color:
+        variant == "outline" || variant == "glass"
+            ? (touch.has-hover && !disabled
+                ? Tokens.color-border-hairline-strong
+                : Tokens.color-border-hairline)
+            : transparent;
+
+    drop-shadow-blur:
+        variant == "glow" ?
+            (touch.has-hover && !disabled
+                ? Tokens.shadow-glow-lg-blur
+                : Tokens.shadow-glow-md-blur) : 0px;
+    drop-shadow-color:
+        variant == "glow" ?
+            (touch.has-hover && !disabled
+                ? Tokens.shadow-glow-lg-color
+                : Tokens.shadow-glow-md-color) : transparent;
+
+    y: disabled ? 0px : (touch.pressed ? 1px : 0px);
+    opacity: disabled ? 0.5 : 1.0;
+
+    animate y, opacity, background, border-color, drop-shadow-blur {
+        duration: Tokens.motion-fast;
+        easing: Tokens.motion-easing-standard;
+    }
+
+    label := Text {
+        x: (parent.width - self.preferred-width) / 2;
+        y: (parent.height - self.preferred-height) / 2;
+        text: root.text;
+        color:
+            variant == "default" || variant == "glow" ? Tokens.color-primary-foreground :
+            variant == "destructive" ? Tokens.color-destructive :
+            variant == "link" ? Tokens.color-primary :
+            (variant == "ghost" || variant == "outline")
+                ? (touch.has-hover && !disabled
+                    ? Tokens.color-foreground
+                    : Tokens.color-muted-foreground)
+                : Tokens.color-foreground;
+        font-size:
+            size == "xs" || size == "sm" ? Tokens.typography-body-sm-size :
+            Tokens.typography-body-size;
+        font-weight: Tokens.typography-weight-medium;
+        visible: root.text != "";
+    }
+
+    if variant == "link" && touch.has-hover && !disabled: Rectangle {
+        x: label.x;
+        y: label.y + label.preferred-height - 2px;
+        width: label.preferred-width;
+        height: 1px;
+        background: Tokens.color-primary;
+    }
+
+    @children
+
+    touch := TouchArea {
+        mouse-cursor: root.disabled ? default : pointer;
+        clicked => { if (!root.disabled) { root.clicked(); } }
+    }
+}
