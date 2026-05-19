@@ -1,33 +1,42 @@
 import { Tokens } from "../theme/tokens.slint";
 
+// glass: non-interactive translucent surface (e.g. inside a Dialog body).
+// glass-interactive: clickable variant — its border/background respond to hover.
+// Both share the same e3 shadow.
+export enum CardVariant { solid, glass, glass-interactive, raised }
+export enum CardSize    { sm, default }
+
 export component Card inherits Rectangle {
-    in property <string> variant: "solid";
-    in property <string> size: "default";
+    in property <CardVariant> variant: CardVariant.solid;
+    in property <CardSize>    size:    CardSize.default;
     in property <bool> hovered: false;
 
     background:
-        variant == "glass" || variant == "glassInteractive" ?
-            (variant == "glassInteractive" && hovered
+        variant == CardVariant.glass || variant == CardVariant.glass-interactive ?
+            (variant == CardVariant.glass-interactive && hovered
                 ? Tokens.color-surface-3
                 : Tokens.color-scrim-2) :
         Tokens.color-card;
 
     border-color:
-        variant == "glassInteractive" && hovered
+        variant == CardVariant.glass-interactive && hovered
             ? Tokens.color-border-hairline-strong
             : Tokens.color-border-hairline;
     border-width: 1px;
     border-radius: Tokens.radius-xl;
 
     drop-shadow-blur:
-        variant == "glass" || variant == "glassInteractive" ? Tokens.shadow-e3-blur :
-        variant == "raised" ? Tokens.shadow-e2-blur : 0px;
+        variant == CardVariant.glass || variant == CardVariant.glass-interactive
+            ? Tokens.shadow-e3-blur :
+        variant == CardVariant.raised ? Tokens.shadow-e2-blur : 0px;
     drop-shadow-offset-y:
-        variant == "glass" || variant == "glassInteractive" ? Tokens.shadow-e3-offset-y :
-        variant == "raised" ? Tokens.shadow-e2-offset-y : 0px;
+        variant == CardVariant.glass || variant == CardVariant.glass-interactive
+            ? Tokens.shadow-e3-offset-y :
+        variant == CardVariant.raised ? Tokens.shadow-e2-offset-y : 0px;
     drop-shadow-color:
-        variant == "glass" || variant == "glassInteractive" ? Tokens.shadow-e3-color :
-        variant == "raised" ? Tokens.shadow-e2-color : transparent;
+        variant == CardVariant.glass || variant == CardVariant.glass-interactive
+            ? Tokens.shadow-e3-color :
+        variant == CardVariant.raised ? Tokens.shadow-e2-color : transparent;
 
     animate background, border-color {
         duration: Tokens.motion-base;
@@ -35,9 +44,9 @@ export component Card inherits Rectangle {
     }
 
     out property <length> padding-l:
-        size == "sm" ? Tokens.spacing-md : Tokens.spacing-lg;
+        size == CardSize.sm ? Tokens.spacing-md : Tokens.spacing-lg;
     out property <length> gap-l:
-        size == "sm" ? Tokens.spacing-sm : Tokens.spacing-md;
+        size == CardSize.sm ? Tokens.spacing-sm : Tokens.spacing-md;
 
     @children
 }

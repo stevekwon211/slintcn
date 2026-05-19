@@ -1,8 +1,8 @@
 import { Tokens } from "../../../registry/default/theme/tokens.slint";
-import { Button } from "../../../registry/default/components/button.slint";
-import { Card } from "../../../registry/default/components/card.slint";
+import { Button, ButtonVariant, ButtonSize } from "../../../registry/default/components/button.slint";
+import { Card, CardVariant } from "../../../registry/default/components/card.slint";
 import { Input } from "../../../registry/default/components/input.slint";
-import { Badge } from "../../../registry/default/components/badge.slint";
+import { Badge, BadgeVariant } from "../../../registry/default/components/badge.slint";
 
 export component AppWindow inherits Window {
     title: "slintcn showcase";
@@ -16,9 +16,9 @@ export component AppWindow inherits Window {
 
         HorizontalLayout {
             spacing: 8px;
-            Badge { text: "slintcn"; variant: "default"; }
-            Badge { text: "v0.1"; variant: "secondary"; }
-            Badge { text: "dark glass"; variant: "outline"; }
+            Badge { text: "slintcn"; variant: BadgeVariant.default; }
+            Badge { text: "v0.1"; variant: BadgeVariant.secondary; }
+            Badge { text: "dark glass"; variant: BadgeVariant.outline; }
         }
 
         Text {
@@ -29,18 +29,18 @@ export component AppWindow inherits Window {
 
         HorizontalLayout {
             spacing: 8px;
-            Button { variant: "default"; text: "Default"; }
-            Button { variant: "secondary"; text: "Secondary"; }
-            Button { variant: "outline"; text: "Outline"; }
-            Button { variant: "ghost"; text: "Ghost"; }
+            Button { variant: ButtonVariant.default;   text: "Default"; }
+            Button { variant: ButtonVariant.secondary; text: "Secondary"; }
+            Button { variant: ButtonVariant.outline;   text: "Outline"; }
+            Button { variant: ButtonVariant.ghost;     text: "Ghost"; }
         }
 
         HorizontalLayout {
             spacing: 8px;
-            Button { variant: "glass"; text: "Glass"; }
-            Button { variant: "glow"; text: "Glow CTA"; size: "lg"; }
-            Button { variant: "destructive"; text: "Delete"; }
-            Button { variant: "link"; text: "Learn more"; }
+            Button { variant: ButtonVariant.glass;       text: "Glass"; }
+            Button { variant: ButtonVariant.glow;        text: "Glow CTA"; size: ButtonSize.lg; }
+            Button { variant: ButtonVariant.destructive; text: "Delete"; }
+            Button { variant: ButtonVariant.link;        text: "Learn more"; }
         }
 
         Text {
@@ -50,7 +50,7 @@ export component AppWindow inherits Window {
         }
 
         Card {
-            variant: "glass";
+            variant: CardVariant.glass;
             width: 100%;
             height: 140px;
 
