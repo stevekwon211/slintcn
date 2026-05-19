@@ -1,6 +1,6 @@
-// slintcn Toast — Sonner-shaped imperative API with a 3-slot ring buffer.
+// slintcn Toast — Sonner-shaped imperative API, growable Rust-backed queue.
 //
-// Usage:
+// Usage (Slint side):
 //   import { Toaster, ToastQueue, ToastVariant } from "slintcn/components/toast.slint";
 //
 //   // Mount once at Window root (last child, like Dialog):
@@ -9,80 +9,51 @@
 //   // Fire from anywhere:
 //   ToastQueue.show("Saved.", ToastVariant.success);
 //
-// Stacks up to 3 simultaneous toasts. A 4th show() overwrites the oldest
-// slot (drop-oldest policy). Each slot has its own 3 s auto-dismiss Timer.
+// v0.7 changes the backing model from the v0.4 3-slot ring buffer to a
+// real growable Rust slint::VecModel<ToastItem>. The 3-slot was a
+// workaround for Slint 1.16's missing array spread / filter; the Rust
+// side owns the queue cleanly now.
 //
-// The 3-slot ring buffer pattern works around Slint 1.16's limited array
-// mutation — there's no in-Slint `[...items, new]` spread or `.filter()`,
-// so we declare three fixed property slots and rotate writes through them.
-// A real growable queue is v0.5 work (Rust-side model).
+// Rust glue (showcase main.rs ships a reference impl):
+//
+//   let items: Rc<VecModel<ToastItem>> = Rc::default();
+//   ui.global::<ToastQueue>().set_items(ModelRc::from(items.clone()));
+//   ui.global::<ToastQueue>().on_show(move |text, variant| {
+//       items.push(ToastItem { id, text, variant });
+//       // start a Timer that calls invoke_dismiss(id) after 3s
+//   });
+//   ui.global::<ToastQueue>().on_dismiss(move |id| {
+//       items.remove_where(|t| t.id == id);
+//   });
+//
+// Without that glue, show() is a no-op (no handler bound).
 
 import { Tokens } from "../theme/tokens.slint";
 
 export enum ToastVariant { default, success, error }
 
-export struct ToastSlot {
-    active: bool,
+export struct ToastItem {
+    id: int,
     text: string,
     variant: ToastVariant,
-    id: int,
 }
 
 export global ToastQueue {
-    in-out property <ToastSlot> slot-0: { active: false, text: "", variant: ToastVariant.default, id: 0 };
-    in-out property <ToastSlot> slot-1: { active: false, text: "", variant: ToastVariant.default, id: 0 };
-    in-out property <ToastSlot> slot-2: { active: false, text: "", variant: ToastVariant.default, id: 0 };
-    in-out property <int> next-slot: 0;
-    in-out property <int> next-id:   1;
-
+    in-out property <[ToastItem]> items: [];
     callback show(string, ToastVariant);
-    show(t, v) => {
-        if (next-slot == 0) {
-            slot-0 = { active: true, text: t, variant: v, id: next-id };
-        } else if (next-slot == 1) {
-            slot-1 = { active: true, text: t, variant: v, id: next-id };
-        } else {
-            slot-2 = { active: true, text: t, variant: v, id: next-id };
-        }
-        next-slot = mod(next-slot + 1, 3);
-        next-id = next-id + 1;
-    }
-
     callback dismiss(int);
-    dismiss(id) => {
-        if (slot-0.id == id) {
-            slot-0 = { active: false, text: "", variant: ToastVariant.default, id: 0 };
-        }
-        if (slot-1.id == id) {
-            slot-1 = { active: false, text: "", variant: ToastVariant.default, id: 0 };
-        }
-        if (slot-2.id == id) {
-            slot-2 = { active: false, text: "", variant: ToastVariant.default, id: 0 };
-        }
-    }
 }
 
-// Single rendered toast at a fixed stack position. Drives its own auto-
-// dismiss Timer bound to its slot's `active` flag.
 component ToastView inherits Rectangle {
-    in property <ToastSlot> slot;
+    in property <ToastItem> item;
     in property <int> stack-index;
-    // Parent dims are passed in explicitly — Slint forbids `parent.*` on a
-    // component's own root bindings since the parent isn't known until the
-    // component is instantiated.
     in property <length> available-width;
     in property <length> available-height;
 
-    Timer {
-        interval: 3s;
-        running: slot.active;
-        triggered => { ToastQueue.dismiss(slot.id); }
-    }
-
     background:
-        slot.variant == ToastVariant.success
+        item.variant == ToastVariant.success
             ? Tokens.color-primary :
-        slot.variant == ToastVariant.error
+        item.variant == ToastVariant.error
             ? Tokens.color-destructive.with-alpha(0.95) :
             Tokens.color-card;
     border-color: Tokens.color-border-hairline-strong;
@@ -95,24 +66,17 @@ component ToastView inherits Rectangle {
     width:  toast-text.preferred-width + 28px;
     height: 36px;
 
-    // Stacked from the bottom — slot 0 sits closest to the bottom-right
-    // gutter, slot 1 sits one row up, slot 2 two rows up.
-    x: available-width - self.width - 16px;
-    y: slot.active
-        ? available-height - self.height - 16px - (stack-index * 44px)
-        : available-height - self.height -  8px - (stack-index * 44px);
-
-    opacity: slot.active ? 1.0 : 0.0;
-    animate opacity, y {
-        duration: Tokens.motion-base;
-        easing: Tokens.motion-easing-standard;
-    }
+    // Bottom-right anchored, stacked upward by stack-index. v0.7 ships
+    // instant removal — fade-out animation needs a 2-phase Rust dismiss
+    // (set `dismissed: true`, animate, then remove from model) — v0.8.
+    x: available-width  - self.width  - 16px;
+    y: available-height - self.height - 16px - (stack-index * 44px);
 
     toast-text := Text {
         x: 14px;
         y: (parent.height - self.preferred-height) / 2;
-        text: slot.text;
-        color: slot.variant == ToastVariant.success
+        text: item.text;
+        color: item.variant == ToastVariant.success
             ? Tokens.color-primary-foreground
             : Tokens.color-foreground;
         font-size: Tokens.typography-body-size;
@@ -121,14 +85,17 @@ component ToastView inherits Rectangle {
 
     TouchArea {
         mouse-cursor: pointer;
-        clicked => { ToastQueue.dismiss(slot.id); }
+        clicked => { ToastQueue.dismiss(item.id); }
     }
 }
 
 export component Toaster inherits Rectangle {
     background: transparent;
 
-    ToastView { slot: ToastQueue.slot-0; stack-index: 0; available-width: root.width; available-height: root.height; }
-    ToastView { slot: ToastQueue.slot-1; stack-index: 1; available-width: root.width; available-height: root.height; }
-    ToastView { slot: ToastQueue.slot-2; stack-index: 2; available-width: root.width; available-height: root.height; }
+    for item[idx] in ToastQueue.items: ToastView {
+        item: item;
+        stack-index: idx;
+        available-width:  root.width;
+        available-height: root.height;
+    }
 }

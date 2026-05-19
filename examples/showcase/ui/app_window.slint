@@ -18,7 +18,10 @@ import { Dialog }                               from "slintcn/components/dialog.
 import { AlertDialog }                          from "slintcn/components/alert-dialog.slint";
 import { Sheet, SheetSide }                     from "slintcn/components/sheet.slint";
 import { Tooltip, TooltipSide }                 from "slintcn/components/tooltip.slint";
-import { Toaster, ToastQueue, ToastVariant }    from "slintcn/components/toast.slint";
+import { Toaster, ToastQueue, ToastVariant, ToastItem } from "slintcn/components/toast.slint";
+
+// Re-export so include_modules!() exposes them to Rust glue in main.rs.
+export { ToastQueue, ToastVariant, ToastItem }
 import { Tabs, TabItem }                        from "slintcn/components/tabs.slint";
 import { Checkbox }                             from "slintcn/components/checkbox.slint";
 import { Switch }                               from "slintcn/components/switch.slint";
