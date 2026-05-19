@@ -29,7 +29,7 @@ to be Slint-idiomatic, accessible, and dogfood-verified.
       `cargo build` — no more bypass of the user code path
 - [x] `make verify` (npm test + cargo build + clippy -D warnings)
 
-## v0.2 — shadcn shell (current)
+## v0.2 — shadcn shell
 
 App-chrome overlays. Slint has no portals, so modals mount as the last
 Window child sized to fill via `width: parent.width; height: parent.height`
@@ -64,11 +64,34 @@ Window child sized to fill via `width: parent.width; height: parent.height`
 - **Toast queue** is single-active. Stacked toasts + per-toast
   dismissal timing need richer Slint array mutation than 1.16 ships.
 
-## v0.3 — developer experience
+## v0.3 — selection primitives + showcase (current)
+
+Form-selection trio and a docs-style showcase. The showcase becomes
+the kind of multi-section surface developers expect when they land
+on a component library — sidebar nav, gallery sections, three
+realistic composed examples.
+
+- [x] **Tabs** primitive — horizontal nav strip; consumer renders
+      content with `if current == N`. Tab + Enter / Space.
+- [x] **Checkbox** primitive — Path-drawn check, optional label,
+      Space toggles, 2 px focus ring.
+- [x] **Switch** primitive — 36 × 20 track + 16 × 16 sliding knob,
+      Space toggles, 2 px focus ring.
+- [x] **Showcase reorganization** — sidebar nav (Components +
+      Examples) + section pages.
+- [x] **Composed examples** — Sign-in (Card + Inputs + Checkbox +
+      CTA), Settings (Tabs + Switches + Inputs), Dashboard (metric
+      Cards + activity feed).
+- [x] **Button regression fix** — drop root-level `y` so Button
+      works inside layouts that own placement; press feedback moves
+      to the label.
+
+### Still pending for v0.3 (rolling into v0.4)
 
 - [ ] Real focus trap inside modal overlays (Tab cycling)
 - [ ] PopupWindow-based Tooltip + edge-aware positioning
 - [ ] Stacked Toast queue with per-toast lifecycle
+- [ ] **Select** + **RadioGroup** primitives
 - [ ] `slintcn init` scaffolds Rust `build.rs` import paths
 - [ ] Font guide (Inter / Geist embedding in Slint)
 - [ ] Icon slot pattern (optional `image` prop + lucide PNG pipeline)

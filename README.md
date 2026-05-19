@@ -14,7 +14,8 @@ you copy into your repo and customize.
 | **v0.1** | SaaS-adjacent dark glass — Button, Card, Input, Badge | ✅ |
 | **v0.1.1** | Foundation hardening — enum variants, focus ring, dogfooded showcase | ✅ |
 | **v0.2** | Shell + overlays — Label, Separator, Dialog, AlertDialog, Sheet, Tooltip, Toast | ✅ |
-| **v0.3** | DX & theming — light palette, `npx slintcn` publish, visual-regression CI | upcoming |
+| **v0.3** | Selection primitives + docs-style showcase — Tabs, Checkbox, Switch + Sign-in / Settings / Dashboard examples | ✅ |
+| **v0.4** | DX & theming — Select, RadioGroup, light palette, `npx slintcn` publish, visual-regression CI | upcoming |
 | **v1.0** | Game HUD registry — hotbar, reticle, keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
@@ -75,6 +76,13 @@ silently falling through to the default styling.
 | **Label** | default · muted · required | — |
 | **Separator** | horizontal · vertical | — |
 
+### Selection
+| Component | Variants | Notable props |
+|-----------|----------|---------------|
+| **Tabs** | (horizontal nav strip) | `items: [TabItem]`, `current: int`, `changed(int)` |
+| **Checkbox** | (Path-drawn check) | `checked`, `label`, `disabled`, `toggled(bool)` |
+| **Switch** | (sliding knob, 36 × 20 track) | `checked`, `label`, `disabled`, `toggled(bool)` |
+
 ### Overlays
 | Component | Purpose | Notable props |
 |-----------|---------|---------------|
@@ -87,6 +95,15 @@ silently falling through to the default styling.
 Keyboard activation (Enter / Space) and a visible 2 px focus ring are wired into
 every interactive primitive. Modals close on Escape; Dialog and Sheet close on
 backdrop click (configurable).
+
+### Composed examples (showcase)
+
+`cd examples/showcase && cargo run` opens a sidebar-navigated app with three
+realistic composed surfaces alongside per-primitive galleries:
+
+- **Sign-in** — Card + Inputs + Checkbox + CTA + footer link
+- **Settings** — three-tab preferences (Account / Notifications / Appearance) with Switches and Inputs
+- **Dashboard** — 3-column metric Cards with delta Badges + activity feed with Separator-divided rows
 
 ## Mounting overlays
 
@@ -126,7 +143,7 @@ closed modals don't block interaction with the underlying UI.
 registry/default/         # Source of truth (published with npm package)
   theme/palette.slint     #   raw color/alpha primitives
   theme/tokens.slint      #   semantic layer (components read this)
-  components/*.slint      #   12 primitives + popup-helpers
+  components/*.slint      #   14 primitives + popup-helpers
 examples/showcase/        # Runnable gallery (regenerated via `slintcn add`)
 bin/slintcn.mjs           # init + add CLI (transitive deps)
 bin/__test__/             # node:test suite — `make test`
