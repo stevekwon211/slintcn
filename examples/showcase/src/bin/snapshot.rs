@@ -14,9 +14,8 @@ use slint::platform::software_renderer::{
     MinimalSoftwareWindow, RepaintBufferType,
 };
 use slint::ComponentHandle;
+use slintcn_showcase::AppWindow;
 use std::rc::Rc;
-
-slint::include_modules!();
 
 struct SnapshotPlatform {
     window: Rc<MinimalSoftwareWindow>,

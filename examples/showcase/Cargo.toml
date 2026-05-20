@@ -4,6 +4,10 @@ version = "0.8.1"
 edition = "2021"
 publish = false
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
+
 [[bin]]
 name = "slintcn-showcase"
 path = "src/main.rs"
@@ -19,6 +23,10 @@ snapshot = ["dep:png"]
 [dependencies]
 slint = { version = "1.16", features = ["compat-1-2", "renderer-software"] }
 png = { version = "0.17", optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1"
 
 [build-dependencies]
 slint-build = "1.16"
