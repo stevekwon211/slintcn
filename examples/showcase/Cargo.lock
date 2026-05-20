@@ -4219,6 +4219,7 @@ dependencies = [
  "slint",
  "slint-build",
  "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
