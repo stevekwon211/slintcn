@@ -2,6 +2,8 @@
 
 **Copy-paste Slint components that don't look like 2009 desktop widgets.**
 
+🌐 **Live demo**: [stevekwon211.github.io/slintcn](https://stevekwon211.github.io/slintcn) — the full showcase running in your browser via Slint compiled to WebAssembly (~7 MB bundle, FemtoVG + WebGL2). Click around to verify every primitive interactively.
+
 shadcn proved that developers want to *own* UI code, not fight a theme API.
 Slint 1.16 is moving to Fluent as the default — fine for consistency, weak for
 modern dark/glass product UI. **slintcn** is the missing layer: tokens + primitives
