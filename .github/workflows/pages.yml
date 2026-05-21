@@ -57,8 +57,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build static registry (served at /r/<name>.json)
-        run: node bin/slintcn.mjs build -o web/r
+      - name: Build static registry (index at /registry.json, items at /r/<name>.json)
+        run: node bin/slintcn.mjs build -o web
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
