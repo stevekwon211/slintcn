@@ -1,0 +1,51 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Card } from "../components/card.slint";
+import { Input } from "../components/input.slint";
+import { Label } from "../components/label.slint";
+import { Button, ButtonVariant } from "../components/button.slint";
+import { Separator, SeparatorOrientation } from "../components/separator.slint";
+
+// Minimal centered login block — leaner than SignIn (no remember/forgot row).
+export component Login inherits Card {
+    in-out property <string> email;
+    in-out property <string> password;
+    callback submit();
+    callback sso();
+
+    width: 340px;
+    height: 332px;
+
+    VerticalLayout {
+        padding: root.padding-l;
+        spacing: root.gap-l;
+
+        Text {
+            text: "Log in";
+            color: Tokens.color-foreground;
+            font-size: Tokens.typography-title-size;
+            font-weight: Tokens.typography-weight-semibold;
+            horizontal-alignment: center;
+        }
+
+        VerticalLayout {
+            spacing: 8px;
+            Label { text: "Email"; }
+            Input { width: 100%; placeholder: "you@example.com"; text <=> root.email; }
+        }
+        VerticalLayout {
+            spacing: 8px;
+            Label { text: "Password"; }
+            Input { width: 100%; placeholder: "••••••••"; password: true; text <=> root.password; }
+        }
+
+        HorizontalLayout {
+            Button { variant: ButtonVariant.default; text: "Continue"; clicked => { root.submit(); } }
+        }
+
+        Separator { orientation: SeparatorOrientation.horizontal; }
+
+        HorizontalLayout {
+            Button { variant: ButtonVariant.outline; text: "Continue with SSO"; clicked => { root.sso(); } }
+        }
+    }
+}

@@ -87,6 +87,9 @@ export function resolveConfig(rawConfig, cwd) {
   const componentsDir = rawConfig?.componentsDir
     ? path.resolve(cwd, rawConfig.componentsDir)
     : path.join(outDir, "components");
+  const blocksDir = rawConfig?.blocksDir
+    ? path.resolve(cwd, rawConfig.blocksDir)
+    : path.join(outDir, "blocks");
   return {
     style: rawConfig?.style ?? "default",
     baseColor: rawConfig?.baseColor ?? "neutral",
@@ -94,6 +97,7 @@ export function resolveConfig(rawConfig, cwd) {
     outDir,
     themeDir,
     componentsDir,
+    blocksDir,
   };
 }
 
@@ -134,6 +138,9 @@ export function routeDest(rel, config) {
   }
   if (rel.startsWith("components/")) {
     return path.join(config.componentsDir, rel.slice("components/".length));
+  }
+  if (rel.startsWith("blocks/")) {
+    return path.join(config.blocksDir, rel.slice("blocks/".length));
   }
   return path.join(config.outDir, rel);
 }

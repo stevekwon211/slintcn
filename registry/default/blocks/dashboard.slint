@@ -1,0 +1,86 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Card, CardVariant } from "../components/card.slint";
+import { Badge, BadgeVariant, BadgeSize } from "../components/badge.slint";
+import { Label, LabelVariant } from "../components/label.slint";
+import { Separator, SeparatorOrientation } from "../components/separator.slint";
+
+// Dashboard block — three metric cards over a recent-activity feed.
+// Built from Card + Badge + Label + Separator. Replace the inline data.
+export component Dashboard inherits Rectangle {
+    background: transparent;
+
+    VerticalLayout {
+        spacing: 16px;
+        alignment: start;
+
+        HorizontalLayout {
+            spacing: 16px;
+            for metric in [
+                { label: "Revenue",     value: "$ 42,580", delta: "+12.4% MoM", up: true },
+                { label: "Active users", value: "1,284",   delta: "+3.1% WoW",  up: true },
+                { label: "Bounce rate",  value: "27.8%",   delta: "−1.4% MoM",  up: false },
+            ]: Card {
+                variant: CardVariant.raised;
+                width: 32%;
+                height: 120px;
+                VerticalLayout {
+                    padding: parent.padding-l;
+                    spacing: 6px;
+                    alignment: start;
+                    Label { text: metric.label; variant: LabelVariant.muted; }
+                    Text {
+                        text: metric.value;
+                        color: Tokens.color-foreground;
+                        font-size: 26px;
+                        font-weight: Tokens.typography-weight-semibold;
+                    }
+                    Badge {
+                        text: metric.delta;
+                        variant: metric.up ? BadgeVariant.default : BadgeVariant.destructive;
+                        size: BadgeSize.sm;
+                    }
+                }
+            }
+        }
+
+        Card {
+            variant: CardVariant.solid;
+            width: 100%;
+            height: 220px;
+            VerticalLayout {
+                padding: parent.padding-l;
+                spacing: 12px;
+                alignment: start;
+
+                HorizontalLayout {
+                    alignment: start;
+                    Text {
+                        text: "Recent activity";
+                        color: Tokens.color-foreground;
+                        font-size: Tokens.typography-title-size;
+                        font-weight: Tokens.typography-weight-semibold;
+                    }
+                    Rectangle { horizontal-stretch: 1; background: transparent; }
+                    Text { text: "View all"; color: Tokens.color-muted-foreground; font-size: Tokens.typography-body-size; }
+                }
+                Separator { orientation: SeparatorOrientation.horizontal; }
+
+                for row in [
+                    { tag: "DEPLOY", text: "Production deploy succeeded", time: "2m ago",  bad: false },
+                    { tag: "USER",   text: "12 new sign-ups in the last hour", time: "14m ago", bad: false },
+                    { tag: "ALERT",  text: "API latency spike — 99p over 800 ms", time: "1h ago", bad: true },
+                ]: HorizontalLayout {
+                    spacing: 12px;
+                    alignment: start;
+                    Badge {
+                        text: row.tag;
+                        variant: row.bad ? BadgeVariant.destructive : BadgeVariant.secondary;
+                        size: BadgeSize.sm;
+                    }
+                    Text { text: row.text; color: Tokens.color-foreground; font-size: Tokens.typography-body-size; vertical-alignment: center; horizontal-stretch: 1; }
+                    Text { text: row.time; color: Tokens.color-muted-foreground; font-size: Tokens.typography-body-sm-size; vertical-alignment: center; }
+                }
+            }
+        }
+    }
+}

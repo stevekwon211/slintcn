@@ -1,0 +1,83 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Card, CardVariant, CardRadius } from "../components/card.slint";
+import { Button, ButtonVariant } from "../components/button.slint";
+import { Badge, BadgeVariant, BadgeSize } from "../components/badge.slint";
+import { Separator, SeparatorOrientation } from "../components/separator.slint";
+
+// Three-tier pricing block. `chosen` (0..2) highlights a plan; `pick(int)`
+// fires on a CTA. Plan copy is inline — edit freely once installed.
+export component Pricing inherits Rectangle {
+    in-out property <int> chosen: 1;
+    callback pick(int);
+
+    background: transparent;
+    height: 320px;
+
+    HorizontalLayout {
+        spacing: 16px;
+        alignment: start;
+
+        for plan[idx] in [
+            { name: "Hobby",   price: "$0",  blurb: "For side projects.",      cta: "Start free" },
+            { name: "Pro",     price: "$19", blurb: "For growing teams.",      cta: "Go Pro" },
+            { name: "Scale",   price: "$99", blurb: "For heavy workloads.",    cta: "Contact us" },
+        ]: Card {
+            variant: idx == root.chosen ? CardVariant.raised : CardVariant.solid;
+            card-radius: CardRadius.lg;
+            width: 220px;
+
+            VerticalLayout {
+                padding: parent.padding-l;
+                spacing: 12px;
+                alignment: start;
+
+                HorizontalLayout {
+                    alignment: start;
+                    spacing: 8px;
+                    Text {
+                        text: plan.name;
+                        color: Tokens.color-foreground;
+                        font-size: Tokens.typography-title-size;
+                        font-weight: Tokens.typography-weight-semibold;
+                    }
+                    if idx == root.chosen: Badge { text: "Popular"; variant: BadgeVariant.default; size: BadgeSize.sm; }
+                }
+
+                HorizontalLayout {
+                    alignment: start;
+                    spacing: 4px;
+                    Text {
+                        text: plan.price;
+                        color: Tokens.color-foreground;
+                        font-size: Tokens.typography-h1-size;
+                        font-weight: Tokens.typography-weight-semibold;
+                    }
+                    Text {
+                        text: "/mo";
+                        color: Tokens.color-muted-foreground;
+                        font-size: Tokens.typography-body-size;
+                        vertical-alignment: bottom;
+                    }
+                }
+
+                Text {
+                    text: plan.blurb;
+                    color: Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-body-size;
+                }
+
+                Separator { orientation: SeparatorOrientation.horizontal; }
+
+                Rectangle { vertical-stretch: 1; background: transparent; }
+
+                HorizontalLayout {
+                    Button {
+                        variant: idx == root.chosen ? ButtonVariant.default : ButtonVariant.outline;
+                        text: plan.cta;
+                        clicked => { root.pick(idx); }
+                    }
+                }
+            }
+        }
+    }
+}

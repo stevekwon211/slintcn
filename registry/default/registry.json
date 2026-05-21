@@ -2,7 +2,7 @@
   "$schema": "https://slintcn.dev/schema/registry.schema.json",
   "name": "default",
   "homepage": "https://stevekwon211.github.io/slintcn",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Dark glass theme — shadcn-adjacent primitives for Slint",
   "slintVersion": ">=1.16",
   "theme": {
@@ -316,6 +316,46 @@
       "category": "overlay",
       "files": ["components/context-menu.slint"],
       "requires": ["theme"]
+    },
+    "sign-in": {
+      "type": "registry:block",
+      "title": "Sign-in",
+      "description": "Auth card — email/password + remember + submit. Composed block.",
+      "category": "block",
+      "files": ["blocks/sign-in.slint"],
+      "requires": ["theme", "card", "input", "label", "checkbox", "button"]
+    },
+    "login": {
+      "type": "registry:block",
+      "title": "Login",
+      "description": "Minimal centered login card with an SSO action. Composed block.",
+      "category": "block",
+      "files": ["blocks/login.slint"],
+      "requires": ["theme", "card", "input", "label", "button", "separator"]
+    },
+    "pricing": {
+      "type": "registry:block",
+      "title": "Pricing",
+      "description": "Three-tier pricing cards with a highlighted plan. Composed block.",
+      "category": "block",
+      "files": ["blocks/pricing.slint"],
+      "requires": ["theme", "card", "button", "badge", "separator"]
+    },
+    "dashboard": {
+      "type": "registry:block",
+      "title": "Dashboard",
+      "description": "Metric cards + recent-activity feed. Composed block.",
+      "category": "block",
+      "files": ["blocks/dashboard.slint"],
+      "requires": ["theme", "card", "badge", "label", "separator"]
+    },
+    "settings": {
+      "type": "registry:block",
+      "title": "Settings",
+      "description": "Tabbed settings panel (Account / Notifications). Composed block.",
+      "category": "block",
+      "files": ["blocks/settings.slint"],
+      "requires": ["theme", "card", "tabs", "input", "label", "switch", "button"]
     }
   }
 }

@@ -20,6 +20,7 @@ fn main() {
             "slider", "breadcrumb", "pagination", "table",
             "text", "keycap", "hud-pill", "slot-tile",
             "scroll-area", "popover", "context-menu",
+            "sign-in", "login", "pricing", "dashboard", "settings",
         ])
         .status()
         .expect("failed to invoke `node` for the slintcn CLI (need Node 20+ on PATH)");

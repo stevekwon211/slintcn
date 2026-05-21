@@ -1,0 +1,81 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Card, CardVariant } from "../components/card.slint";
+import { Tabs, TabItem } from "../components/tabs.slint";
+import { Input } from "../components/input.slint";
+import { Label, LabelVariant } from "../components/label.slint";
+import { Switch } from "../components/switch.slint";
+import { Button, ButtonVariant } from "../components/button.slint";
+
+// Settings panel block — Tabs over a Card body (Account / Notifications).
+// Self-contained tab state; bind the fields + handle `save()`.
+export component Settings inherits Rectangle {
+    in-out property <int> tab: 0;
+    in-out property <string> display-name;
+    in-out property <string> email;
+    in-out property <bool> notify-product: true;
+    in-out property <bool> notify-security: true;
+    callback save();
+
+    background: transparent;
+
+    VerticalLayout {
+        spacing: 16px;
+        alignment: start;
+
+        HorizontalLayout {
+            alignment: start;
+            Tabs {
+                items: [{ label: "Account" }, { label: "Notifications" }];
+                current <=> root.tab;
+            }
+        }
+
+        Card {
+            variant: CardVariant.solid;
+            width: 100%;
+            height: 300px;
+            VerticalLayout {
+                padding: parent.padding-l;
+                spacing: parent.gap-l;
+
+                if root.tab == 0: VerticalLayout {
+                    spacing: 12px;
+                    alignment: start;
+                    Text {
+                        text: "Profile";
+                        color: Tokens.color-foreground;
+                        font-size: Tokens.typography-title-size;
+                        font-weight: Tokens.typography-weight-semibold;
+                    }
+                    VerticalLayout {
+                        spacing: 8px;
+                        Label { text: "Display name"; }
+                        Input { width: 100%; placeholder: "Steve Kwon"; text <=> root.display-name; }
+                    }
+                    VerticalLayout {
+                        spacing: 8px;
+                        Label { text: "Email"; variant: LabelVariant.required; }
+                        Input { width: 100%; placeholder: "you@example.com"; text <=> root.email; }
+                    }
+                    HorizontalLayout {
+                        alignment: end;
+                        Button { variant: ButtonVariant.default; text: "Save changes"; clicked => { root.save(); } }
+                    }
+                }
+
+                if root.tab == 1: VerticalLayout {
+                    spacing: 14px;
+                    alignment: start;
+                    Text {
+                        text: "Notifications";
+                        color: Tokens.color-foreground;
+                        font-size: Tokens.typography-title-size;
+                        font-weight: Tokens.typography-weight-semibold;
+                    }
+                    Switch { label: "Product updates"; checked <=> root.notify-product; }
+                    Switch { label: "Security alerts"; checked <=> root.notify-security; }
+                }
+            }
+        }
+    }
+}

@@ -49,6 +49,11 @@ import { TabsVariant }                          from "slintcn/components/tabs.sl
 import { ScrollArea }                           from "slintcn/components/scroll-area.slint";
 import { Popover }                              from "slintcn/components/popover.slint";
 import { ContextMenu, ContextMenuItemData }     from "slintcn/components/context-menu.slint";
+import { SignIn }                               from "slintcn/blocks/sign-in.slint";
+import { Login }                                from "slintcn/blocks/login.slint";
+import { Pricing }                              from "slintcn/blocks/pricing.slint";
+import { Dashboard as DashboardBlock }          from "slintcn/blocks/dashboard.slint";
+import { Settings as SettingsBlock }            from "slintcn/blocks/settings.slint";
 
 // Sidebar nav item — local helper, not part of the registry.
 component NavItem inherits Rectangle {
@@ -157,7 +162,7 @@ export component AppWindow inherits Window {
                         font-weight: Tokens.typography-weight-semibold;
                     }
                     Badge {
-                        text: "v0.14";
+                        text: "v0.15";
                         variant: BadgeVariant.secondary;
                         size: BadgeSize.sm;
                     }
@@ -226,6 +231,11 @@ export component AppWindow inherits Window {
                     label: "Interaction";
                     active: root.active-section == 14;
                     clicked => { root.active-section = 14; }
+                }
+                NavItem {
+                    label: "Blocks";
+                    active: root.active-section == 15;
+                    clicked => { root.active-section = 15; }
                 }
 
                 Rectangle { height: 12px; background: transparent; }
@@ -347,7 +357,7 @@ export component AppWindow inherits Window {
                             spacing: 8px;
                             alignment: start;
                             Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
-                            Badge { text: "v0.14"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Badge { text: "v0.15"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
                         }
 
                         VerticalLayout {
@@ -1298,6 +1308,39 @@ export component AppWindow inherits Window {
                             }
                         }
                     }
+                }
+            }
+
+            // (15) Blocks — composed templates installable via `slintcn add <name>`
+            if root.active-section == 15: VerticalLayout {
+                spacing: Tokens.spacing-lg;
+                alignment: start;
+
+                SectionHeading {
+                    title: "Blocks";
+                    subtitle: "Composed templates — `slintcn add sign-in · login · pricing · dashboard · settings`.";
+                }
+
+                HorizontalLayout {
+                    spacing: 16px;
+                    alignment: start;
+                    SignIn {
+                        submit => { ToastQueue.show("Signed in", ToastVariant.success); }
+                        forgot => { ToastQueue.show("Reset link sent", ToastVariant.default); }
+                    }
+                    Login {
+                        submit => { ToastQueue.show("Logged in", ToastVariant.success); }
+                    }
+                }
+
+                Pricing {
+                    pick(i) => { ToastQueue.show("Picked plan \{i}", ToastVariant.default); }
+                }
+
+                DashboardBlock { }
+
+                SettingsBlock {
+                    save => { ToastQueue.show("Settings saved", ToastVariant.success); }
                 }
             }
         }

@@ -42,6 +42,14 @@ describe("routeDest", () => {
     const c = resolveConfig({ componentsDir: "src/parts" }, cwd);
     assert.equal(routeDest("components/button.slint", c), "/proj/src/parts/button.slint");
   });
+
+  it("routes blocks/ files to blocksDir (default + explicit)", () => {
+    const def = resolveConfig({}, cwd);
+    assert.equal(def.blocksDir, "/proj/ui/slintcn/blocks");
+    assert.equal(routeDest("blocks/sign-in.slint", def), "/proj/ui/slintcn/blocks/sign-in.slint");
+    const custom = resolveConfig({ blocksDir: "src/templates" }, cwd);
+    assert.equal(routeDest("blocks/dashboard.slint", custom), "/proj/src/templates/dashboard.slint");
+  });
 });
 
 describe("rewriteImports", () => {

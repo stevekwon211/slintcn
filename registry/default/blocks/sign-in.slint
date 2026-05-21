@@ -1,0 +1,65 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Card, CardVariant } from "../components/card.slint";
+import { Input } from "../components/input.slint";
+import { Label, LabelVariant } from "../components/label.slint";
+import { Checkbox } from "../components/checkbox.slint";
+import { Button, ButtonVariant } from "../components/button.slint";
+
+// Sign-in card block — Card + Label + Input + Checkbox + Button.
+// Bind email/password and handle the submit / forgot / create callbacks.
+export component SignIn inherits Card {
+    in-out property <string> email;
+    in-out property <string> password;
+    in-out property <bool> remember: true;
+    callback submit();
+    callback forgot();
+    callback create-account();
+
+    width: 380px;
+    height: 408px;
+
+    VerticalLayout {
+        padding: root.padding-l;
+        spacing: root.gap-l;
+
+        VerticalLayout {
+            spacing: 6px;
+            Text {
+                text: "Welcome back";
+                color: Tokens.color-foreground;
+                font-size: Tokens.typography-title-size;
+                font-weight: Tokens.typography-weight-semibold;
+            }
+            Text {
+                text: "Sign in to your account.";
+                color: Tokens.color-muted-foreground;
+                font-size: Tokens.typography-body-size;
+            }
+        }
+
+        VerticalLayout {
+            spacing: 8px;
+            Label { text: "Email"; variant: LabelVariant.required; }
+            Input { width: 100%; placeholder: "you@example.com"; text <=> root.email; }
+        }
+        VerticalLayout {
+            spacing: 8px;
+            Label { text: "Password"; variant: LabelVariant.required; }
+            Input { width: 100%; placeholder: "••••••••"; password: true; text <=> root.password; }
+        }
+
+        HorizontalLayout {
+            alignment: start;
+            Checkbox { label: "Remember me"; checked <=> root.remember; }
+            Rectangle { horizontal-stretch: 1; background: transparent; }
+            Button { variant: ButtonVariant.link; text: "Forgot password?"; clicked => { root.forgot(); } }
+        }
+
+        HorizontalLayout {
+            alignment: start;
+            Button { variant: ButtonVariant.default; text: "Sign in"; clicked => { root.submit(); } }
+            Rectangle { horizontal-stretch: 1; background: transparent; }
+            Button { variant: ButtonVariant.ghost; text: "Create account"; clicked => { root.create-account(); } }
+        }
+    }
+}
