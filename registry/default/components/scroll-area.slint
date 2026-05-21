@@ -1,0 +1,37 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Scrollable viewport with a slim custom scrollbar. Set `content-height` to
+// the total height of the @children content; place children laid out to that
+// height (e.g. a VerticalLayout with height: parent's content-height).
+export component ScrollArea inherits Rectangle {
+    in property <length> content-height;
+
+    clip: true;
+    background: transparent;
+
+    flick := Flickable {
+        width: parent.width;
+        height: parent.height;
+        viewport-width: parent.width;
+        viewport-height: root.content-height;
+        @children
+    }
+
+    // Vertical scrollbar — only when the content overflows.
+    if root.content-height > flick.height: Rectangle {
+        x: parent.width - 8px;
+        y: 0;
+        width: 6px;
+        height: parent.height;
+        background: transparent;
+
+        thumb := Rectangle {
+            x: 0;
+            width: parent.width;
+            height: max(24px, flick.height * flick.height / root.content-height);
+            y: -flick.viewport-y * flick.height / root.content-height;
+            background: Tokens.color-border-hairline-strong;
+            border-radius: 3px;
+        }
+    }
+}

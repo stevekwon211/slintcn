@@ -1,0 +1,58 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Click-triggered floating panel. The trigger is `@children`; clicking it
+// opens a card showing `title` + `description` below. Closes on click
+// outside (PopupWindow default). For richer content, adapt the panel body.
+export component Popover inherits Rectangle {
+    in property <string> title;
+    in property <string> description;
+    in property <length> content-width: 260px;
+
+    background: transparent;
+    width:  trigger.preferred-width;
+    height: trigger.preferred-height;
+
+    trigger := HorizontalLayout {
+        @children
+    }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { popup.show(); }
+    }
+
+    popup := PopupWindow {
+        x: 0;
+        y: root.height + 6px;
+        width: root.content-width;
+        close-policy: close-on-click-outside;
+
+        Rectangle {
+            background: Tokens.color-card;
+            border-color: Tokens.color-border-hairline;
+            border-width: 1px;
+            border-radius: Tokens.radius-lg;
+            drop-shadow-blur:     Tokens.shadow-e3-blur;
+            drop-shadow-offset-y: Tokens.shadow-e3-offset-y;
+            drop-shadow-color:    Tokens.shadow-e3-color;
+            height: body.preferred-height;
+
+            body := VerticalLayout {
+                padding: Tokens.spacing-lg;
+                spacing: Tokens.spacing-sm;
+                if root.title != "": Text {
+                    text: root.title;
+                    color: Tokens.color-foreground;
+                    font-size: Tokens.typography-body-size;
+                    font-weight: Tokens.typography-weight-semibold;
+                }
+                if root.description != "": Text {
+                    text: root.description;
+                    color: Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-body-size;
+                    wrap: word-wrap;
+                }
+            }
+        }
+    }
+}

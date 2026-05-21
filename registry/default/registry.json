@@ -146,6 +146,18 @@
     "slot-tile": {
       "files": ["components/slot-tile.slint"],
       "requires": ["theme"]
+    },
+    "scroll-area": {
+      "files": ["components/scroll-area.slint"],
+      "requires": ["theme"]
+    },
+    "popover": {
+      "files": ["components/popover.slint"],
+      "requires": ["theme"]
+    },
+    "context-menu": {
+      "files": ["components/context-menu.slint"],
+      "requires": ["theme"]
     }
   }
 }

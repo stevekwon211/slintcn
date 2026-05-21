@@ -1,0 +1,79 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Right-click context menu over an area. The right-clickable region is
+// `@children`; right-click opens a menu at the cursor with `items`, each
+// firing `selected(index)`. Closes on click outside.
+export struct ContextMenuItemData { label: string }
+
+export component ContextMenu inherits Rectangle {
+    in property <[ContextMenuItemData]> items;
+    callback selected(int);
+
+    background: transparent;
+
+    in-out property <length> menu-x;
+    in-out property <length> menu-y;
+
+    @children
+
+    touch := TouchArea {
+        // Capture right-clicks anywhere in the area; ignore other buttons.
+        pointer-event(ev) => {
+            if (ev.button == PointerEventButton.right
+                    && ev.kind == PointerEventKind.down) {
+                root.menu-x = self.mouse-x;
+                root.menu-y = self.mouse-y;
+                popup.show();
+            }
+        }
+    }
+
+    popup := PopupWindow {
+        x: root.menu-x;
+        y: root.menu-y;
+        width: 180px;
+        close-policy: close-on-click-outside;
+
+        Rectangle {
+            background: Tokens.color-card;
+            border-color: Tokens.color-border-hairline;
+            border-width: 1px;
+            border-radius: Tokens.radius-md;
+            drop-shadow-blur:     Tokens.shadow-e2-blur;
+            drop-shadow-offset-y: Tokens.shadow-e2-offset-y;
+            drop-shadow-color:    Tokens.shadow-e2-color;
+            height: menu.preferred-height;
+
+            menu := VerticalLayout {
+                padding: 4px;
+                spacing: 0;
+                for item[idx] in root.items: Rectangle {
+                    height: 30px;
+                    border-radius: Tokens.radius-sm;
+                    background: item-touch.has-hover
+                        ? Tokens.color-surface-1 : transparent;
+
+                    HorizontalLayout {
+                        padding-left: 8px;
+                        padding-right: 8px;
+                        Text {
+                            text: item.label;
+                            color: Tokens.color-foreground;
+                            font-size: Tokens.typography-body-size;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
+                        }
+                    }
+
+                    item-touch := TouchArea {
+                        mouse-cursor: pointer;
+                        clicked => {
+                            root.selected(idx);
+                            popup.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
