@@ -130,6 +130,22 @@
     "table": {
       "files": ["components/table.slint"],
       "requires": ["theme", "separator"]
+    },
+    "text": {
+      "files": ["components/text.slint"],
+      "requires": ["theme"]
+    },
+    "keycap": {
+      "files": ["components/keycap.slint"],
+      "requires": ["theme"]
+    },
+    "hud-pill": {
+      "files": ["components/hud-pill.slint"],
+      "requires": ["theme"]
+    },
+    "slot-tile": {
+      "files": ["components/slot-tile.slint"],
+      "requires": ["theme"]
     }
   }
 }

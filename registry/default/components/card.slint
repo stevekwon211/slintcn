@@ -9,10 +9,15 @@ import { Tokens } from "../theme/tokens.slint";
 // Both share the same e3 shadow.
 export enum CardVariant { solid, glass, glass-interactive, raised }
 export enum CardSize    { sm, default }
+// Independent padding + radius axes (mirrors the web Card API). `xxl` = 2xl.
+export enum CardPadding { none, sm, md, lg }
+export enum CardRadius  { md, lg, xl, xxl }
 
 export component Card inherits Rectangle {
     in property <CardVariant> variant: CardVariant.solid;
     in property <CardSize>    size:    CardSize.default;
+    in property <CardPadding> card-padding: CardPadding.lg;
+    in property <CardRadius>  card-radius:  CardRadius.xl;
 
     // Read-only hover signal — driven by the internal TouchArea below.
     // Consumers can read it (e.g. to drive header chip styling) but never set it.
@@ -30,7 +35,11 @@ export component Card inherits Rectangle {
             ? Tokens.color-border-hairline-strong
             : Tokens.color-border-hairline;
     border-width: 1px;
-    border-radius: Tokens.radius-xl;
+    border-radius:
+        card-radius == CardRadius.md  ? Tokens.radius-md :
+        card-radius == CardRadius.lg  ? Tokens.radius-lg :
+        card-radius == CardRadius.xxl ? 20px :
+        /* xl */                        Tokens.radius-xl;
 
     drop-shadow-blur:
         variant == CardVariant.glass || variant == CardVariant.glass-interactive
@@ -50,11 +59,13 @@ export component Card inherits Rectangle {
         easing: Tokens.motion-easing-standard;
     }
 
-    // shadcn Card: p-6 (24px) padding. gap-l is the in-content rhythm —
-    // 16px (gap-4) reads right for mixed form/section content (gap-6 was
-    // too airy between form fields). Compact size tightens to 12px.
+    // padding-l derives from the `padding` axis (none/sm/md/lg → 0/12/16/24).
+    // gap-l is the in-content rhythm, still keyed off `size`.
     out property <length> padding-l:
-        size == CardSize.sm ? Tokens.spacing-lg : Tokens.spacing-xl;
+        card-padding == CardPadding.none ? 0px :
+        card-padding == CardPadding.sm   ? Tokens.spacing-md :
+        card-padding == CardPadding.md   ? Tokens.spacing-lg :
+        /* lg */                           Tokens.spacing-xl;
     out property <length> gap-l:
         size == CardSize.sm ? Tokens.spacing-md : Tokens.spacing-lg;
 

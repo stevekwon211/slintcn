@@ -23,7 +23,8 @@ export global Palette {
     out property <color> neutral-950: #0a0a0a;
 
     // accents (only what's currently used; extend as needed)
-    out property <color> red-400: #ff6467;
+    out property <color> red-400:   #ff6467;
+    out property <color> green-400: #4ade80;
 
     // alpha primitives — translucent overlays for glass/scrim/hairline work.
     // Named by base color (w = white, b = black) and alpha % × 100.
@@ -34,8 +35,10 @@ export global Palette {
     out property <color> alpha-w-20: rgba(255, 255, 255, 0.20);
     out property <color> alpha-w-25: rgba(255, 255, 255, 0.25);
     out property <color> alpha-w-35: rgba(255, 255, 255, 0.35);
+    out property <color> alpha-b-30: rgba(0, 0, 0, 0.30);
     out property <color> alpha-b-32: rgba(0, 0, 0, 0.32);
     out property <color> alpha-b-38: rgba(0, 0, 0, 0.38);
+    out property <color> alpha-b-45: rgba(0, 0, 0, 0.45);
     out property <color> alpha-b-60: rgba(0, 0, 0, 0.60);
 
     // Black-on-light overlays mirror alpha-w-* for the light theme — at these

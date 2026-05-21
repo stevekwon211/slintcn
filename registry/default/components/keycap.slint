@@ -1,0 +1,52 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Keyboard key hint cap. `tone` encodes the surface it sits on (Glow = bright
+// surface, Glass = translucent) crossed with semantics (neutral / affirm /
+// deny). For HUDs and keyboard-shortcut hints.
+export enum KeycapSize { sm, md }
+export enum KeycapTone {
+    on-glow, on-glass, muted,
+    affirm-on-glow, deny-on-glow, affirm-on-glass, deny-on-glass,
+}
+
+export component Keycap inherits Rectangle {
+    in property <string> text;
+    in property <KeycapSize> size: KeycapSize.md;
+    in property <KeycapTone> tone: KeycapTone.on-glass;
+
+    property <bool> is-affirm:
+        tone == KeycapTone.affirm-on-glow || tone == KeycapTone.affirm-on-glass;
+    property <bool> is-deny:
+        tone == KeycapTone.deny-on-glow || tone == KeycapTone.deny-on-glass;
+    property <bool> on-glass:
+        tone == KeycapTone.on-glass || tone == KeycapTone.affirm-on-glass
+        || tone == KeycapTone.deny-on-glass;
+
+    property <color> accent:
+        is-affirm ? Tokens.color-affirm :
+        is-deny   ? Tokens.color-destructive :
+        Tokens.color-foreground;
+
+    height: size == KeycapSize.sm ? 18px : 24px;
+    width: max(self.height, label.preferred-width + 12px);   // ≥ square
+    border-radius: Tokens.radius-sm;
+
+    background:
+        tone == KeycapTone.muted ? Tokens.color-muted :
+        root.on-glass            ? Tokens.color-surface-2 :
+        /* on-glow */              Tokens.color-scrim-1;
+    border-width: 1px;
+    border-color:
+        root.is-affirm ? root.accent.with-alpha(0.5) :
+        root.is-deny   ? root.accent.with-alpha(0.5) :
+        Tokens.color-border-hairline-strong;
+
+    label := Text {
+        x: (parent.width  - self.preferred-width)  / 2;
+        y: (parent.height - self.preferred-height) / 2;
+        text: root.text;
+        color: root.accent;
+        font-size: size == KeycapSize.sm ? 11px : Tokens.typography-label-size;
+        font-weight: Tokens.typography-weight-medium;
+    }
+}

@@ -1,0 +1,42 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Typography primitive. `variant` sets the size/weight scale; `tone` sets the
+// color role. Mirrors a shadcn/Base-UI-style <Text variant tone> API.
+//
+// Imported into a scene where the built-in `Text` is also used? Alias it:
+//   import { Text as Typography } from "slintcn/components/text.slint";
+
+export enum TextVariant {
+    display, headline, title, body-lg, body, body-sm, label, caption,
+}
+export enum TextTone {
+    default, muted, subtle, accent, danger,
+}
+
+export component Text inherits Text {
+    in property <TextVariant> variant: TextVariant.body;
+    in property <TextTone>    tone:    TextTone.default;
+
+    font-size:
+        variant == TextVariant.display  ? 36px :
+        variant == TextVariant.headline ? 30px :
+        variant == TextVariant.title    ? 20px :
+        variant == TextVariant.body-lg  ? 16px :
+        variant == TextVariant.body     ? 14px :
+        variant == TextVariant.body-sm  ? 13px :
+        variant == TextVariant.label    ? 12px :
+        /* caption */                     11px;
+
+    font-weight:
+        variant == TextVariant.display || variant == TextVariant.headline
+            || variant == TextVariant.title ? Tokens.typography-weight-semibold :
+        variant == TextVariant.label ? Tokens.typography-weight-medium :
+        /* body / caption */ 400;
+
+    color:
+        tone == TextTone.muted   ? Tokens.color-muted-foreground :
+        tone == TextTone.subtle  ? Tokens.color-subtle-foreground :
+        tone == TextTone.accent  ? Tokens.color-primary :
+        tone == TextTone.danger  ? Tokens.color-destructive :
+        /* default */              Tokens.color-foreground;
+}

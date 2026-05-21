@@ -1,6 +1,6 @@
 import { Tokens } from "../theme/tokens.slint";
 
-export enum BadgeVariant { default, secondary, outline, destructive }
+export enum BadgeVariant { default, secondary, outline, destructive, ghost, link }
 export enum BadgeSize    { sm, default }
 
 export component Badge inherits Rectangle {
@@ -17,6 +17,8 @@ export component Badge inherits Rectangle {
     background:
         variant == BadgeVariant.secondary ? Tokens.color-secondary :
         variant == BadgeVariant.outline ? transparent :
+        variant == BadgeVariant.ghost ? transparent :
+        variant == BadgeVariant.link ? transparent :
         variant == BadgeVariant.destructive ? Tokens.color-destructive.with-alpha(0.2) :
         Tokens.color-primary;
 
@@ -34,6 +36,17 @@ export component Badge inherits Rectangle {
             variant == BadgeVariant.destructive ? Tokens.color-destructive :
             variant == BadgeVariant.outline ? Tokens.color-foreground :
             variant == BadgeVariant.secondary ? Tokens.color-foreground :
+            variant == BadgeVariant.ghost ? Tokens.color-muted-foreground :
+            variant == BadgeVariant.link ? Tokens.color-primary :
             Tokens.color-primary-foreground;
+    }
+
+    // link variant: underline to read as a link.
+    if variant == BadgeVariant.link: Rectangle {
+        x: label.x;
+        y: label.y + label.preferred-height - 1px;
+        width: label.preferred-width;
+        height: 1px;
+        background: Tokens.color-primary;
     }
 }

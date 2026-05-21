@@ -1,0 +1,37 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Rounded-full HUD status pill. `tone` picks the scrim opacity (scrim0
+// lightest → scrim2 darkest) so it reads on any game/HUD background.
+export enum HudPillSize { sm, md, lg }
+export enum HudPillTone { scrim0, scrim1, scrim2 }
+
+export component HudPill inherits Rectangle {
+    in property <string> text;
+    in property <HudPillSize> size: HudPillSize.md;
+    in property <HudPillTone> tone: HudPillTone.scrim1;
+
+    height:
+        size == HudPillSize.sm ? 20px :
+        size == HudPillSize.lg ? 32px : 26px;
+    width: label.preferred-width + (size == HudPillSize.lg ? 28px : 20px);
+    border-radius: self.height / 2;                 // pill
+
+    background:
+        tone == HudPillTone.scrim0 ? Tokens.color-scrim-0 :
+        tone == HudPillTone.scrim2 ? Tokens.color-scrim-2 :
+        Tokens.color-scrim-1;
+    border-width: 1px;
+    border-color: Tokens.color-border-hairline;
+
+    label := Text {
+        x: (parent.width  - self.preferred-width)  / 2;
+        y: (parent.height - self.preferred-height) / 2;
+        text: root.text;
+        color: Tokens.color-foreground;
+        font-size:
+            size == HudPillSize.sm ? Tokens.typography-label-size :
+            size == HudPillSize.lg ? Tokens.typography-body-size :
+            Tokens.typography-body-sm-size;
+        font-weight: Tokens.typography-weight-medium;
+    }
+}
