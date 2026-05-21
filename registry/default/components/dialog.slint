@@ -69,44 +69,47 @@ export component Dialog inherits Rectangle {
             easing: Tokens.motion-easing-standard;
         }
 
-        // Absorb clicks inside the panel — first child sits z-below the
-        // content, so the layout's buttons/inputs still receive their own
-        // clicks, but empty-padding clicks don't reach the Scrim behind.
-        TouchArea {}
+        // Wrap content in a TouchArea so clicks on empty panel area are
+        // absorbed (clicked no-op) — they don't fall through to the Scrim
+        // behind. Nested controls (the footer Button, body inputs) still
+        // receive their own clicks via Slint's nested-TouchArea routing.
+        TouchArea {
+            clicked => { }
 
-        layout := VerticalLayout {
-            padding: Tokens.spacing-xl;       // p-6 (24)
-            spacing: Tokens.spacing-lg;       // gap-4 (16)
+            layout := VerticalLayout {
+                padding: Tokens.spacing-xl;       // p-6 (24)
+                spacing: Tokens.spacing-lg;       // gap-4 (16)
 
-            // Header
-            VerticalLayout {
-                spacing: Tokens.spacing-sm;   // gap-2 (8)
-                if root.title != "": Text {
-                    text: root.title;
-                    color: Tokens.color-foreground;
-                    font-size: Tokens.typography-title-size;
-                    font-weight: Tokens.typography-weight-semibold;
+                // Header
+                VerticalLayout {
+                    spacing: Tokens.spacing-sm;   // gap-2 (8)
+                    if root.title != "": Text {
+                        text: root.title;
+                        color: Tokens.color-foreground;
+                        font-size: Tokens.typography-title-size;
+                        font-weight: Tokens.typography-weight-semibold;
+                    }
+                    if root.description != "": Text {
+                        text: root.description;
+                        color: Tokens.color-muted-foreground;
+                        font-size: Tokens.typography-body-size;
+                        wrap: word-wrap;
+                    }
                 }
-                if root.description != "": Text {
-                    text: root.description;
-                    color: Tokens.color-muted-foreground;
-                    font-size: Tokens.typography-body-size;
-                    wrap: word-wrap;
-                }
-            }
 
-            @children
+                @children
 
-            Separator { orientation: SeparatorOrientation.horizontal; }
+                Separator { orientation: SeparatorOrientation.horizontal; }
 
-            HorizontalLayout {
-                alignment: end;
-                Button {
-                    variant: ButtonVariant.default;
-                    text: root.close-label;
-                    clicked => {
-                        root.open = false;
-                        root.dismissed();
+                HorizontalLayout {
+                    alignment: end;
+                    Button {
+                        variant: ButtonVariant.default;
+                        text: root.close-label;
+                        clicked => {
+                            root.open = false;
+                            root.dismissed();
+                        }
                     }
                 }
             }

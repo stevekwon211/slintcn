@@ -63,7 +63,10 @@
     </div>
 
     <script type="module">
-        import init from './pkg/slintcn-showcase.js';
+        // Cache-bust: bump ?v= on each deploy so browsers fetch the fresh
+        // bundle without a manual hard-refresh. The JS import query busts the
+        // glue; the explicit wasm URL below busts the 7 MB binary.
+        import init from './pkg/slintcn-showcase.js?v=0.9.1';
 
         function reveal() {
             document.getElementById('loader').classList.add('hidden');
@@ -78,7 +81,7 @@
             return msg.includes('control flow') || msg.includes("isn't actually an error");
         }
 
-        init()
+        init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.9.1' })
             .then(reveal)
             .catch((err) => {
                 if (isWinitControlFlow(err)) {

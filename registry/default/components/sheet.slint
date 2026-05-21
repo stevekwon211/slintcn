@@ -82,9 +82,10 @@ export component Sheet inherits Rectangle {
             easing: Tokens.motion-easing-standard;
         }
 
-        // Absorb inside-panel clicks (no fall-through to Scrim).
-        TouchArea {}
-
+        // Wrap content so empty-area clicks are absorbed (no fall-through to
+        // Scrim); nested controls still receive their own clicks.
+        TouchArea {
+        clicked => { }
         VerticalLayout {
             padding: Tokens.spacing-xl;
             spacing: Tokens.spacing-lg;
@@ -106,6 +107,7 @@ export component Sheet inherits Rectangle {
             }
 
             @children
+        }
         }
     }
 

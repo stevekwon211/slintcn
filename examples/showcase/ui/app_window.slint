@@ -566,6 +566,7 @@ export component AppWindow inherits Window {
 
                         if root.settings-tab == 0: VerticalLayout {
                             spacing: 12px;
+                            alignment: start;
                             Text {
                                 text: "Profile";
                                 color: Tokens.color-foreground;
@@ -594,6 +595,7 @@ export component AppWindow inherits Window {
 
                         if root.settings-tab == 1: VerticalLayout {
                             spacing: 14px;
+                            alignment: start;
                             Text {
                                 text: "Email";
                                 color: Tokens.color-foreground;
@@ -621,6 +623,7 @@ export component AppWindow inherits Window {
 
                         if root.settings-tab == 2: VerticalLayout {
                             spacing: 14px;
+                            alignment: start;
                             Text {
                                 text: "Theme";
                                 color: Tokens.color-foreground;
@@ -670,6 +673,7 @@ export component AppWindow inherits Window {
                         VerticalLayout {
                             padding: parent.padding-l;
                             spacing: 6px;
+                            alignment: start;
                             Label { text: "Revenue"; variant: LabelVariant.muted; }
                             Text {
                                 text: "$ 42,580";
@@ -687,6 +691,7 @@ export component AppWindow inherits Window {
                         VerticalLayout {
                             padding: parent.padding-l;
                             spacing: 6px;
+                            alignment: start;
                             Label { text: "Active users"; variant: LabelVariant.muted; }
                             Text {
                                 text: "1,284";
@@ -704,6 +709,7 @@ export component AppWindow inherits Window {
                         VerticalLayout {
                             padding: parent.padding-l;
                             spacing: 6px;
+                            alignment: start;
                             Label { text: "Bounce rate"; variant: LabelVariant.muted; }
                             Text {
                                 text: "27.8%";
