@@ -1,0 +1,90 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Horizontal slider. Drag the thumb or click the track. `value` is in-out.
+export component Slider inherits Rectangle {
+    in-out property <float> value: 0;
+    in property <float> minimum: 0;
+    in property <float> maximum: 100;
+    in property <bool> disabled: false;
+    callback changed(float);
+
+    height: 20px;            // hit area
+    horizontal-stretch: 1;
+    opacity: root.disabled ? 0.5 : 1.0;
+
+    property <float> ratio:
+        (root.maximum - root.minimum) > 0
+            ? (root.value - root.minimum) / (root.maximum - root.minimum)
+            : 0;
+
+    function set-from-x(px: length) {
+        if (root.disabled) { return; }
+        root.value = root.minimum
+            + max(0, min(1, px / root.width)) * (root.maximum - root.minimum);
+        root.changed(root.value);
+    }
+
+    // Track
+    Rectangle {
+        y: (parent.height - self.height) / 2;
+        height: 6px;
+        width: parent.width;
+        background: Tokens.color-muted;
+        border-radius: 3px;
+
+        Rectangle {
+            x: 0;
+            y: 0;
+            width: parent.width * root.ratio;
+            height: parent.height;
+            background: Tokens.color-primary;
+            border-radius: 3px;
+        }
+    }
+
+    // Thumb
+    Rectangle {
+        width: 16px;
+        height: 16px;
+        x: (parent.width - self.width) * root.ratio;
+        y: (parent.height - self.height) / 2;
+        background: Tokens.color-background;
+        border-width: 2px;
+        border-color: Tokens.color-primary;
+        border-radius: 8px;
+
+        if focus-scope.has-focus: Rectangle {
+            x: -3px; y: -3px;
+            width: parent.width + 6px;
+            height: parent.height + 6px;
+            border-width: Tokens.focus-ring-width;
+            border-color: Tokens.color-ring-muted;
+            border-radius: 11px;
+            background: transparent;
+        }
+    }
+
+    touch := TouchArea {
+        mouse-cursor: root.disabled ? default : pointer;
+        clicked => { root.set-from-x(self.mouse-x); focus-scope.focus(); }
+        moved => { if (self.pressed) { root.set-from-x(self.mouse-x); } }
+    }
+
+    forward-focus: focus-scope;
+    focus-scope := FocusScope {
+        enabled: !root.disabled;
+        key-pressed(event) => {
+            if (event.text == Key.LeftArrow) {
+                root.value = max(root.minimum, root.value - 1);
+                root.changed(root.value);
+                return accept;
+            }
+            if (event.text == Key.RightArrow) {
+                root.value = min(root.maximum, root.value + 1);
+                root.changed(root.value);
+                return accept;
+            }
+            return reject;
+        }
+    }
+}

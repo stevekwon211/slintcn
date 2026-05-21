@@ -1,0 +1,53 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Icon } from "icon.slint";
+import { LucidePaths } from "lucide-paths.slint";
+
+// Navigation path. The last item is the current page (foreground, not
+// clickable); earlier items are links that fire `navigate(index)`.
+export struct BreadcrumbItem { label: string }
+
+export component Breadcrumb inherits Rectangle {
+    in property <[BreadcrumbItem]> items;
+    callback navigate(int);
+
+    background: transparent;
+    height: 20px;
+
+    HorizontalLayout {
+        spacing: 8px;
+        alignment: start;
+
+        for item[idx] in items: HorizontalLayout {
+            spacing: 8px;
+
+            Rectangle {
+                background: transparent;
+                width: link.preferred-width;
+
+                link := Text {
+                    text: item.label;
+                    color: (idx == root.items.length - 1)
+                        ? Tokens.color-foreground
+                        : (touch.has-hover
+                            ? Tokens.color-foreground
+                            : Tokens.color-muted-foreground);
+                    font-size: Tokens.typography-body-size;
+                    vertical-alignment: center;
+                }
+                touch := TouchArea {
+                    mouse-cursor: (idx == root.items.length - 1) ? default : pointer;
+                    clicked => {
+                        if (idx != root.items.length - 1) { root.navigate(idx); }
+                    }
+                }
+            }
+
+            // Separator chevron (skip after the last item).
+            if idx < root.items.length - 1: Icon {
+                commands: LucidePaths.chevron-right;
+                tint: Tokens.color-muted-foreground;
+                size: 14px;
+            }
+        }
+    }
+}

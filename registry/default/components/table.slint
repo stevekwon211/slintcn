@@ -1,0 +1,60 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Separator, SeparatorOrientation } from "separator.slint";
+
+// Simple data table. `columns` are header titles; each row's `cells` align
+// to the columns by equal-stretch. Columns and cells share the same count.
+export struct TableRow { cells: [string] }
+
+export component Table inherits Rectangle {
+    in property <[string]> columns;
+    in property <[TableRow]> rows;
+
+    background: transparent;
+
+    VerticalLayout {
+        alignment: start;
+
+        // Header
+        HorizontalLayout {
+            height: 40px;
+            for col in root.columns: Rectangle {
+                horizontal-stretch: 1;
+                Text {
+                    x: 12px;
+                    y: (parent.height - self.preferred-height) / 2;
+                    text: col;
+                    color: Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-body-size;
+                    font-weight: Tokens.typography-weight-medium;
+                }
+            }
+        }
+        Separator { orientation: SeparatorOrientation.horizontal; }
+
+        // Body rows
+        for row[idx] in root.rows: VerticalLayout {
+            Rectangle {
+                height: 44px;
+                background: row-touch.has-hover ? Tokens.color-surface-1 : transparent;
+
+                HorizontalLayout {
+                    for cell in row.cells: Rectangle {
+                        horizontal-stretch: 1;
+                        Text {
+                            x: 12px;
+                            y: (parent.height - self.preferred-height) / 2;
+                            text: cell;
+                            color: Tokens.color-foreground;
+                            font-size: Tokens.typography-body-size;
+                        }
+                    }
+                }
+
+                row-touch := TouchArea { }
+                animate background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
+            }
+            // Divider under every row except the last.
+            if idx < root.rows.length - 1: Separator { orientation: SeparatorOrientation.horizontal; }
+        }
+    }
+}

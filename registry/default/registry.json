@@ -114,6 +114,22 @@
     "accordion": {
       "files": ["components/accordion.slint"],
       "requires": ["theme", "icon", "lucide-paths", "separator"]
+    },
+    "slider": {
+      "files": ["components/slider.slint"],
+      "requires": ["theme"]
+    },
+    "breadcrumb": {
+      "files": ["components/breadcrumb.slint"],
+      "requires": ["theme", "icon", "lucide-paths"]
+    },
+    "pagination": {
+      "files": ["components/pagination.slint"],
+      "requires": ["theme", "icon", "lucide-paths"]
+    },
+    "table": {
+      "files": ["components/table.slint"],
+      "requires": ["theme", "separator"]
     }
   }
 }

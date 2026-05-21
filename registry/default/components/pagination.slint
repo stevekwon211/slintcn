@@ -1,0 +1,96 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Icon } from "icon.slint";
+import { LucidePaths } from "lucide-paths.slint";
+
+// Page navigation: prev / page-numbers / next. `current` is 0-based.
+export component Pagination inherits Rectangle {
+    in property <int> total: 1;
+    in-out property <int> current: 0;
+    callback changed(int);
+
+    background: transparent;
+    height: 36px;
+    horizontal-stretch: 0;
+
+    function go(page: int) {
+        if (page >= 0 && page < root.total && page != root.current) {
+            root.current = page;
+            root.changed(page);
+        }
+    }
+
+    HorizontalLayout {
+        spacing: 4px;
+        alignment: start;
+
+        // Prev
+        Rectangle {
+            width: 36px;
+            height: 36px;
+            border-radius: Tokens.radius-md;
+            border-width: 1px;
+            border-color: Tokens.color-border-hairline;
+            background: prev-touch.has-hover && root.current > 0
+                ? Tokens.color-accent : transparent;
+            Icon {
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                commands: LucidePaths.chevron-left;
+                tint: root.current > 0 ? Tokens.color-foreground : Tokens.color-muted-foreground;
+                size: 16px;
+            }
+            prev-touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => { root.go(root.current - 1); }
+            }
+            animate background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
+        }
+
+        // Page numbers
+        for page in root.total: Rectangle {
+            property <bool> active: page == root.current;
+            width: 36px;
+            height: 36px;
+            border-radius: Tokens.radius-md;
+            background: active
+                ? Tokens.color-primary
+                : (num-touch.has-hover ? Tokens.color-accent : transparent);
+            Text {
+                x: (parent.width - self.preferred-width) / 2;
+                y: (parent.height - self.preferred-height) / 2;
+                text: (page + 1);
+                color: active ? Tokens.color-primary-foreground : Tokens.color-foreground;
+                font-size: Tokens.typography-body-size;
+                font-weight: Tokens.typography-weight-medium;
+            }
+            num-touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => { root.go(page); }
+            }
+            animate background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
+        }
+
+        // Next
+        Rectangle {
+            width: 36px;
+            height: 36px;
+            border-radius: Tokens.radius-md;
+            border-width: 1px;
+            border-color: Tokens.color-border-hairline;
+            background: next-touch.has-hover && root.current < root.total - 1
+                ? Tokens.color-accent : transparent;
+            Icon {
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                commands: LucidePaths.chevron-right;
+                tint: root.current < root.total - 1 ? Tokens.color-foreground : Tokens.color-muted-foreground;
+                size: 16px;
+            }
+            next-touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => { root.go(root.current + 1); }
+            }
+            animate background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
+        }
+    }
+}
