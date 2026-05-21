@@ -58,7 +58,8 @@ Files land in `ui/slintcn/` — **you own them**. Change colors in
 | **v0.12** | **Web-parity P0** — Text typography + game/HUD trio (Keycap, HudPill, SlotTile) + variant axes (Card padding/radius, Badge ghost/link, Tabs line) (34 components) | ✅ |
 | **v0.13** | **Web-parity P1/P2** — ScrollArea (Flickable + custom scrollbar), Popover, ContextMenu (right-click) (37 components) | ✅ |
 | **v0.14** | **Distribution backbone** — registry metadata (type/title/category), CLI `list`/`view`/`build`, remote-URL + namespaced install, npm/HTTP-ready | ✅ |
-| **v0.15** | Blocks — Sign-in/Settings/Dashboard + login/pricing/sidebar as installable `registry:block` items | upcoming |
+| **v0.15** | **Blocks** — sign-in, login, pricing, dashboard, settings as installable `registry:block` templates | ✅ |
+| **v0.16** | Theming — base-color variants (zinc/slate/stone) as distributable `registry:theme` items | upcoming |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics

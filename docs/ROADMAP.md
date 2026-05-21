@@ -1,6 +1,20 @@
 # slintcn roadmap
 
-## v0.14 — distribution backbone (current)
+## v0.15 — blocks (current)
+
+Composed, multi-component templates distributed as `registry:block` items —
+shadcn's "blocks." Installable like any component: `slintcn add sign-in`.
+
+- [x] **Block routing** — `slintcn.json` `blocksDir` (default `outDir/blocks`);
+      `routeDest` sends `blocks/*` there; imports rewritten as usual.
+- [x] **5 blocks** in `registry/default/blocks/`: **sign-in**, **login**,
+      **pricing** (3-tier), **dashboard** (metrics + activity feed),
+      **settings** (tabbed). Each is a self-contained component composing
+      primitives, with exposed props + callbacks.
+- [x] Registered as `registry:block` (category `block`) with `requires`;
+      added to the showcase's `build.rs` + a new **Blocks** showcase section.
+
+## v0.14 — distribution backbone
 
 shadcn.com isn't a component library — it's "a distribution system for code."
 This wave brings slintcn's ecosystem up to that model.
