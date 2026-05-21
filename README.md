@@ -1,13 +1,40 @@
 # slintcn
 
+[![CI](https://github.com/stevekwon211/slintcn/actions/workflows/ci.yml/badge.svg)](https://github.com/stevekwon211/slintcn/actions/workflows/ci.yml)
+[![Pages](https://github.com/stevekwon211/slintcn/actions/workflows/pages.yml/badge.svg)](https://github.com/stevekwon211/slintcn/actions/workflows/pages.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-white.svg)](LICENSE)
+
 **Copy-paste Slint components that don't look like 2009 desktop widgets.**
 
-🌐 **Live demo**: [stevekwon211.github.io/slintcn](https://stevekwon211.github.io/slintcn) — the full showcase running in your browser via Slint compiled to WebAssembly (~7 MB bundle, FemtoVG + WebGL2). Click around to verify every primitive interactively.
+**Live demo**: [stevekwon211.github.io/slintcn](https://stevekwon211.github.io/slintcn) - the full showcase running in your browser via Slint compiled to WebAssembly (~7 MB bundle, FemtoVG + WebGL2). Click around to verify every primitive interactively.
+
+<p align="center">
+  <img src="docs/img/snapshots/section-6-dashboard.png" alt="slintcn dashboard components" width="31%">
+  <img src="docs/img/snapshots/section-4-signin.png" alt="slintcn sign-in form" width="31%">
+  <img src="docs/img/snapshots/section-2-overlays.png" alt="slintcn overlay components" width="31%">
+</p>
+
+## Why it exists
 
 shadcn proved that developers want to *own* UI code, not fight a theme API.
 Slint 1.16 is moving to Fluent as the default — fine for consistency, weak for
 modern dark/glass product UI. **slintcn** is the missing layer: tokens + primitives
 you copy into your repo and customize.
+
+## Quick start
+
+```bash
+# Run the visual showcase
+cd examples/showcase && cargo run
+
+# Install components into your Slint project
+cd your-app
+node /path/to/slintcn/bin/slintcn.mjs init
+node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
+```
+
+Files land in `ui/slintcn/` — **you own them**. Change colors in
+`ui/slintcn/theme/tokens.slint`, tweak `button.slint` for your product.
 
 ## Philosophy
 
@@ -36,21 +63,6 @@ exist, a second registry (`registry/game/`) is just more `.slint` files.
 
 - **Rust** with Slint 1.16 (for the showcase or your Slint app)
 - **Node 20+** (the CLI runtime)
-
-## Quick start
-
-```bash
-# Run the visual showcase
-cd examples/showcase && cargo run
-
-# Install components into your Slint project
-cd your-app
-node /path/to/slintcn/bin/slintcn.mjs init
-node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
-```
-
-Files land in `ui/slintcn/` — **you own them**. Change colors in
-`ui/slintcn/theme/tokens.slint`, tweak `button.slint` for your product.
 
 ```slint
 import { Button, ButtonVariant, ButtonSize } from "slintcn/components/button.slint";
