@@ -9,7 +9,7 @@
 
 import { Tokens, Theme, ThemeMode }             from "slintcn/theme/tokens.slint";
 import { Button, ButtonVariant, ButtonSize }    from "slintcn/components/button.slint";
-import { Card, CardVariant }                    from "slintcn/components/card.slint";
+import { Card, CardVariant, CardPadding, CardRadius } from "slintcn/components/card.slint";
 import { Input }                                from "slintcn/components/input.slint";
 import { Badge, BadgeVariant, BadgeSize }       from "slintcn/components/badge.slint";
 import { Separator, SeparatorOrientation }      from "slintcn/components/separator.slint";
@@ -41,6 +41,11 @@ import { Slider }                               from "slintcn/components/slider.
 import { Breadcrumb, BreadcrumbItem }           from "slintcn/components/breadcrumb.slint";
 import { Pagination }                           from "slintcn/components/pagination.slint";
 import { Table, TableRow }                      from "slintcn/components/table.slint";
+import { Text as Typography, TextVariant, TextTone } from "slintcn/components/text.slint";
+import { Keycap, KeycapSize, KeycapTone }       from "slintcn/components/keycap.slint";
+import { HudPill, HudPillSize, HudPillTone }    from "slintcn/components/hud-pill.slint";
+import { SlotTile, SlotTileTone, SlotTileState } from "slintcn/components/slot-tile.slint";
+import { TabsVariant }                          from "slintcn/components/tabs.slint";
 
 // Sidebar nav item — local helper, not part of the registry.
 component NavItem inherits Rectangle {
@@ -149,7 +154,7 @@ export component AppWindow inherits Window {
                         font-weight: Tokens.typography-weight-semibold;
                     }
                     Badge {
-                        text: "v0.11";
+                        text: "v0.12";
                         variant: BadgeVariant.secondary;
                         size: BadgeSize.sm;
                     }
@@ -203,6 +208,16 @@ export component AppWindow inherits Window {
                     label: "Data";
                     active: root.active-section == 11;
                     clicked => { root.active-section = 11; }
+                }
+                NavItem {
+                    label: "Typography";
+                    active: root.active-section == 12;
+                    clicked => { root.active-section = 12; }
+                }
+                NavItem {
+                    label: "HUD";
+                    active: root.active-section == 13;
+                    clicked => { root.active-section = 13; }
                 }
 
                 Rectangle { height: 12px; background: transparent; }
@@ -324,7 +339,7 @@ export component AppWindow inherits Window {
                             spacing: 8px;
                             alignment: start;
                             Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
-                            Badge { text: "v0.11"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Badge { text: "v0.12"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
                         }
 
                         VerticalLayout {
@@ -1088,6 +1103,122 @@ export component AppWindow inherits Window {
                             ];
                         }
                     }
+                }
+            }
+
+            // (12) Typography — Text variants/tones + new variant axes
+            if root.active-section == 12: VerticalLayout {
+                spacing: Tokens.spacing-lg;
+                alignment: start;
+
+                SectionHeading {
+                    title: "Typography";
+                    subtitle: "Text variant × tone scale, plus the new Badge / Tabs / Card variant axes.";
+                }
+
+                Typography { text: "Display — 36"; variant: TextVariant.display; }
+                Typography { text: "Headline — 30"; variant: TextVariant.headline; }
+                Typography { text: "Title — 20"; variant: TextVariant.title; }
+                Typography { text: "Body large — 16"; variant: TextVariant.body-lg; }
+                Typography { text: "Body — 14"; variant: TextVariant.body; }
+                Typography { text: "Caption — 11"; variant: TextVariant.caption; tone: TextTone.muted; }
+
+                Label { text: "Tones"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 20px;
+                    alignment: start;
+                    Typography { text: "default"; tone: TextTone.default; }
+                    Typography { text: "muted";   tone: TextTone.muted; }
+                    Typography { text: "subtle";  tone: TextTone.subtle; }
+                    Typography { text: "accent";  tone: TextTone.accent; }
+                    Typography { text: "danger";  tone: TextTone.danger; }
+                }
+
+                Label { text: "Badge ghost / link  ·  Tabs line variant"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 12px;
+                    alignment: start;
+                    Badge { text: "ghost"; variant: BadgeVariant.ghost; }
+                    Badge { text: "link"; variant: BadgeVariant.link; }
+                }
+                HorizontalLayout {
+                    alignment: start;
+                    Tabs {
+                        variant: TabsVariant.line;
+                        items: [{ label: "Overview" }, { label: "Activity" }, { label: "Settings" }];
+                    }
+                }
+
+                Label { text: "Card padding / radius axes"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 12px;
+                    alignment: start;
+                    Card {
+                        card-padding: CardPadding.sm;
+                        card-radius: CardRadius.md;
+                        width: 150px; height: 70px;
+                        VerticalLayout {
+                            padding: parent.padding-l;
+                            Typography { text: "pad sm · rad md"; variant: TextVariant.body-sm; tone: TextTone.muted; }
+                        }
+                    }
+                    Card {
+                        card-padding: CardPadding.lg;
+                        card-radius: CardRadius.xxl;
+                        width: 150px; height: 70px;
+                        VerticalLayout {
+                            padding: parent.padding-l;
+                            Typography { text: "pad lg · rad 2xl"; variant: TextVariant.body-sm; tone: TextTone.muted; }
+                        }
+                    }
+                }
+            }
+
+            // (13) HUD — Keycap, HudPill, SlotTile (Slint for games + tools)
+            if root.active-section == 13: VerticalLayout {
+                spacing: Tokens.spacing-lg;
+                alignment: start;
+
+                SectionHeading {
+                    title: "HUD";
+                    subtitle: "Keycap, HudPill, SlotTile — the games + tools layer.";
+                }
+
+                Label { text: "Keycap (tones)"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    Keycap { text: "⌘"; tone: KeycapTone.on-glass; }
+                    Keycap { text: "K"; tone: KeycapTone.on-glow; }
+                    Keycap { text: "Esc"; tone: KeycapTone.muted; }
+                    Keycap { text: "↵"; tone: KeycapTone.affirm-on-glass; }
+                    Keycap { text: "⌫"; tone: KeycapTone.deny-on-glass; }
+                    Keycap { text: "W"; size: KeycapSize.sm; tone: KeycapTone.on-glass; }
+                }
+
+                Label { text: "HudPill (scrim levels × sizes)"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    HudPill { text: "120 FPS"; size: HudPillSize.sm; tone: HudPillTone.scrim0; }
+                    HudPill { text: "Wave 3 / 8"; tone: HudPillTone.scrim1; }
+                    HudPill { text: "● REC"; size: HudPillSize.lg; tone: HudPillTone.scrim2; }
+                }
+
+                Label { text: "SlotTile (hotbar)"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: start;
+                    SlotTile {
+                        tone: SlotTileTone.stone;
+                        state: SlotTileState.active;
+                        interactive: true;
+                        Keycap { x: 4px; y: 4px; text: "1"; size: KeycapSize.sm; tone: KeycapTone.on-glass; }
+                    }
+                    SlotTile { tone: SlotTileTone.stone; interactive: true; }
+                    SlotTile { tone: SlotTileTone.accent; interactive: true; }
+                    SlotTile { tone: SlotTileTone.empty; }
+                    SlotTile { tone: SlotTileTone.stone; state: SlotTileState.disabled; }
                 }
             }
         }

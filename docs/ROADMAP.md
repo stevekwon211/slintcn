@@ -1,6 +1,28 @@
 # slintcn roadmap
 
-## v0.11 — breadth batch B (current)
+## v0.12 — web-parity P0 (current)
+
+Driven by an audit of a real Base-UI/shadcn web app (apps/web): the 21 UI
+elements actually used there, with their variant axes. Closed slintcn's P0
+gaps. 30 → 34 components.
+
+- [x] **Text** — typography primitive: `variant` (display/headline/title/
+      body-lg/body/body-sm/label/caption) × `tone` (default/muted/subtle/
+      accent/danger). Import `as Typography` to avoid the built-in `Text`.
+- [x] **Keycap** — keyboard-hint cap; `size` (sm/md) × `tone` (on-glow/
+      on-glass/muted/affirm-*/deny-*). Affirm = green, deny = red.
+- [x] **HudPill** — rounded-full status pill; `size` (sm/md/lg) × `tone`
+      (scrim0/scrim1/scrim2).
+- [x] **SlotTile** — inventory/hotbar slot holding `@children`; `tone`
+      (stone/empty/accent) × `state` (idle/active/disabled) × `interactive`.
+- [x] **Variant axes**: Card gains `card-padding` (none/sm/md/lg) +
+      `card-radius` (md/lg/xl/xxl); Badge gains `ghost` + `link`; Tabs gains
+      a `line` variant (underline) alongside the default segmented control.
+- [x] Tokens: `color-affirm` (green), `color-subtle-foreground`,
+      `color-scrim-0/1` (HUD pill levels).
+- [x] Showcase: **Typography** + **HUD** sections.
+
+## v0.11 — breadth batch B
 
 Navigation + data primitives. 26 → 30 components.
 
