@@ -111,6 +111,49 @@ component SectionHeading inherits VerticalLayout {
     }
 }
 
+// Docs-style install + usage block (shadcn-docs feel): a `$ slintcn add …`
+// command line over an optional .slint usage snippet, both in mono boxes.
+component DocBlock inherits VerticalLayout {
+    in property <string> command;
+    in property <string> code;
+    spacing: 8px;
+
+    Rectangle {
+        background: Tokens.color-surface-1;
+        border-width: 1px;
+        border-color: Tokens.color-border-hairline;
+        border-radius: Tokens.radius-md;
+        height: cmd.preferred-height + 16px;
+        HorizontalLayout {
+            padding-left: 12px;
+            padding-right: 12px;
+            cmd := Text {
+                text: "$ " + root.command;
+                color: Tokens.color-foreground;
+                font-family: "monospace";
+                font-size: Tokens.typography-body-sm-size;
+                vertical-alignment: center;
+            }
+        }
+    }
+
+    if root.code != "": Rectangle {
+        background: Tokens.color-surface-1;
+        border-width: 1px;
+        border-color: Tokens.color-border-hairline;
+        border-radius: Tokens.radius-md;
+        height: snippet.preferred-height + 24px;
+        snippet := Text {
+            x: 12px;
+            y: 12px;
+            text: root.code;
+            color: Tokens.color-muted-foreground;
+            font-family: "monospace";
+            font-size: Tokens.typography-body-sm-size;
+        }
+    }
+}
+
 export component AppWindow inherits Window {
     title: "slintcn showcase";
     preferred-width:  1100px;
@@ -163,7 +206,7 @@ export component AppWindow inherits Window {
                         font-weight: Tokens.typography-weight-semibold;
                     }
                     Badge {
-                        text: "v0.16";
+                        text: "v0.17";
                         variant: BadgeVariant.secondary;
                         size: BadgeSize.sm;
                     }
@@ -303,6 +346,10 @@ export component AppWindow inherits Window {
                     title: "Buttons";
                     subtitle: "8 variants × 4 text sizes, plus 4 icon sizes. Enter / Space activate the focused button.";
                 }
+                DocBlock {
+                    command: "slintcn add button";
+                    code: "import { Button, ButtonVariant } from \"slintcn/components/button.slint\";\n\nButton {\n    variant: ButtonVariant.default;\n    text: \"Ship it\";\n    clicked => { /* … */ }\n}";
+                }
 
                 Label { text: "Variants"; variant: LabelVariant.muted; }
                 HorizontalLayout {
@@ -349,6 +396,10 @@ export component AppWindow inherits Window {
                     title: "Form";
                     subtitle: "Input, Label, Checkbox, Switch, Badge — wired with a Card surface.";
                 }
+                DocBlock {
+                    command: "slintcn add input label checkbox switch textarea";
+                    code: "import { Input } from \"slintcn/components/input.slint\";\n\nInput { placeholder: \"you@example.com\"; text <=> email; }";
+                }
 
                 Card {
                     variant: CardVariant.glass;
@@ -363,7 +414,7 @@ export component AppWindow inherits Window {
                             spacing: 8px;
                             alignment: start;
                             Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
-                            Badge { text: "v0.16"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Badge { text: "v0.17"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
                         }
 
                         VerticalLayout {
@@ -408,6 +459,10 @@ export component AppWindow inherits Window {
                 SectionHeading {
                     title: "Overlays";
                     subtitle: "Dialog · AlertDialog · Sheet · Tooltip · Toast — Escape closes modals.";
+                }
+                DocBlock {
+                    command: "slintcn add dialog alert-dialog sheet tooltip toast";
+                    code: "import { Dialog } from \"slintcn/components/dialog.slint\";\n\n// mount as the LAST child of Window:\ndlg := Dialog { width: parent.width; height: parent.height; title: \"Confirm\"; }";
                 }
 
                 Label { text: "Modals"; variant: LabelVariant.muted; }
@@ -466,6 +521,10 @@ export component AppWindow inherits Window {
                 SectionHeading {
                     title: "Tabs";
                     subtitle: "Visual navigation strip. Consumer renders content per current index.";
+                }
+                DocBlock {
+                    command: "slintcn add tabs";
+                    code: "import { Tabs, TabsVariant } from \"slintcn/components/tabs.slint\";\n\nTabs { items: [{ label: \"Account\" }, { label: \"Password\" }]; current <=> tab; }";
                 }
 
                 // Wrap in alignment:start so the segmented strip sizes to its
@@ -886,6 +945,10 @@ export component AppWindow inherits Window {
                     title: "Selection";
                     subtitle: "RadioGroup, Select (in-tree dropdown), and the Icon helper with Lucide-compatible path data.";
                 }
+                DocBlock {
+                    command: "slintcn add radio-group select toggle toggle-group";
+                    code: "import { Select, SelectItem } from \"slintcn/components/select.slint\";\n\nSelect { items: [{ label: \"Monthly\" }, { label: \"Yearly\" }]; }";
+                }
 
                 Card {
                     variant: CardVariant.solid;
@@ -989,6 +1052,10 @@ export component AppWindow inherits Window {
                     title: "Feedback";
                     subtitle: "Alert, Progress, and Skeleton — status and loading states.";
                 }
+                DocBlock {
+                    command: "slintcn add alert progress skeleton";
+                    code: "import { Alert, AlertVariant } from \"slintcn/components/alert.slint\";\n\nAlert { title: \"Heads up\"; description: \"You can do this.\"; }";
+                }
 
                 Alert {
                     width: 100%;
@@ -1025,6 +1092,10 @@ export component AppWindow inherits Window {
                 SectionHeading {
                     title: "Display";
                     subtitle: "Avatar, Accordion, Toggle, and ToggleGroup.";
+                }
+                DocBlock {
+                    command: "slintcn add avatar accordion card badge";
+                    code: "import { Accordion } from \"slintcn/components/accordion.slint\";\n\nAccordion { open-index <=> open; items: [{ title: \"Q\", content: \"A\" }]; }";
                 }
 
                 Label { text: "Avatars"; variant: LabelVariant.muted; }
@@ -1076,6 +1147,10 @@ export component AppWindow inherits Window {
                     title: "Navigation";
                     subtitle: "Breadcrumb, Pagination, and Slider.";
                 }
+                DocBlock {
+                    command: "slintcn add breadcrumb pagination slider";
+                    code: "import { Pagination } from \"slintcn/components/pagination.slint\";\n\nPagination { total: 5; current <=> page; changed(p) => { /* … */ } }";
+                }
 
                 Label { text: "Breadcrumb"; variant: LabelVariant.muted; }
                 Breadcrumb {
@@ -1110,6 +1185,10 @@ export component AppWindow inherits Window {
                     title: "Data";
                     subtitle: "Table — header + rows aligned by equal-stretch columns.";
                 }
+                DocBlock {
+                    command: "slintcn add table";
+                    code: "import { Table, TableRow } from \"slintcn/components/table.slint\";\n\nTable { columns: [\"Invoice\", \"Amount\"]; rows: [{ cells: [\"INV-001\", \"$250\"] }]; }";
+                }
 
                 Card {
                     variant: CardVariant.solid;
@@ -1138,6 +1217,10 @@ export component AppWindow inherits Window {
                 SectionHeading {
                     title: "Typography";
                     subtitle: "Text variant × tone scale, plus the new Badge / Tabs / Card variant axes.";
+                }
+                DocBlock {
+                    command: "slintcn add text";
+                    code: "// alias to avoid shadowing the built-in Text:\nimport { Text as Typography, TextVariant } from \"slintcn/components/text.slint\";\n\nTypography { text: \"Display\"; variant: TextVariant.display; }";
                 }
 
                 Typography { text: "Display — 36"; variant: TextVariant.display; }
@@ -1207,6 +1290,10 @@ export component AppWindow inherits Window {
                     title: "HUD";
                     subtitle: "Keycap, HudPill, SlotTile — the games + tools layer.";
                 }
+                DocBlock {
+                    command: "slintcn add keycap hud-pill slot-tile";
+                    code: "import { Keycap, KeycapTone } from \"slintcn/components/keycap.slint\";\n\nKeycap { text: \"⌘\"; tone: KeycapTone.on-glass; }";
+                }
 
                 Label { text: "Keycap (tones)"; variant: LabelVariant.muted; }
                 HorizontalLayout {
@@ -1254,6 +1341,10 @@ export component AppWindow inherits Window {
                 SectionHeading {
                     title: "Interaction";
                     subtitle: "ScrollArea, Popover, and ContextMenu — overlay + scroll behaviors.";
+                }
+                DocBlock {
+                    command: "slintcn add scroll-area popover context-menu";
+                    code: "import { Popover } from \"slintcn/components/popover.slint\";\n\nPopover { title: \"Settings\"; description: \"…\"; Button { text: \"Open\"; } }";
                 }
 
                 Label { text: "Popover (click) · ContextMenu (right-click)"; variant: LabelVariant.muted; }

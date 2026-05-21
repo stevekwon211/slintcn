@@ -1,6 +1,20 @@
 # slintcn roadmap
 
-## v0.16 — theming (current)
+## v0.17 — docs IA (current)
+
+The WASM showcase becomes a docs site: every component section now leads
+with a shadcn-docs-style **install command + usage code** above its live
+preview.
+
+- [x] **DocBlock** showcase component — a `$ slintcn add …` command box over
+      an optional `.slint` usage snippet, both monospace.
+- [x] Applied to all 12 component sections (Buttons → Interaction): each
+      shows how to install it and a minimal usage example, then the gallery.
+
+That completes the shadcn.com ecosystem port: distribution backbone (v0.14),
+blocks (v0.15), theming (v0.16), and docs IA (v0.17).
+
+## v0.16 — theming
 
 Base-color variants — shadcn's neutral/zinc/slate/stone choice, chosen at
 init via `slintcn.json` `baseColor`.
