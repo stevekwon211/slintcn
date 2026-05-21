@@ -1,6 +1,18 @@
 # slintcn roadmap
 
-## v0.15 — blocks (current)
+## v0.16 — theming (current)
+
+Base-color variants — shadcn's neutral/zinc/slate/stone choice, chosen at
+init via `slintcn.json` `baseColor`.
+
+- [x] **Variant palettes** — `theme/palette-{zinc,slate,stone}.slint`
+      (Tailwind neutral scales); `palette.slint` stays the default neutral.
+- [x] **baseColor-driven install** — `installItem(theme)` writes the
+      `baseColor`-matching palette as `palette.slint` (so `tokens.slint`'s
+      import resolves). `slintcn init --base-color zinc` records the choice.
+- [x] **Colors showcase section** — neutral ramp (50–950) + accent swatches.
+
+## v0.15 — blocks
 
 Composed, multi-component templates distributed as `registry:block` items —
 shadcn's "blocks." Installable like any component: `slintcn add sign-in`.

@@ -59,7 +59,8 @@ Files land in `ui/slintcn/` — **you own them**. Change colors in
 | **v0.13** | **Web-parity P1/P2** — ScrollArea (Flickable + custom scrollbar), Popover, ContextMenu (right-click) (37 components) | ✅ |
 | **v0.14** | **Distribution backbone** — registry metadata (type/title/category), CLI `list`/`view`/`build`, remote-URL + namespaced install, npm/HTTP-ready | ✅ |
 | **v0.15** | **Blocks** — sign-in, login, pricing, dashboard, settings as installable `registry:block` templates | ✅ |
-| **v0.16** | Theming — base-color variants (zinc/slate/stone) as distributable `registry:theme` items | upcoming |
+| **v0.16** | **Theming** — base-color variants (neutral/zinc/slate/stone) via `slintcn init --base-color` + Colors reference | ✅ |
+| **v0.17** | Docs IA — showcase as a docs site (install command + usage code per component) | upcoming |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
@@ -107,8 +108,10 @@ slintcn build -o dist/registry     # emit a static registry (registry.json + r/*
 ```
 
 **Config — `slintcn.json`** (created by `init`): `style` (which registry),
-`baseColor`, `outDir`/`themeDir`/`componentsDir` (where files land — fully
-relocatable, imports are rewritten to match), and `registries` (namespace → URL).
+`baseColor` (`neutral` · `zinc` · `slate` · `stone` — pick at init with
+`slintcn init --base-color zinc`), `outDir`/`themeDir`/`componentsDir`/`blocksDir`
+(where files land — fully relocatable, imports are rewritten to match), and
+`registries` (namespace → URL).
 
 **Remote / custom registries.** `slintcn build` emits a static registry —
 a `registry.json` index plus `r/<name>.json` files with each component's
