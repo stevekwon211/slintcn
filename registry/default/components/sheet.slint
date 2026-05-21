@@ -82,16 +82,19 @@ export component Sheet inherits Rectangle {
             easing: Tokens.motion-easing-standard;
         }
 
+        // Absorb inside-panel clicks (no fall-through to Scrim).
+        TouchArea {}
+
         VerticalLayout {
-            padding: Tokens.spacing-lg;
-            spacing: Tokens.spacing-md;
+            padding: Tokens.spacing-xl;
+            spacing: Tokens.spacing-lg;
 
             VerticalLayout {
-                spacing: 4px;
+                spacing: Tokens.spacing-sm;
                 if root.title != "": Text {
                     text: root.title;
                     color: Tokens.color-foreground;
-                    font-size: 18px;
+                    font-size: Tokens.typography-title-size;
                     font-weight: Tokens.typography-weight-semibold;
                 }
                 if root.description != "": Text {

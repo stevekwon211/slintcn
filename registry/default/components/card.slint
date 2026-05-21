@@ -50,14 +50,61 @@ export component Card inherits Rectangle {
         easing: Tokens.motion-easing-standard;
     }
 
+    // shadcn Card: p-6 (24px) padding. gap-l is the in-content rhythm —
+    // 16px (gap-4) reads right for mixed form/section content (gap-6 was
+    // too airy between form fields). Compact size tightens to 12px.
     out property <length> padding-l:
-        size == CardSize.sm ? Tokens.spacing-md : Tokens.spacing-lg;
+        size == CardSize.sm ? Tokens.spacing-lg : Tokens.spacing-xl;
     out property <length> gap-l:
-        size == CardSize.sm ? Tokens.spacing-sm : Tokens.spacing-md;
+        size == CardSize.sm ? Tokens.spacing-md : Tokens.spacing-lg;
 
     // Hover tracker. Placed before @children so child interactive controls
     // (Buttons, Inputs) sit z-above and receive their own click events.
     touch := TouchArea { }
 
+    @children
+}
+
+// shadcn-faithful Card composition helpers. Compose inside a Card's
+// VerticalLayout (padding: parent.padding-l; spacing: parent.gap-l):
+//
+//   Card {
+//       VerticalLayout {
+//           padding: parent.padding-l;
+//           spacing: parent.gap-l;
+//           CardHeader {
+//               CardTitle { text: "Notifications"; }
+//               CardDescription { text: "Choose what to be notified about."; }
+//           }
+//           // ...content...
+//           CardFooter { Button { text: "Save"; } }
+//       }
+//   }
+
+export component CardTitle inherits Text {
+    color: Tokens.color-foreground;
+    font-size: Tokens.typography-title-size;   // text-lg (18)
+    font-weight: Tokens.typography-weight-semibold;
+}
+
+export component CardDescription inherits Text {
+    color: Tokens.color-muted-foreground;
+    font-size: Tokens.typography-body-size;     // text-sm (14)
+    wrap: word-wrap;
+}
+
+export component CardHeader inherits VerticalLayout {
+    spacing: 6px;   // gap-1.5 between title + description
+    @children
+}
+
+export component CardContent inherits VerticalLayout {
+    spacing: Tokens.spacing-md;
+    @children
+}
+
+export component CardFooter inherits HorizontalLayout {
+    alignment: end;
+    spacing: Tokens.spacing-sm;   // gap-2 between footer buttons
     @children
 }

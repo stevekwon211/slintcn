@@ -8,11 +8,11 @@ export component Badge inherits Rectangle {
     in property <BadgeSize>    size:    BadgeSize.default;
     in property <string> text;
 
-    property <length> hpad: size == BadgeSize.sm ? 6px : 8px;
+    property <length> hpad: size == BadgeSize.sm ? 6px : 8px;   // px-2
 
     height: size == BadgeSize.sm ? 18px : 22px;
     width: label.preferred-width + 2 * hpad;
-    border-radius: Tokens.radius-sm;
+    border-radius: Tokens.radius-md;   // shadcn badge rounded-md
 
     background:
         variant == BadgeVariant.secondary ? Tokens.color-secondary :

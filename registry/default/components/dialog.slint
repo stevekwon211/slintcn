@@ -1,25 +1,27 @@
-// slintcn Dialog — modal overlay (Scrim + glass panel).
+// slintcn Dialog — modal overlay (Scrim + card panel), shadcn chrome.
 //
-// Mount as the LAST child of Window (see popup-helpers.slint for the pattern)
-// and size to the full window via `width: parent.width; height: parent.height`.
+// Mount as the LAST child of Window (see popup-helpers.slint) sized to the
+// full window via `width: parent.width; height: parent.height`.
 //
 // Public API:
 //   in-out property <bool> open
-//   in property <string> title
-//   in property <string> description
+//   in property <string> title / description
 //   in property <bool> dismiss-on-backdrop: true
-//   callback dismissed()    // fired when backdrop click or Close button closes
+//   in property <string> close-label: "Close"
+//   callback dismissed()
 //
 // Body content goes via `@children` between header and footer.
 //
-// Keyboard: Escape closes when open. Tab moves between focusable items inside
-// the panel; on v0.2 Tab is not fully trapped — focus may escape if the
-// underlying UI also has focusable elements. Tracked for v0.3.
+// Interaction: backdrop click closes (when dismiss-on-backdrop); clicks
+// INSIDE the panel are absorbed by a panel-wide TouchArea so they never fall
+// through to the Scrim. X button (top-right) and Escape also close.
 
 import { Tokens } from "../theme/tokens.slint";
 import { Scrim } from "popup-helpers.slint";
 import { Button, ButtonVariant } from "button.slint";
 import { Separator, SeparatorOrientation } from "separator.slint";
+import { Icon } from "icon.slint";
+import { LucidePaths } from "lucide-paths.slint";
 
 export component Dialog inherits Rectangle {
     in-out property <bool> open: false;
@@ -48,7 +50,7 @@ export component Dialog inherits Rectangle {
         background: Tokens.color-card;
         border-color: Tokens.color-border-hairline;
         border-width: 1px;
-        border-radius: Tokens.radius-xl;
+        border-radius: Tokens.radius-lg;     // shadcn dialog rounded-lg (10)
         drop-shadow-blur:     Tokens.shadow-e3-blur;
         drop-shadow-offset-y: Tokens.shadow-e3-offset-y;
         drop-shadow-color:    Tokens.shadow-e3-color;
@@ -56,29 +58,33 @@ export component Dialog inherits Rectangle {
         width: 420px;
         height: layout.preferred-height;
         x: (root.width - self.width) / 2;
-        // Slight slide-up on open (offset-y 8px → 0) for a less-flat feel.
-        y: root.open
-            ? (root.height - self.height) / 2
-            : (root.height - self.height) / 2 + 8px;
+        y: (root.height - self.height) / 2;
 
+        // shadcn fades + zooms; Slint has no scale transform on Rectangle,
+        // so we use a clean opacity fade (no floaty slide).
         opacity: root.open ? 1.0 : 0.0;
-
-        animate opacity, y {
+        visible: root.open || self.opacity > 0.0;
+        animate opacity {
             duration: Tokens.motion-base;
             easing: Tokens.motion-easing-standard;
         }
 
+        // Absorb clicks inside the panel — first child sits z-below the
+        // content, so the layout's buttons/inputs still receive their own
+        // clicks, but empty-padding clicks don't reach the Scrim behind.
+        TouchArea {}
+
         layout := VerticalLayout {
-            padding: Tokens.spacing-lg;
-            spacing: Tokens.spacing-md;
+            padding: Tokens.spacing-xl;       // p-6 (24)
+            spacing: Tokens.spacing-lg;       // gap-4 (16)
 
             // Header
             VerticalLayout {
-                spacing: 4px;
+                spacing: Tokens.spacing-sm;   // gap-2 (8)
                 if root.title != "": Text {
                     text: root.title;
                     color: Tokens.color-foreground;
-                    font-size: 18px;
+                    font-size: Tokens.typography-title-size;
                     font-weight: Tokens.typography-weight-semibold;
                 }
                 if root.description != "": Text {
@@ -89,12 +95,10 @@ export component Dialog inherits Rectangle {
                 }
             }
 
-            // Body slot
             @children
 
             Separator { orientation: SeparatorOrientation.horizontal; }
 
-            // Default footer — a single Close button at the trailing edge.
             HorizontalLayout {
                 alignment: end;
                 Button {
@@ -107,13 +111,36 @@ export component Dialog inherits Rectangle {
                 }
             }
         }
+
+        // X close button, top-right (shadcn).
+        close-x := Rectangle {
+            x: parent.width - self.width - 12px;
+            y: 12px;
+            width: 28px;
+            height: 28px;
+            border-radius: Tokens.radius-sm;
+            background: x-touch.has-hover ? Tokens.color-accent : transparent;
+            Icon {
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                commands: LucidePaths.x-mark;
+                tint: Tokens.color-muted-foreground;
+                size: 16px;
+            }
+            x-touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => {
+                    root.open = false;
+                    root.dismissed();
+                }
+            }
+            animate background {
+                duration: Tokens.motion-fast;
+                easing: Tokens.motion-easing-standard;
+            }
+        }
     }
 
-    // When `open` flips true, move focus into the dialog so the Escape /
-    // Tab interceptors in the outer FocusScope receive keyboard events.
-    // The default close button is the only focusable element in v0.5
-    // Dialog; consumers with body inputs should call `.focus()` on their
-    // own element after setting `open = true` (documented in README).
     changed open => {
         if (self.open) {
             focus-scope.focus();
@@ -129,11 +156,8 @@ export component Dialog inherits Rectangle {
                 root.dismissed();
                 return accept;
             }
-            // Tab and Shift+Tab are trapped — v0.5 Dialog has a single
-            // focusable (the Close button) so Tab is effectively a no-op
-            // rather than a route out into the underlying UI.
             if (event.text == "\u{9}") {
-                return accept;
+                return accept;   // trap Tab (single focusable footer button)
             }
             return reject;
         }

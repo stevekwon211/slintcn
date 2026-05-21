@@ -35,8 +35,8 @@ export component Tooltip inherits Rectangle {
     preferred-width:  child-layout.preferred-width;
     preferred-height: child-layout.preferred-height;
 
-    property <length> bubble-width:  measure-text.preferred-width  + 16px;
-    property <length> bubble-height: measure-text.preferred-height + 8px;
+    property <length> bubble-width:  measure-text.preferred-width  + 24px;  // px-3
+    property <length> bubble-height: measure-text.preferred-height + 12px;  // py-1.5
 
     child-layout := HorizontalLayout {
         @children
@@ -82,20 +82,20 @@ export component Tooltip inherits Rectangle {
         height: root.bubble-height;
 
         Rectangle {
-            background: Tokens.color-card;
-            border-color: Tokens.color-border-hairline-strong;
-            border-width: 1px;
+            // shadcn tooltip is inverted: bg-primary + primary-foreground text.
+            background: Tokens.color-primary;
+            border-width: 0px;
             border-radius: Tokens.radius-md;
             drop-shadow-blur:     Tokens.shadow-e2-blur;
             drop-shadow-offset-y: Tokens.shadow-e2-offset-y;
             drop-shadow-color:    Tokens.shadow-e2-color;
 
             Text {
-                x: 8px;
-                y: 4px;
+                x: 12px;
+                y: 6px;
+                color: Tokens.color-primary-foreground;
+                font-size: Tokens.typography-label-size;
                 text: root.text;
-                color: Tokens.color-foreground;
-                font-size: Tokens.typography-body-sm-size;
             }
         }
     }

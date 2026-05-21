@@ -12,7 +12,7 @@ export component Input inherits Rectangle {
 
     forward-focus: input;
 
-    height: 40px;
+    height: Tokens.density-input;
     background: Tokens.color-surface-1;
     border-color: input.has-focus ? Tokens.color-ring : Tokens.color-border-hairline;
     border-width: 1px;
@@ -58,7 +58,7 @@ export component Input inherits Rectangle {
         width:  parent.width  + 2 * Tokens.focus-ring-offset;
         height: parent.height + 2 * Tokens.focus-ring-offset;
         border-width: Tokens.focus-ring-width;
-        border-color: Tokens.color-ring;
+        border-color: Tokens.color-ring-muted;
         border-radius: Tokens.radius-md + Tokens.focus-ring-offset;
         background: transparent;
     }

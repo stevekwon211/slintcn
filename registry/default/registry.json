@@ -37,7 +37,7 @@
     },
     "dialog": {
       "files": ["components/dialog.slint"],
-      "requires": ["theme", "popup-helpers", "button", "separator"]
+      "requires": ["theme", "popup-helpers", "button", "separator", "icon", "lucide-paths"]
     },
     "alert-dialog": {
       "files": ["components/alert-dialog.slint"],

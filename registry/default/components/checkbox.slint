@@ -30,7 +30,7 @@ export component Checkbox {
                     ? Tokens.color-primary
                     : Tokens.color-border-hairline-strong;
                 border-width: 1px;
-                border-radius: Tokens.radius-sm;
+                border-radius: 4px;  // shadcn checkbox rounded-[4px]
 
                 if root.checked: Path {
                     width: 16px;
@@ -42,13 +42,13 @@ export component Checkbox {
                 }
 
                 if focus-scope.has-focus: Rectangle {
-                    x: -2px;
-                    y: -2px;
-                    width:  parent.width  + 4px;
-                    height: parent.height + 4px;
-                    border-width: 2px;
-                    border-color: Tokens.color-ring;
-                    border-radius: Tokens.radius-sm + 2px;
+                    x: -3px;
+                    y: -3px;
+                    width:  parent.width  + 6px;
+                    height: parent.height + 6px;
+                    border-width: Tokens.focus-ring-width;
+                    border-color: Tokens.color-ring-muted;
+                    border-radius: 4px + 3px;
                     background: transparent;
                 }
 

@@ -27,10 +27,11 @@ export component Button inherits Rectangle {
         size == ButtonSize.icon || size == ButtonSize.icon-xs
         || size == ButtonSize.icon-sm || size == ButtonSize.icon-lg;
 
+    // shadcn horizontal padding: default px-4(16), sm px-3(12), lg px-6(24).
     property <length> hpad:
-        size == ButtonSize.xs ? 8px :
-        size == ButtonSize.sm ? 10px :
-        size == ButtonSize.lg ? 12px : 10px;
+        size == ButtonSize.xs ? 10px :
+        size == ButtonSize.sm ? 12px :
+        size == ButtonSize.lg ? 24px : 16px;
 
     height:
         size == ButtonSize.xs || size == ButtonSize.icon-xs ? Tokens.density-button-xs :
@@ -44,7 +45,7 @@ export component Button inherits Rectangle {
 
     // ----- per-variant color resolution (single source per role) -----
     property <color> bg-rest:
-        variant == ButtonVariant.outline     ? Tokens.color-surface-1.with-alpha(0.3) :
+        variant == ButtonVariant.outline     ? transparent :
         variant == ButtonVariant.secondary   ? Tokens.color-secondary :
         variant == ButtonVariant.ghost       ? transparent :
         variant == ButtonVariant.link        ? transparent :
@@ -53,9 +54,9 @@ export component Button inherits Rectangle {
         /* default | glow */                   Tokens.color-foreground;
 
     property <color> bg-hover:
-        variant == ButtonVariant.outline     ? Tokens.color-surface-1.with-alpha(0.5) :
+        variant == ButtonVariant.outline     ? Tokens.color-accent :
         variant == ButtonVariant.secondary   ? Tokens.color-secondary.with-alpha(0.8) :
-        variant == ButtonVariant.ghost       ? Tokens.color-muted.with-alpha(0.5) :
+        variant == ButtonVariant.ghost       ? Tokens.color-accent :
         variant == ButtonVariant.link        ? transparent :
         variant == ButtonVariant.destructive ? Tokens.color-destructive.with-alpha(0.3) :
         variant == ButtonVariant.glass       ? Tokens.color-surface-3 :
@@ -168,7 +169,7 @@ export component Button inherits Rectangle {
         width:  parent.width  + 2 * Tokens.focus-ring-offset;
         height: parent.height + 2 * Tokens.focus-ring-offset;
         border-width: Tokens.focus-ring-width;
-        border-color: Tokens.color-ring;
+        border-color: Tokens.color-ring-muted;
         border-radius: Tokens.radius-md + Tokens.focus-ring-offset;
         background: transparent;
     }

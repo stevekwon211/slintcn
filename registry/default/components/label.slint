@@ -25,13 +25,13 @@ export component Label inherits Rectangle {
             color: variant == LabelVariant.muted
                 ? Tokens.color-muted-foreground
                 : Tokens.color-foreground;
-            font-size: Tokens.typography-label-size;
+            font-size: Tokens.typography-body-size;   // shadcn Label text-sm (14)
             font-weight: Tokens.typography-weight-medium;
         }
         if variant == LabelVariant.required: Text {
             text: "*";
             color: Tokens.color-destructive;
-            font-size: Tokens.typography-label-size;
+            font-size: Tokens.typography-body-size;   // shadcn Label text-sm (14)
             font-weight: Tokens.typography-weight-medium;
         }
     }

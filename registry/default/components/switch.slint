@@ -41,13 +41,13 @@ export component Switch {
             }
 
             if focus-scope.has-focus: Rectangle {
-                x: -2px;
-                y: -2px;
-                width:  parent.width  + 4px;
-                height: parent.height + 4px;
-                border-width: 2px;
-                border-color: Tokens.color-ring;
-                border-radius: 12px;
+                x: -3px;
+                y: -3px;
+                width:  parent.width  + 6px;
+                height: parent.height + 6px;
+                border-width: Tokens.focus-ring-width;
+                border-color: Tokens.color-ring-muted;
+                border-radius: 13px;
                 background: transparent;
             }
 
