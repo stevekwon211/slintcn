@@ -1,6 +1,21 @@
 # slintcn roadmap
 
-## v0.12 — web-parity P0 (current)
+## v0.13 — web-parity P1/P2 (current)
+
+Closes the remaining audit gaps — the interaction-heavy ones. 34 → 37.
+
+- [x] **ScrollArea** — clipped `Flickable` viewport with a slim custom
+      scrollbar (thumb size/position from viewport-y / content-height /
+      visible-height). Set `content-height`; lay children to that height.
+- [x] **Popover** — click-triggered floating panel; trigger is `@children`,
+      content is a `title` + `description` card in a PopupWindow that closes
+      on click-outside.
+- [x] **ContextMenu** — right-click menu over an area (`@children`); a
+      TouchArea `pointer-event` catches the right button and opens a
+      PopupWindow at the cursor with `items`, each firing `selected(int)`.
+- [x] Showcase: **Interaction** section.
+
+## v0.12 — web-parity P0
 
 Driven by an audit of a real Base-UI/shadcn web app (apps/web): the 21 UI
 elements actually used there, with their variant axes. Closed slintcn's P0

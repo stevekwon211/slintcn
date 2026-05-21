@@ -46,6 +46,9 @@ import { Keycap, KeycapSize, KeycapTone }       from "slintcn/components/keycap.
 import { HudPill, HudPillSize, HudPillTone }    from "slintcn/components/hud-pill.slint";
 import { SlotTile, SlotTileTone, SlotTileState } from "slintcn/components/slot-tile.slint";
 import { TabsVariant }                          from "slintcn/components/tabs.slint";
+import { ScrollArea }                           from "slintcn/components/scroll-area.slint";
+import { Popover }                              from "slintcn/components/popover.slint";
+import { ContextMenu, ContextMenuItemData }     from "slintcn/components/context-menu.slint";
 
 // Sidebar nav item — local helper, not part of the registry.
 component NavItem inherits Rectangle {
@@ -154,7 +157,7 @@ export component AppWindow inherits Window {
                         font-weight: Tokens.typography-weight-semibold;
                     }
                     Badge {
-                        text: "v0.12";
+                        text: "v0.13";
                         variant: BadgeVariant.secondary;
                         size: BadgeSize.sm;
                     }
@@ -218,6 +221,11 @@ export component AppWindow inherits Window {
                     label: "HUD";
                     active: root.active-section == 13;
                     clicked => { root.active-section = 13; }
+                }
+                NavItem {
+                    label: "Interaction";
+                    active: root.active-section == 14;
+                    clicked => { root.active-section = 14; }
                 }
 
                 Rectangle { height: 12px; background: transparent; }
@@ -339,7 +347,7 @@ export component AppWindow inherits Window {
                             spacing: 8px;
                             alignment: start;
                             Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
-                            Badge { text: "v0.12"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Badge { text: "v0.13"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
                         }
 
                         VerticalLayout {
@@ -1219,6 +1227,77 @@ export component AppWindow inherits Window {
                     SlotTile { tone: SlotTileTone.accent; interactive: true; }
                     SlotTile { tone: SlotTileTone.empty; }
                     SlotTile { tone: SlotTileTone.stone; state: SlotTileState.disabled; }
+                }
+            }
+
+            // (14) Interaction — ScrollArea, Popover, ContextMenu
+            if root.active-section == 14: VerticalLayout {
+                spacing: Tokens.spacing-lg;
+                alignment: start;
+
+                SectionHeading {
+                    title: "Interaction";
+                    subtitle: "ScrollArea, Popover, and ContextMenu — overlay + scroll behaviors.";
+                }
+
+                Label { text: "Popover (click) · ContextMenu (right-click)"; variant: LabelVariant.muted; }
+                HorizontalLayout {
+                    spacing: 12px;
+                    alignment: start;
+
+                    Popover {
+                        title: "Quick settings";
+                        description: "A click-triggered floating panel. Click outside to dismiss.";
+                        Button { text: "Open popover"; variant: ButtonVariant.outline; }
+                    }
+
+                    ContextMenu {
+                        items: [
+                            { label: "Cut" },
+                            { label: "Copy" },
+                            { label: "Paste" },
+                            { label: "Delete" },
+                        ];
+                        selected(i) => { ToastQueue.show("Menu action \{i}", ToastVariant.default); }
+                        Card {
+                            card-padding: CardPadding.md;
+                            width: 240px;
+                            height: 56px;
+                            VerticalLayout {
+                                padding: parent.padding-l;
+                                Typography {
+                                    text: "Right-click anywhere here";
+                                    variant: TextVariant.body-sm;
+                                    tone: TextTone.muted;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Label { text: "ScrollArea"; variant: LabelVariant.muted; }
+                Card {
+                    variant: CardVariant.solid;
+                    card-padding: CardPadding.none;
+                    width: 360px;
+                    height: 200px;
+                    ScrollArea {
+                        content-height: 520px;
+                        VerticalLayout {
+                            padding: Tokens.spacing-lg;
+                            spacing: Tokens.spacing-md;
+                            height: 520px;
+                            for i in 12: HorizontalLayout {
+                                spacing: 12px;
+                                alignment: start;
+                                Avatar { fallback: "U"; size: 28px; }
+                                Typography {
+                                    text: "Scrollable row — drag to scroll";
+                                    variant: TextVariant.body;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

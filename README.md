@@ -26,7 +26,7 @@ you copy into your repo and customize.
 | **v0.10** | **Breadth batch A** — Accordion, Avatar, Textarea, Progress, Alert, Skeleton, Toggle, ToggleGroup (26 components) | ✅ |
 | **v0.11** | **Breadth batch B** — Breadcrumb, Pagination, Table, Slider (30 components) | ✅ |
 | **v0.12** | **Web-parity P0** — Text typography + game/HUD trio (Keycap, HudPill, SlotTile) + variant axes (Card padding/radius, Badge ghost/link, Tabs line) (34 components) | ✅ |
-| **v0.13** | P1/P2 — ScrollArea, Popover, ContextMenu | upcoming |
+| **v0.13** | **Web-parity P1/P2** — ScrollArea (Flickable + custom scrollbar), Popover, ContextMenu (right-click) (37 components) | ✅ |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
@@ -124,6 +124,13 @@ silently falling through to the default styling.
 | **HudPill** | rounded-full HUD status pill | `text`, `size: sm/md/lg`, `tone: scrim0/scrim1/scrim2` |
 | **SlotTile** | inventory / hotbar slot (holds `@children`) | `tone: stone/empty/accent`, `state: idle/active/disabled`, `interactive`, `size` |
 
+### Interaction (overlay + scroll)
+| Component | Purpose | Notable props |
+|-----------|---------|---------------|
+| **ScrollArea** | clipped Flickable viewport + slim custom scrollbar | `content-height: length`; lay out `@children` to that height |
+| **Popover** | click-triggered floating panel (trigger = `@children`) | `title`, `description`, `content-width`; closes on click outside |
+| **ContextMenu** | right-click menu over an area (`@children`) | `items: [ContextMenuItemData]`, `selected(int)`; opens at cursor |
+
 ### Iconography & theming
 | Component | Purpose | Notable props |
 |-----------|---------|---------------|
@@ -197,7 +204,7 @@ closed modals don't block interaction with the underlying UI.
 registry/default/         # Source of truth (published with npm package)
   theme/palette.slint     #   raw color/alpha primitives
   theme/tokens.slint      #   semantic layer (components read this)
-  components/*.slint      #   34 primitives + popup-helpers + lucide-paths
+  components/*.slint      #   37 primitives + popup-helpers + lucide-paths
 examples/showcase/        # Runnable gallery (regenerated via `slintcn add`)
 bin/slintcn.mjs           # init + add CLI (transitive deps)
 bin/__test__/             # node:test suite — `make test`
