@@ -1,0 +1,91 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Icon } from "icon.slint";
+import { LucidePaths } from "lucide-paths.slint";
+import { Separator, SeparatorOrientation } from "separator.slint";
+
+// Single-open accordion. Each item has a title + content string. Clicking a
+// header expands it (and collapses any other); clicking the open one closes
+// it. Content height animates; the chevron swaps down/up.
+export struct AccordionItem {
+    title: string,
+    content: string,
+}
+
+export component Accordion inherits Rectangle {
+    in property <[AccordionItem]> items;
+    in-out property <int> open-index: -1;   // -1 = all closed
+    callback changed(int);
+
+    background: transparent;
+
+    VerticalLayout {
+        alignment: start;
+
+        for item[idx] in items: VerticalLayout {
+            // Header row
+            header := Rectangle {
+                height: 48px;
+                background: touch.has-hover ? Tokens.color-surface-1 : transparent;
+
+                HorizontalLayout {
+                    padding-left: 4px;
+                    padding-right: 4px;
+                    spacing: 8px;
+
+                    Text {
+                        text: item.title;
+                        color: Tokens.color-foreground;
+                        font-size: Tokens.typography-body-size;
+                        font-weight: Tokens.typography-weight-medium;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                    }
+                    Icon {
+                        commands: (idx == root.open-index)
+                            ? LucidePaths.chevron-up
+                            : LucidePaths.chevron-down;
+                        tint: Tokens.color-muted-foreground;
+                        size: 16px;
+                    }
+                }
+
+                touch := TouchArea {
+                    mouse-cursor: pointer;
+                    clicked => {
+                        root.open-index = (idx == root.open-index) ? -1 : idx;
+                        root.changed(root.open-index);
+                    }
+                }
+                animate background {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
+                }
+            }
+
+            // Collapsible content
+            content-wrap := Rectangle {
+                clip: true;
+                height: (idx == root.open-index) ? body.preferred-height : 0px;
+
+                body := VerticalLayout {
+                    padding-left: 4px;
+                    padding-right: 4px;
+                    padding-bottom: 16px;
+                    Text {
+                        text: item.content;
+                        color: Tokens.color-muted-foreground;
+                        font-size: Tokens.typography-body-size;
+                        wrap: word-wrap;
+                    }
+                }
+
+                animate height {
+                    duration: Tokens.motion-base;
+                    easing: Tokens.motion-easing-standard;
+                }
+            }
+
+            Separator { orientation: SeparatorOrientation.horizontal; }
+        }
+    }
+}

@@ -1,0 +1,57 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Multi-line text input. Like Input but taller and word-wrapping.
+export component Textarea inherits Rectangle {
+    in-out property <string> text;
+    in property <string> placeholder;
+    in property <bool> enabled: true;
+    callback edited(string);
+
+    forward-focus: input;
+
+    min-height: 72px;
+    background: Tokens.color-surface-1;
+    border-color: input.has-focus ? Tokens.color-ring : Tokens.color-border-hairline;
+    border-width: 1px;
+    border-radius: Tokens.radius-md;
+    opacity: root.enabled ? 1.0 : 0.5;
+
+    focus-area := TouchArea {
+        clicked => { input.focus(); }
+    }
+
+    input := TextInput {
+        x: 12px;
+        y: 8px;
+        width: parent.width - 24px;
+        height: parent.height - 16px;
+        text <=> root.text;
+        color: Tokens.color-foreground;
+        font-size: Tokens.typography-body-size;
+        wrap: word-wrap;
+        single-line: false;
+        read-only: !root.enabled;
+        edited => { root.edited(self.text); }
+    }
+
+    if root.text == "": Text {
+        x: 12px;
+        y: 8px;
+        width: parent.width - 24px;
+        text: root.placeholder;
+        color: Tokens.color-muted-foreground;
+        font-size: Tokens.typography-body-size;
+        wrap: word-wrap;
+    }
+
+    if input.has-focus: Rectangle {
+        x: -Tokens.focus-ring-offset;
+        y: -Tokens.focus-ring-offset;
+        width:  parent.width  + 2 * Tokens.focus-ring-offset;
+        height: parent.height + 2 * Tokens.focus-ring-offset;
+        border-width: Tokens.focus-ring-width;
+        border-color: Tokens.color-ring-muted;
+        border-radius: Tokens.radius-md + Tokens.focus-ring-offset;
+        background: transparent;
+    }
+}

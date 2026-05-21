@@ -1,0 +1,24 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Horizontal progress bar. `value` is 0–100.
+export component Progress inherits Rectangle {
+    in property <float> value: 0;
+
+    height: 8px;          // h-2
+    border-radius: 4px;
+    background: Tokens.color-muted;
+    clip: true;
+
+    Rectangle {
+        x: 0;
+        y: 0;
+        width: parent.width * (max(0, min(100, root.value)) / 100);
+        height: parent.height;
+        background: Tokens.color-primary;
+        border-radius: 4px;
+        animate width {
+            duration: Tokens.motion-base;
+            easing: Tokens.motion-easing-standard;
+        }
+    }
+}

@@ -82,6 +82,38 @@
     "select": {
       "files": ["components/select.slint"],
       "requires": ["theme", "icon", "lucide-paths"]
+    },
+    "progress": {
+      "files": ["components/progress.slint"],
+      "requires": ["theme"]
+    },
+    "skeleton": {
+      "files": ["components/skeleton.slint"],
+      "requires": ["theme"]
+    },
+    "avatar": {
+      "files": ["components/avatar.slint"],
+      "requires": ["theme"]
+    },
+    "alert": {
+      "files": ["components/alert.slint"],
+      "requires": ["theme", "icon"]
+    },
+    "textarea": {
+      "files": ["components/textarea.slint"],
+      "requires": ["theme"]
+    },
+    "toggle": {
+      "files": ["components/toggle.slint"],
+      "requires": ["theme"]
+    },
+    "toggle-group": {
+      "files": ["components/toggle-group.slint"],
+      "requires": ["theme"]
+    },
+    "accordion": {
+      "files": ["components/accordion.slint"],
+      "requires": ["theme", "icon", "lucide-paths", "separator"]
     }
   }
 }

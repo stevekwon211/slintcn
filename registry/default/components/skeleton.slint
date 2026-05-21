@@ -1,0 +1,25 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Pulsing placeholder. Size it via width/height where you use it.
+// shadcn's animate-pulse: opacity 1 → 0.5 → 1; we toggle on a Timer and
+// let `animate opacity` ease between the two states.
+export component Skeleton inherits Rectangle {
+    in property <length> radius: Tokens.radius-md;
+
+    background: Tokens.color-muted;
+    border-radius: root.radius;
+
+    property <bool> dim: false;
+    opacity: dim ? 0.45 : 1.0;
+
+    pulse := Timer {
+        interval: 800ms;
+        running: true;
+        triggered => { root.dim = !root.dim; }
+    }
+
+    animate opacity {
+        duration: 800ms;
+        easing: Tokens.motion-easing-standard;
+    }
+}

@@ -1,0 +1,59 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Icon } from "icon.slint";
+
+// Bordered callout with an icon, title, and description. `icon` takes a
+// LucidePaths command string (empty = no icon). Destructive variant tints
+// the border/text red.
+export enum AlertVariant { default, destructive }
+
+export component Alert inherits Rectangle {
+    in property <string> title;
+    in property <string> description;
+    in property <string> icon;            // LucidePaths.* command string
+    in property <AlertVariant> variant: AlertVariant.default;
+
+    property <color> accent:
+        variant == AlertVariant.destructive
+            ? Tokens.color-destructive
+            : Tokens.color-foreground;
+
+    background: variant == AlertVariant.destructive
+        ? Tokens.color-destructive.with-alpha(0.08)
+        : Tokens.color-card;
+    border-width: 1px;
+    border-color: variant == AlertVariant.destructive
+        ? Tokens.color-destructive.with-alpha(0.4)
+        : Tokens.color-border-hairline;
+    border-radius: Tokens.radius-lg;
+
+    HorizontalLayout {
+        padding: Tokens.spacing-lg;       // p-4 (16)
+        spacing: Tokens.spacing-md;       // gap-3
+
+        if root.icon != "": Icon {
+            commands: root.icon;
+            tint: root.accent;
+            size: 16px;
+            y: 2px;
+            horizontal-stretch: 0;
+        }
+
+        VerticalLayout {
+            spacing: 4px;
+            alignment: start;
+            horizontal-stretch: 1;
+            if root.title != "": Text {
+                text: root.title;
+                color: root.accent;
+                font-size: Tokens.typography-body-size;
+                font-weight: Tokens.typography-weight-medium;
+            }
+            if root.description != "": Text {
+                text: root.description;
+                color: Tokens.color-muted-foreground;
+                font-size: Tokens.typography-body-size;
+                wrap: word-wrap;
+            }
+        }
+    }
+}

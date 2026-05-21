@@ -1,0 +1,52 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Single-selection row of toggle buttons (shadcn ToggleGroup, type=single).
+export struct ToggleGroupItem { label: string }
+
+export component ToggleGroup inherits Rectangle {
+    in property <[ToggleGroupItem]> items;
+    in-out property <int> selected: 0;
+    callback changed(int);
+
+    background: transparent;
+    height: Tokens.density-button-default;
+    horizontal-stretch: 0;
+
+    HorizontalLayout {
+        spacing: 4px;
+        alignment: start;
+
+        for item[idx] in items: Rectangle {
+            property <bool> active: idx == root.selected;
+            min-width: t.preferred-width + 24px;
+            border-radius: Tokens.radius-md;
+            background: active
+                ? Tokens.color-accent
+                : (touch.has-hover ? Tokens.color-surface-1 : transparent);
+
+            t := Text {
+                x: (parent.width  - self.preferred-width)  / 2;
+                y: (parent.height - self.preferred-height) / 2;
+                text: item.label;
+                color: active
+                    ? Tokens.color-foreground
+                    : Tokens.color-muted-foreground;
+                font-size: Tokens.typography-body-size;
+                font-weight: Tokens.typography-weight-medium;
+            }
+
+            touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => {
+                    root.selected = idx;
+                    root.changed(idx);
+                }
+            }
+
+            animate background {
+                duration: Tokens.motion-fast;
+                easing: Tokens.motion-easing-standard;
+            }
+        }
+    }
+}
