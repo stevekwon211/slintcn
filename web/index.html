@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>slintcn — copy-paste Slint components</title>
-<meta name="description" content="Beautiful copy-paste Slint components — shadcn for native UI. 37 components, 5 blocks, dark-glass theming, a real CLI, and a games/HUD layer. npx slintcn add button.">
-<meta property="og:title" content="slintcn — copy-paste Slint components">
-<meta property="og:description" content="shadcn for native UI. Own the code. npx slintcn add button.">
+<title>slintcn: copy-paste components for Slint</title>
+<meta name="description" content="Copy-paste UI components for Slint. Like shadcn, for native apps. The CLI drops the source into your project and you own it. 39 components, 5 blocks, a dark theme, and a HUD layer for tools and games.">
+<meta property="og:title" content="slintcn: copy-paste components for Slint">
+<meta property="og:description" content="Like shadcn, for Slint. Install the source into your app and own it. npx slintcn add button">
 <meta property="og:image" content="img/section-6-dashboard.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23fafafa%22&gt;&lt;circle cx=%2212%22 cy=%2212%22 r=%229%22 fill=%22%23171717%22 stroke=%22%23fafafa%22 stroke-width=%221.5%22/&gt;&lt;/svg&gt;">
 <style>
@@ -103,10 +103,10 @@
 
 <header class="hero">
   <div class="wrap">
-    <span class="tag">37 components · 5 blocks · dark-glass + games/HUD</span>
-    <h1><span class="grad">Copy-paste Slint components<br>that don't look like 2009.</span></h1>
-    <p>shadcn for native UI. Own the code — primitives + tokens you copy into your
-       Slint app and customize. Not a dependency you fight.</p>
+    <span class="tag">39 components · 5 blocks · dark theme · built for tools and games</span>
+    <h1><span class="grad">Copy-paste components<br>for Slint.</span></h1>
+    <p>Like shadcn, for native apps. The CLI drops the source into your project and
+       you own it. Tokens, typed variants, focus rings, and keyboard handling come wired up.</p>
     <div class="cta">
       <a class="btn btn-primary" href="./docs/">Browse the docs →</a>
       <a class="btn btn-ghost" href="./demo.html">Live demo</a>
@@ -122,16 +122,16 @@
 <section class="block">
   <div class="wrap">
     <div class="eyebrow">Why slintcn</div>
-    <h2>A distribution system, not a library.</h2>
-    <p class="lede">The shadcn model, ported to Slint: a CLI + registry that copies
-       source into your repo. You own every file.</p>
+    <h2>You own the code.</h2>
+    <p class="lede">slintcn isn't a dependency. The CLI copies Slint source into your
+       repo, rewrites the imports to fit your layout, and stays out of your way.</p>
     <div class="features">
-      <div class="feature"><h3>Own the code</h3><p>`slintcn add` copies .slint source into your project — edit freely, no lock-in. Imports auto-rewrite to your layout.</p></div>
-      <div class="feature"><h3>A real CLI + registry</h3><p>init · add · list · view · build. Install from the bundled registry, a remote URL, or a custom `@ns/name`.</p></div>
-      <div class="feature"><h3>Dark-glass + theming</h3><p>Measured-from-shadcn tokens. Pick a base color (neutral · zinc · slate · stone) at init; runtime dark/light.</p></div>
-      <div class="feature"><h3>37 components</h3><p>Buttons to Dialogs to Tables to Tooltips — typed enum variants, focus rings, keyboard nav, animations.</p></div>
-      <div class="feature"><h3>5 blocks</h3><p>Composed templates — sign-in, login, pricing, dashboard, settings — installable like any component.</p></div>
-      <div class="feature"><h3>Slint for games + tools</h3><p>A HUD layer most kits skip: Keycap, HudPill, SlotTile — keyboard hints, status pills, inventory slots.</p></div>
+      <div class="feature"><h3>You own the files</h3><p>slintcn add copies .slint source into your project. Edit it however you want. Imports rewrite to match your folders.</p></div>
+      <div class="feature"><h3>A real CLI</h3><p>init, add, list, view, build. Install from the built-in registry, a URL, or your own namespace.</p></div>
+      <div class="feature"><h3>Theming</h3><p>Dark by default, light at runtime. Pick a base color (neutral, zinc, slate, stone) when you init.</p></div>
+      <div class="feature"><h3>39 components</h3><p>Buttons, dialogs, tables, tooltips, and more. Typed variants, focus rings, keyboard nav, and animations are built in.</p></div>
+      <div class="feature"><h3>5 blocks</h3><p>Sign-in, login, pricing, dashboard, and settings. Whole screens you install like any component.</p></div>
+      <div class="feature"><h3>Made for tools and games</h3><p>A HUD layer most kits skip: Keycap, HudPill, and SlotTile for keyboard hints, status pills, and inventory slots.</p></div>
     </div>
   </div>
 </section>
@@ -139,14 +139,14 @@
 <section class="block">
   <div class="wrap">
     <div class="eyebrow">Built with slintcn</div>
-    <h2>Real surfaces, copy-paste fast.</h2>
-    <p class="lede">Every screenshot below is the live showcase, rendered by Slint
-       compiled to WebAssembly. <a style="color:var(--fg);text-decoration:underline" href="./demo.html">Open the interactive demo →</a></p>
+    <h2>See it running.</h2>
+    <p class="lede">Every shot below is the live showcase, Slint compiled to
+       WebAssembly. <a style="color:var(--fg);text-decoration:underline" href="./demo.html">Open the demo →</a></p>
     <div class="gallery">
-      <div class="shot"><img src="img/section-4-signin.png" alt="Sign-in block" loading="lazy"><div class="cap">Sign-in — Card + Input + Checkbox + Button</div></div>
-      <div class="shot"><img src="img/section-6-dashboard.png" alt="Dashboard block" loading="lazy"><div class="cap">Dashboard — metric cards + activity feed</div></div>
-      <div class="shot"><img src="img/section-0-buttons.png" alt="Buttons" loading="lazy"><div class="cap">Buttons — 8 variants × sizes, install + usage</div></div>
-      <div class="shot"><img src="img/section-13-hud.png" alt="HUD components" loading="lazy"><div class="cap">HUD — Keycap, HudPill, SlotTile</div></div>
+      <div class="shot"><img src="img/section-4-signin.png" alt="Sign-in block" loading="lazy"><div class="cap">Sign-in: Card, Input, Checkbox, Button</div></div>
+      <div class="shot"><img src="img/section-6-dashboard.png" alt="Dashboard block" loading="lazy"><div class="cap">Dashboard: metric cards and an activity feed</div></div>
+      <div class="shot"><img src="img/section-0-buttons.png" alt="Buttons" loading="lazy"><div class="cap">Buttons: 8 variants and sizes</div></div>
+      <div class="shot"><img src="img/section-13-hud.png" alt="HUD components" loading="lazy"><div class="cap">HUD: Keycap, HudPill, SlotTile</div></div>
     </div>
   </div>
 </section>
@@ -155,7 +155,7 @@
   <div class="wrap">
     <div class="eyebrow">Get started</div>
     <h2>Three commands.</h2>
-    <p class="lede">Node 20+ and a Slint project. Files land in <code>ui/slintcn/</code> — yours to keep.</p>
+    <p class="lede">You need Node 20+ and a Slint project. Files land in <code>ui/slintcn/</code> and they're yours.</p>
     <div class="install" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:13px;line-height:1.9;">
       <div><span class="dollar">$</span> npx slintcn@latest init</div>
       <div><span class="dollar">$</span> npx slintcn@latest add button card dialog</div>
