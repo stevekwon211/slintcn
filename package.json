@@ -1,6 +1,6 @@
 {
   "name": "slintcn",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Beautiful copy-paste Slint components — shadcn for native UI",
   "keywords": [
     "slint",
@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://github.com/stevekwon211/slintcn/issues"
   },
-  "homepage": "https://github.com/stevekwon211/slintcn#readme",
+  "homepage": "https://stevekwon211.github.io/slintcn/docs/",
   "type": "module",
   "bin": {
     "slintcn": "bin/slintcn.mjs"

@@ -1,17 +1,32 @@
 # slintcn
 
 [![Pages](https://github.com/stevekwon211/slintcn/actions/workflows/pages.yml/badge.svg)](https://github.com/stevekwon211/slintcn/actions/workflows/pages.yml)
+[![npm](https://img.shields.io/npm/v/slintcn?color=white)](https://www.npmjs.com/package/slintcn)
 [![License: MIT](https://img.shields.io/badge/License-MIT-white.svg)](LICENSE)
 
-**Copy-paste Slint components that don't look like 2009 desktop widgets.**
+**shadcn/ui-style copy-paste components for Slint native apps.**
 
-**Live demo**: [stevekwon211.github.io/slintcn](https://stevekwon211.github.io/slintcn) - the full showcase running in your browser via Slint compiled to WebAssembly (~7 MB bundle, FemtoVG + WebGL2). Click around to verify every primitive interactively.
+[Live docs](https://stevekwon211.github.io/slintcn/docs/) · [Live demo](https://stevekwon211.github.io/slintcn) · [npm](https://www.npmjs.com/package/slintcn)
+
+36 UI primitives, 5 installable blocks, a theme system, and a static registry you can host yourself.
 
 <p align="center">
   <img src="docs/img/snapshots/section-6-dashboard.png" alt="slintcn dashboard components" width="31%">
   <img src="docs/img/snapshots/section-4-signin.png" alt="slintcn sign-in form" width="31%">
   <img src="docs/img/snapshots/section-2-overlays.png" alt="slintcn overlay components" width="31%">
 </p>
+
+## Install
+
+```bash
+cd your-slint-app
+npx slintcn@latest init
+npx slintcn@latest add button card input dialog
+```
+
+Files land in `ui/slintcn/` — **you own them**. Change colors in
+`ui/slintcn/theme/tokens.slint`, tweak `button.slint` for your product, or host
+your own registry.
 
 ## Why it exists
 
@@ -26,18 +41,15 @@ you copy into your repo and customize.
 # Run the visual showcase
 cd examples/showcase && cargo run
 
-# Install components into your Slint project (once published to npm)
-cd your-app
+# Install components into your Slint project
+cd your-slint-app
 npx slintcn@latest init
 npx slintcn@latest add button card input dialog
 
-# …or from a local checkout today (pre-publish):
+# …or from a local checkout:
 node /path/to/slintcn/bin/slintcn.mjs init
 node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 ```
-
-Files land in `ui/slintcn/` — **you own them**. Change colors in
-`ui/slintcn/theme/tokens.slint`, tweak `button.slint` for your product.
 
 ## Philosophy
 

@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest a component, block, CLI improvement, or docs improvement.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What are you trying to build, and where does slintcn fall short?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed shape
+      description: Describe the desired component API, CLI behavior, or docs page.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - component
+        - block
+        - CLI
+        - registry
+        - docs
+        - theme
+        - other
+    validations:
+      required: true
