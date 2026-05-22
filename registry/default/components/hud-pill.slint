@@ -6,8 +6,11 @@ export enum HudPillSize { sm, md, lg }
 export enum HudPillTone { scrim0, scrim1, scrim2 }
 
 export component HudPill inherits Rectangle {
+    // Label inside the pill.
     in property <string> text;
+    // Height + padding — sm, md, lg.
     in property <HudPillSize> size: HudPillSize.md;
+    // Scrim / glass tone — scrim1, scrim2, glass.
     in property <HudPillTone> tone: HudPillTone.scrim1;
 
     height:

@@ -7,9 +7,13 @@ import { Separator, SeparatorOrientation } from "../components/separator.slint";
 
 // Minimal centered login block — leaner than SignIn (no remember/forgot row).
 export component Login inherits Card {
+    // Two-way bound to the email field.
     in-out property <string> email;
+    // Two-way bound to the password field.
     in-out property <string> password;
+    // Fired on the primary action.
     callback submit();
+    // Fired on the SSO button.
     callback sso();
 
     width: 340px;

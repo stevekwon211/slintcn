@@ -7,7 +7,9 @@ import { Separator, SeparatorOrientation } from "../components/separator.slint";
 // Three-tier pricing block. `chosen` (0..2) highlights a plan; `pick(int)`
 // fires on a CTA. Plan copy is inline — edit freely once installed.
 export component Pricing inherits Rectangle {
+    // Two-way; index of the highlighted tier.
     in-out property <int> chosen: 1;
+    // Fired when a tier's CTA is pressed; argument is the tier index.
     callback pick(int);
 
     background: transparent;

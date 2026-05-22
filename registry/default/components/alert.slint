@@ -7,9 +7,13 @@ import { Icon } from "icon.slint";
 export enum AlertVariant { default, destructive }
 
 export component Alert inherits Rectangle {
+    // Bold heading at the top of the alert.
     in property <string> title;
+    // Body text below the title.
     in property <string> description;
+    // SVG path commands for the leading icon — pass a `LucidePaths.*` value.
     in property <string> icon;            // LucidePaths.* command string
+    // Tone — `default` or `destructive`.
     in property <AlertVariant> variant: AlertVariant.default;
 
     property <color> accent:

@@ -86,7 +86,7 @@ function topnav() {
   <div id="scrim"></div>`;
 }
 
-function page(item, prev, next, items, api = { enums: {}, a11y: null }) {
+function page(item, prev, next, items, api = { enums: {}, a11y: null, props: [] }) {
   const cmds = installCommands(item.name);
   const enumNames = Object.keys(api.enums ?? {});
   const hasApi = enumNames.length > 0 || api.a11y;
@@ -160,6 +160,16 @@ ${sidebar(items, item.name)}
     <pre><code class="slint">${esc(code)}</code></pre>
   </div>
 
+${(api.props ?? []).length ? `  <h2 id="properties">Properties</h2>
+  <div class="props">
+${api.props.map((p) => `    <div class="prop-row">
+      <code class="prop-name">${esc(p.name)}</code>
+      <span class="prop-kind kind-${p.kind.replace("-", "")}">${esc(p.kind)}</span>
+      <code class="prop-type">${esc(p.type)}</code>
+      ${p.doc ? `<p class="prop-doc">${esc(p.doc)}</p>` : `<p class="prop-doc muted small">—</p>`}
+    </div>`).join("\n")}
+  </div>` : ""}
+
 ${apiSection}
 
   <h2 id="dependencies">Dependencies</h2>
@@ -173,6 +183,7 @@ ${apiSection}
   <a href="#preview">Preview</a>
   <a href="#installation">Installation</a>
   <a href="#usage">Usage</a>
+  ${(api.props ?? []).length ? `<a href="#properties">Properties</a>` : ""}
   ${hasApi ? `<a href="#api">API</a>` : ""}
   <a href="#dependencies">Dependencies</a>
 </aside>
@@ -234,11 +245,56 @@ async function main() {
   await writeFile(path.join(outDir, "index.html"), indexPage(items));
 
   for (let i = 0; i < items.length; i++) {
-    const api = { enums: await enumsOf(items[i]), a11y: a11y[items[i].name] ?? null };
+    const api = {
+      enums: await enumsOf(items[i]),
+      a11y: a11y[items[i].name] ?? null,
+      props: await propsOf(items[i]),
+    };
     const html = page(items[i], items[i - 1], items[i + 1], items, api);
     await writeFile(path.join(outDir, `${items[i].name}.html`), html);
   }
   console.log(`Docs → ${path.relative(process.cwd(), outDir)}/ (${items.length} pages + index)`);
+}
+
+// Extract `in` / `in-out` / `out` properties + `callback`s from an item's
+// `.slint` files, each annotated with the description from a `//`-comment block
+// **immediately above** the declaration (no blank line between). Single source
+// of truth — the docs Properties section never drifts from the component.
+const PROP_RX = /^\s*(in|in-out|out)\s+property\s+<([^>]+)>\s+([A-Za-z][\w-]*)/;
+const CB_RX   = /^\s*callback\s+([A-Za-z][\w-]*)\s*(?:\(([^)]*)\))?(?:\s*->\s*([^;{]+?))?\s*[;{]/;
+function parseProps(src) {
+  const lines = src.split("\n");
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    let m, entry;
+    if ((m = lines[i].match(PROP_RX))) {
+      entry = { kind: m[1], name: m[3], type: m[2].trim() };
+    } else if ((m = lines[i].match(CB_RX))) {
+      const args = (m[2] ?? "").trim();
+      const ret = m[3] ? m[3].trim() : "";
+      entry = { kind: "callback", name: m[1],
+                type: `(${args})${ret ? " -> " + ret : ""}` };
+    } else continue;
+    const docLines = [];
+    for (let j = i - 1; j >= 0; j--) {
+      const t = lines[j].match(/^\s*\/\/\s?(.*)$/);
+      if (!t) break;
+      docLines.unshift(t[1]);
+    }
+    entry.doc = docLines.join(" ").replace(/\s+/g, " ").trim();
+    out.push(entry);
+  }
+  return out;
+}
+
+async function propsOf(item) {
+  const all = [];
+  for (const rel of item.files ?? []) {
+    let src;
+    try { src = await readFile(path.join(ROOT, "registry", "default", rel), "utf8"); } catch { continue; }
+    for (const p of parseProps(src)) all.push(p);
+  }
+  return all;
 }
 
 // Derive { EnumName: [members] } from an item's source — variants/sizes shown
@@ -301,6 +357,16 @@ h2{font-size:21px;letter-spacing:-.01em;margin:40px 0 14px;scroll-margin-top:72p
 .deps{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .chip{font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:4px 10px}
 .chip:hover{color:var(--fg);border-color:var(--line-strong)}
+.props{display:flex;flex-direction:column;gap:0}
+.prop-row{display:grid;grid-template-columns:auto auto auto 1fr;gap:10px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+.prop-name{color:var(--fg);font-size:13px;font-weight:600;font-family:var(--mono)}
+.prop-kind{font-size:10px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;text-transform:lowercase;letter-spacing:.02em;align-self:center}
+.kind-callback{color:#c4b5fd;border-color:rgba(196,181,253,.3)}
+.kind-inout{color:#86efac;border-color:rgba(134,239,172,.3)}
+.kind-out{color:#7dd3fc;border-color:rgba(125,211,252,.3)}
+.prop-type{color:var(--muted);font-size:12px;font-family:var(--mono)}
+.prop-doc{color:var(--muted);font-size:13px;margin:0;grid-column:1 / -1;padding-left:0}
+@media(min-width:761px){.prop-doc{grid-column:4}}
 .api-row{display:flex;gap:14px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line)}
 .api-enum{color:var(--fg);font-size:13px;min-width:120px}
 .api-vals{display:flex;gap:6px;flex-wrap:wrap;color:var(--muted);font-size:13px}

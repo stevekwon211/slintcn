@@ -8,10 +8,15 @@ export enum SlotTileTone  { stone, empty, accent }
 export enum SlotTileState { idle, active, disabled }
 
 export component SlotTile inherits Rectangle {
+    // Surface tint — `stone`, `iron`, `gold`, etc.
     in property <SlotTileTone>  tone:  SlotTileTone.stone;
+    // Visual state — `idle`, `selected`, `disabled`.
     in property <SlotTileState> state: SlotTileState.idle;
+    // When true, the tile shows hover affordances and emits `clicked`.
     in property <bool> interactive: false;
+    // Pixel side length of the square tile.
     in property <length> size: 48px;
+    // Fired on press release when `interactive` is true.
     callback clicked();
 
     property <bool> hot: interactive && state != SlotTileState.disabled;

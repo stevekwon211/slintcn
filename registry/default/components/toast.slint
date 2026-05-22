@@ -44,15 +44,22 @@ export struct ToastItem {
 }
 
 export global ToastQueue {
+    // Live queue of toasts; usually managed by `ToastQueue`, not set directly.
     in-out property <[ToastItem]> items: [];
+    // Push a toast onto the queue with `(text, variant)`.
     callback show(string, ToastVariant);
+    // Remove the toast at the given index.
     callback dismiss(int);
 }
 
 component ToastView inherits Rectangle {
+    // The toast data this row renders.
     in property <ToastItem> item;
+    // Position in the stack (0 = bottom).
     in property <int> stack-index;
+    // Width of the parent viewport; the toast clamps to fit.
     in property <length> available-width;
+    // Height of the parent viewport; used for stack positioning.
     in property <length> available-height;
 
     background:

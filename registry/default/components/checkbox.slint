@@ -3,9 +3,13 @@ import { Tokens } from "../theme/tokens.slint";
 // Checkbox with optional trailing label. Space toggles; 2 px focus ring
 // matches the rest of slintcn's keyboard accessibility contract.
 export component Checkbox {
+    // Two-way toggle state.
     in-out property <bool> checked: false;
+    // Text shown to the right of the box; clicking it also toggles.
     in property <string> label;
+    // When true, the checkbox dims and stops responding.
     in property <bool> disabled: false;
+    // Fired with the new `checked` value when the user toggles.
     callback toggled(bool);
 
     HorizontalLayout {

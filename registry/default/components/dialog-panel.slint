@@ -19,10 +19,15 @@ import { Icon } from "icon.slint";
 import { LucidePaths } from "lucide-paths.slint";
 
 export component DialogPanel inherits Rectangle {
+    // Heading at the top of the panel.
     in property <string> title;
+    // Body text under the title.
     in property <string> description;
+    // Tooltip / accessible label for the X-close button.
     in property <string> close-label: "Close";
+    // Tab-cycle focus inside the panel; set false to disable the trap.
     in property <bool>   trap-focus: true;
+    // Fired when the X-close button is pressed.
     callback closed();
 
     background: Tokens.color-card;

@@ -8,6 +8,7 @@ export enum SeparatorOrientation { horizontal, vertical }
 //
 // Outside layouts, set the unconstrained dimension explicitly.
 export component Separator inherits Rectangle {
+    // `horizontal` (default) or `vertical`.
     in property <SeparatorOrientation> orientation: SeparatorOrientation.horizontal;
     background: Tokens.color-border-hairline;
 

@@ -4,8 +4,11 @@ export enum BadgeVariant { default, secondary, outline, destructive, ghost, link
 export enum BadgeSize    { sm, default }
 
 export component Badge inherits Rectangle {
+    // Visual style — default, secondary, outline, destructive, ghost, link.
     in property <BadgeVariant> variant: BadgeVariant.default;
+    // Height + padding — sm, default, lg.
     in property <BadgeSize>    size:    BadgeSize.default;
+    // Label rendered inside the badge.
     in property <string> text;
 
     property <length> hpad: size == BadgeSize.sm ? 6px : 8px;   // px-2

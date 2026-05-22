@@ -12,8 +12,11 @@ export struct AccordionItem {
 }
 
 export component Accordion inherits Rectangle {
+    // Sections shown stacked; each `{ title, body }` renders as one row.
     in property <[AccordionItem]> items;
+    // Index of the expanded item; -1 means all closed.
     in-out property <int> open-index: -1;   // -1 = all closed
+    // Fired when a section is toggled; argument is the new `open-index`.
     callback changed(int);
 
     background: transparent;

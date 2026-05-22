@@ -14,7 +14,9 @@ export enum TextTone {
 }
 
 export component Text inherits Text {
+    // Type role — `display`, `title`, `body`, `body-sm`, `caption`.
     in property <TextVariant> variant: TextVariant.body;
+    // Color role — `default`, `muted`, `subtle`.
     in property <TextTone>    tone:    TextTone.default;
 
     font-size:

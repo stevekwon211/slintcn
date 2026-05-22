@@ -9,11 +9,17 @@ import { Button, ButtonVariant } from "../components/button.slint";
 // Settings panel block — Tabs over a Card body (Account / Notifications).
 // Self-contained tab state; bind the fields + handle `save()`.
 export component Settings inherits Rectangle {
+    // Two-way; active tab (0 = Account, 1 = Notifications).
     in-out property <int> tab: 0;
+    // Two-way bound to the name field.
     in-out property <string> display-name;
+    // Two-way bound to the email field.
     in-out property <string> email;
+    // Two-way; product-news email toggle.
     in-out property <bool> notify-product: true;
+    // Two-way; security-alert email toggle.
     in-out property <bool> notify-security: true;
+    // Fired on the Save button.
     callback save();
 
     background: transparent;

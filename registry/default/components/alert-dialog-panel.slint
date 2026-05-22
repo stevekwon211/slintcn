@@ -15,13 +15,21 @@ import { Button, ButtonVariant } from "button.slint";
 import { Separator, SeparatorOrientation } from "separator.slint";
 
 export component AlertDialogPanel inherits Rectangle {
+    // Heading at the top of the panel.
     in property <string> title;
+    // Body text describing the consequences of the action.
     in property <string> description;
+    // Label for the destructive button (right side).
     in property <string> action-label: "Continue";
+    // Label for the safe button (left side).
     in property <string> cancel-label: "Cancel";
+    // Style for the action button — defaults to `destructive`.
     in property <ButtonVariant> action-variant: ButtonVariant.destructive;
+    // Tab-cycle focus within the two buttons; set false to disable the trap.
     in property <bool> trap-focus: true;
+    // Fired on the destructive action.
     callback confirmed();
+    // Fired on Cancel.
     callback cancelled();
 
     // Focus trap state: 0 = Cancel (default), 1 = Action.

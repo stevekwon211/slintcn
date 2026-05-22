@@ -4,8 +4,11 @@ import { LucidePaths } from "lucide-paths.slint";
 
 // Page navigation: prev / page-numbers / next. `current` is 0-based.
 export component Pagination inherits Rectangle {
+    // Total number of pages (1-based count).
     in property <int> total: 1;
+    // Two-way; the active page (0-indexed internally).
     in-out property <int> current: 0;
+    // Fired with the new page index on click.
     callback changed(int);
 
     background: transparent;

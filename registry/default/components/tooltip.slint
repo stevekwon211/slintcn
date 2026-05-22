@@ -24,7 +24,9 @@ import { Tokens } from "../theme/tokens.slint";
 export enum TooltipSide { top, right, bottom, left }
 
 export component Tooltip inherits Rectangle {
+    // Label rendered inside the bubble.
     in property <string> text;
+    // Which edge of the trigger to anchor to — `top` (default), `right`, `bottom`, `left`.
     in property <TooltipSide> side: TooltipSide.top;
 
     background: transparent;

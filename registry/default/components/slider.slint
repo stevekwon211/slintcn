@@ -2,10 +2,15 @@ import { Tokens } from "../theme/tokens.slint";
 
 // Horizontal slider. Drag the thumb or click the track. `value` is in-out.
 export component Slider inherits Rectangle {
+    // Two-way; current value clamped to `minimum..maximum`.
     in-out property <float> value: 0;
+    // Lower bound (inclusive).
     in property <float> minimum: 0;
+    // Upper bound (inclusive).
     in property <float> maximum: 100;
+    // When true, the thumb dims and stops responding.
     in property <bool> disabled: false;
+    // Fired with the new `value` while dragging.
     callback changed(float);
 
     height: 20px;            // hit area

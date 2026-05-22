@@ -11,7 +11,9 @@
 import { Tokens } from "../theme/tokens.slint";
 
 export component SheetPanel inherits Rectangle {
+    // Heading inside the panel.
     in property <string> title;
+    // Body text under the title.
     in property <string> description;
 
     background: Tokens.color-card;

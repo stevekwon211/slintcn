@@ -1,13 +1,21 @@
 import { Tokens } from "../theme/tokens.slint";
 
 export component Input inherits Rectangle {
+    // Two-way bound to the field contents.
     in-out property <string> text;
+    // Hint shown when the field is empty.
     in property <string> placeholder;
+    // When false, the input dims and stops accepting keystrokes.
     in property <bool> enabled: true;
+    // When true, the user can focus but not edit.
     in property <bool> read-only: false;
+    // When true, characters render as bullets.
     in property <bool> password: false;
+    // When true, the input grabs focus on mount.
     in property <bool> auto-focus: false;
+    // Fired on every keystroke with the current text.
     callback edited(string);
+    // Fired on Enter with the current text.
     callback accepted(string);
 
     forward-focus: input;

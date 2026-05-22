@@ -4,8 +4,11 @@ import { Tokens } from "../theme/tokens.slint";
 export struct ToggleGroupItem { label: string }
 
 export component ToggleGroup inherits Rectangle {
+    // Toggles shown in the group.
     in property <[ToggleGroupItem]> items;
+    // Two-way; index of the active toggle.
     in-out property <int> selected: 0;
+    // Fired with the new `selected` index.
     callback changed(int);
 
     background: transparent;

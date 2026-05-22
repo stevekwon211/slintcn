@@ -10,8 +10,11 @@ export enum LabelVariant { default, muted, required }
 //
 // The `required` variant appends a destructive-colored asterisk.
 export component Label inherits Rectangle {
+    // The label text.
     in property <string> text;
+    // Visual style — `default`, `muted`, `required` (appends an asterisk).
     in property <LabelVariant> variant: LabelVariant.default;
+    // Fired when the label is clicked; useful for forwarding focus.
     callback clicked();
 
     background: transparent;

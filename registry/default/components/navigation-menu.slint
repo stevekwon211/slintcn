@@ -7,8 +7,11 @@ import { Tokens } from "../theme/tokens.slint";
 export struct NavigationItem { label: string }
 
 export component NavigationMenu inherits Rectangle {
+    // Items shown in the nav strip (left-to-right).
     in property <[NavigationItem]> items;
+    // Index of the highlighted item; bound two-way so consumers drive routing.
     in-out property <int> active: 0;
+    // Fired when an item is clicked; `active` is updated first.
     callback navigate(int);
 
     background: transparent;

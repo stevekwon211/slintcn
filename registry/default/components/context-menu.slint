@@ -6,7 +6,9 @@ import { Tokens } from "../theme/tokens.slint";
 export struct ContextMenuItemData { label: string }
 
 export component ContextMenu inherits Rectangle {
+    // Menu rows shown on right-click.
     in property <[ContextMenuItemData]> items;
+    // Fired with the chosen row's index; the menu auto-closes.
     callback selected(int);
 
     background: transparent;
@@ -15,7 +17,9 @@ export component ContextMenu inherits Rectangle {
     preferred-width:  area.preferred-width;
     preferred-height: area.preferred-height;
 
+    // Internal — where the menu opens horizontally (set on right-click).
     in-out property <length> menu-x;
+    // Internal — where the menu opens vertically (set on right-click).
     in-out property <length> menu-y;
 
     area := HorizontalLayout {

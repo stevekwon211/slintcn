@@ -8,7 +8,9 @@ export struct MenubarItem { label: string }
 export struct MenubarMenu { label: string, items: [MenubarItem] }
 
 export component Menubar inherits Rectangle {
+    // Top-level menus (File / Edit / View / …), each with its own `items`.
     in property <[MenubarMenu]> menus;
+    // Fired with the menu index and the chosen item's index; the popup closes.
     callback selected(int /* menu */, int /* item */);
 
     background: transparent;

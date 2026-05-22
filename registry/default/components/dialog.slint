@@ -21,11 +21,17 @@ import { Scrim } from "popup-helpers.slint";
 import { DialogPanel } from "dialog-panel.slint";
 
 export component Dialog inherits Rectangle {
+    // Two-way; consumer sets true to show, slintcn sets false on close.
     in-out property <bool> open: false;
+    // Heading at the top of the modal.
     in property <string> title;
+    // Body text under the title.
     in property <string> description;
+    // When true, clicking outside the panel closes the modal.
     in property <bool>   dismiss-on-backdrop: true;
+    // Tooltip / accessible label for the X-close button.
     in property <string> close-label: "Close";
+    // Fired when the modal closes for any reason.
     callback dismissed();
 
     background: transparent;

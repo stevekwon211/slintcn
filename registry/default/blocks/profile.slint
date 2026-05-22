@@ -11,10 +11,15 @@ import { Separator, SeparatorOrientation } from "../components/separator.slint";
 // Save / Cancel. Built from Card + Avatar + Input + Textarea + Button. Bind the
 // fields and handle `save()` / `cancel()`.
 export component Profile inherits Rectangle {
+    // Two-way bound to the name field.
     in-out property <string> display-name: "Sofia Davis";
+    // Two-way bound to the email field.
     in-out property <string> email: "sofia@acme.dev";
+    // Two-way bound to the bio textarea.
     in-out property <string> bio: "Product designer. Building tools for makers.";
+    // Fired on Save changes.
     callback save();
+    // Fired on Cancel.
     callback cancel();
 
     background: transparent;

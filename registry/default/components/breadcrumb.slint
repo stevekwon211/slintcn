@@ -7,7 +7,9 @@ import { LucidePaths } from "lucide-paths.slint";
 export struct BreadcrumbItem { label: string }
 
 export component Breadcrumb inherits Rectangle {
+    // Crumbs left-to-right; the last item renders as the current page.
     in property <[BreadcrumbItem]> items;
+    // Fired when a crumb is clicked; argument is its index.
     callback navigate(int);
 
     background: transparent;

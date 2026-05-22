@@ -4,8 +4,11 @@ import { Tokens } from "../theme/tokens.slint";
 // opens a card showing `title` + `description` below. Closes on click
 // outside (PopupWindow default). For richer content, adapt the panel body.
 export component Popover inherits Rectangle {
+    // Bold heading inside the popup; empty string omits it.
     in property <string> title;
+    // Body text below the title; empty string omits it.
     in property <string> description;
+    // Pixel width of the popup panel.
     in property <length> content-width: 260px;
 
     background: transparent;

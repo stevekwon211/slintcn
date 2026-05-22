@@ -27,10 +27,15 @@ export enum RadioOrientation { vertical, horizontal }
 // Local helper — one circle + label row. Active state and disabled flow
 // down from the surrounding group; clicking notifies via callback.
 component RadioRow inherits Rectangle {
+    // Label text rendered next to this RadioItem.
     in property <string> label;
+    // Whether this RadioItem is selected.
     in property <bool> active: false;
+    // When true, the focus ring renders even without keyboard focus.
     in property <bool> show-focus: false;
+    // When true, this control dims and stops responding.
     in property <bool> disabled: false;
+    // Fired when this RadioItem is activated.
     callback clicked();
 
     background: transparent;
@@ -98,10 +103,15 @@ component RadioRow inherits Rectangle {
 }
 
 export component RadioGroup inherits Rectangle {
+    // Options shown in the group.
     in property <[RadioItem]> items;
+    // Two-way; index of the chosen item.
     in-out property <int> selected: 0;
+    // When true, this control dims and stops responding.
     in property <bool> disabled: false;
+    // `vertical` (default) or `horizontal`.
     in property <RadioOrientation> orientation: RadioOrientation.vertical;
+    // Fired with the new `selected` index.
     callback changed(int);
 
     // `inherits Rectangle` + explicit min sizes so parent layouts honor the

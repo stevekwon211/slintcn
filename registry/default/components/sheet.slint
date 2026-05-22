@@ -15,13 +15,19 @@ import { SheetPanel } from "sheet-panel.slint";
 export enum SheetSide { top, right, bottom, left }
 
 export component Sheet inherits Rectangle {
+    // Two-way; consumer sets true to slide in, slintcn sets false on close.
     in-out property <bool> open: false;
+    // Edge to attach to — `top`, `right`, `bottom`, `left`.
     in property <SheetSide> side: SheetSide.right;
+    // Heading inside the sheet.
     in property <string> title;
+    // Body text under the title.
     in property <string> description;
+    // When true, clicking outside the sheet closes it.
     in property <bool>   dismiss-on-backdrop: true;
     // Cross-axis dimension of the panel: width for left/right, height for top/bottom.
     in property <length> panel-extent: 360px;
+    // Fired when the sheet closes for any reason.
     callback dismissed();
 
     background: transparent;

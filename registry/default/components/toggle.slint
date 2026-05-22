@@ -4,10 +4,15 @@ import { Tokens } from "../theme/tokens.slint";
 export enum ToggleVariant { default, outline }
 
 export component Toggle inherits Rectangle {
+    // Label rendered inside.
     in property <string> text;
+    // Two-way pressed state.
     in-out property <bool> pressed: false;
+    // Visual style — `default` or `outline`.
     in property <ToggleVariant> variant: ToggleVariant.default;
+    // When true, dims and stops responding.
     in property <bool> disabled: false;
+    // Fired with the new `pressed` value.
     callback toggled(bool);
 
     height: Tokens.density-button-default;   // h-9

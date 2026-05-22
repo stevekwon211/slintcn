@@ -26,9 +26,13 @@ export struct TabItem { label: string }
 export enum TabsVariant { default, line }
 
 export component Tabs inherits Rectangle {
+    // Tab definitions in display order.
     in property <[TabItem]> items;
+    // Two-way; index of the active tab.
     in-out property <int> current: 0;
+    // Style — `default` (segmented) or `line` (underlined).
     in property <TabsVariant> variant: TabsVariant.default;
+    // Fired with the new `current` index.
     callback changed(int);
 
     property <bool> segmented: variant == TabsVariant.default;

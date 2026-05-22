@@ -8,11 +8,17 @@ import { Button, ButtonVariant } from "../components/button.slint";
 // Sign-in card block — Card + Label + Input + Checkbox + Button.
 // Bind email/password and handle the submit / forgot / create callbacks.
 export component SignIn inherits Card {
+    // Two-way bound to the email field.
     in-out property <string> email;
+    // Two-way bound to the password field.
     in-out property <string> password;
+    // Two-way 'remember me' checkbox state.
     in-out property <bool> remember: true;
+    // Fired on the submit button.
     callback submit();
+    // Fired on the 'forgot password' link.
     callback forgot();
+    // Fired on the 'create account' link.
     callback create-account();
 
     width: 380px;

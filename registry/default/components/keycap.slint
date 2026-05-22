@@ -10,8 +10,11 @@ export enum KeycapTone {
 }
 
 export component Keycap inherits Rectangle {
+    // Label inside the keycap (e.g. `⇧`, `K`).
     in property <string> text;
+    // Height + padding — sm, md, lg.
     in property <KeycapSize> size: KeycapSize.md;
+    // Surface treatment — `on-glass` or `on-solid`.
     in property <KeycapTone> tone: KeycapTone.on-glass;
 
     property <bool> is-affirm:

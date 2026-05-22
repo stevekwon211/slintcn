@@ -14,9 +14,13 @@ export enum CardPadding { none, sm, md, lg }
 export enum CardRadius  { md, lg, xl, xxl }
 
 export component Card inherits Rectangle {
+    // Surface treatment — solid, raised, ghost, glass.
     in property <CardVariant> variant: CardVariant.solid;
+    // Padding preset — sm, default, lg.
     in property <CardSize>    size:    CardSize.default;
+    // Padding override — none, sm, md, lg, xl. Use this OR `size`.
     in property <CardPadding> card-padding: CardPadding.lg;
+    // Corner radius override — md, lg, xl, full.
     in property <CardRadius>  card-radius:  CardRadius.xl;
 
     // Read-only hover signal — driven by the internal TouchArea below.
@@ -66,6 +70,7 @@ export component Card inherits Rectangle {
         card-padding == CardPadding.sm   ? Tokens.spacing-md :
         card-padding == CardPadding.md   ? Tokens.spacing-lg :
         /* lg */                           Tokens.spacing-xl;
+    // Resolved gap between header / content / footer in px; outbound.
     out property <length> gap-l:
         size == CardSize.sm ? Tokens.spacing-md : Tokens.spacing-lg;
 

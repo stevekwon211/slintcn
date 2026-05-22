@@ -4,6 +4,7 @@ import { Tokens } from "../theme/tokens.slint";
 // shadcn's animate-pulse: opacity 1 → 0.5 → 1; we toggle on a Timer and
 // let `animate opacity` ease between the two states.
 export component Skeleton inherits Rectangle {
+    // Corner radius of the placeholder.
     in property <length> radius: Tokens.radius-md;
 
     background: Tokens.color-muted;

@@ -6,8 +6,11 @@ import { Tokens } from "../theme/tokens.slint";
 export struct DropdownMenuItem { label: string }
 
 export component DropdownMenu inherits Rectangle {
+    // Menu rows shown when the trigger is clicked.
     in property <[DropdownMenuItem]> items;
+    // Pixel width of the popup panel.
     in property <length> content-width: 200px;
+    // Fired with the chosen row's index; the popup auto-closes.
     callback selected(int);
 
     background: transparent;

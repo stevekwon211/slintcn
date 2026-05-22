@@ -12,12 +12,15 @@ import { Separator, SeparatorOrientation } from "../components/separator.slint";
 export struct TeamMember { name: string, email: string, role: string, initials: string }
 
 export component Team inherits Rectangle {
+    // Members rendered in the list.
     in property <[TeamMember]> members: [
         { name: "Sofia Davis",     email: "sofia@acme.dev",    role: "Owner",  initials: "SD" },
         { name: "Jackson Lee",     email: "jackson@acme.dev",  role: "Member", initials: "JL" },
         { name: "Isabella Nguyen", email: "isabella@acme.dev", role: "Member", initials: "IN" },
     ];
+    // Fired on the Invite button.
     callback invite();
+    // Fired with the row index when a row's action is triggered.
     callback manage(int);
 
     background: transparent;

@@ -6,7 +6,9 @@ import { Separator, SeparatorOrientation } from "separator.slint";
 export struct TableRow { cells: [string] }
 
 export component Table inherits Rectangle {
+    // Column headers, left-to-right.
     in property <[string]> columns;
+    // Row data; each row's `cells` array must match `columns.length`.
     in property <[TableRow]> rows;
 
     background: transparent;

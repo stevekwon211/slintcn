@@ -4,8 +4,11 @@ import { Tokens } from "../theme/tokens.slint";
 // PopupWindow showing `title` + `description`. Closes when the pointer leaves
 // the trigger (like Tooltip, with richer card chrome).
 export component HoverCard inherits Rectangle {
+    // Bold heading inside the card; empty string omits it.
     in property <string> title;
+    // Body text below the title; empty string omits it.
     in property <string> description;
+    // Pixel width of the floating card.
     in property <length> content-width: 280px;
 
     background: transparent;

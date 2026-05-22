@@ -11,12 +11,14 @@ export struct StatMetric { label: string, value: string, delta: string, up: bool
 export struct TrafficSource { label: string, percent: float, value: string }
 
 export component Stats inherits Rectangle {
+    // Top-row metric cards.
     in property <[StatMetric]> metrics: [
         { label: "Revenue",      value: "$ 42,580", delta: "+12.4%", up: true },
         { label: "Subscriptions", value: "2,340",   delta: "+8.1%",  up: true },
         { label: "Active now",   value: "1,284",    delta: "+3.1%",  up: true },
         { label: "Churn",        value: "1.8%",     delta: "−0.4%",  up: false },
     ];
+    // Traffic-by-source bars under the metrics.
     in property <[TrafficSource]> sources: [
         { label: "Direct",   percent: 48, value: "12,480" },
         { label: "Organic",  percent: 31, value: "8,060"  },

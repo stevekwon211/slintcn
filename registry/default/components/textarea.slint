@@ -2,9 +2,13 @@ import { Tokens } from "../theme/tokens.slint";
 
 // Multi-line text input. Like Input but taller and word-wrapping.
 export component Textarea inherits Rectangle {
+    // Two-way bound to the contents.
     in-out property <string> text;
+    // Hint shown when empty.
     in property <string> placeholder;
+    // When false, the textarea dims and stops accepting keystrokes.
     in property <bool> enabled: true;
+    // Fired on every keystroke with the current text.
     callback edited(string);
 
     forward-focus: input;

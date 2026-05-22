@@ -34,11 +34,17 @@ export struct SelectItem {
 }
 
 export component Select inherits Rectangle {
+    // Options shown in the dropdown.
     in property <[SelectItem]> items;
+    // Two-way; index of the chosen item, or -1 for no selection.
     in-out property <int> selected-index: -1;
+    // Shown when nothing is selected.
     in property <string> placeholder: "Select…";
+    // When true, the trigger dims and stops opening.
     in property <bool> disabled: false;
+    // Internal — which item is highlighted by arrow keys inside the popup.
     in-out property <int> highlighted-index: 0;
+    // Fired with the new `selected-index` when the user picks an item.
     callback changed(int);
 
     // `inherits Rectangle` + explicit dimensions so parent layouts get a

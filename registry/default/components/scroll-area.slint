@@ -4,6 +4,7 @@ import { Tokens } from "../theme/tokens.slint";
 // the total height of the @children content; place children laid out to that
 // height (e.g. a VerticalLayout with height: parent's content-height).
 export component ScrollArea inherits Rectangle {
+    // Logical height of the scrollable content; scrolls when this exceeds the visible height.
     in property <length> content-height;
 
     clip: true;

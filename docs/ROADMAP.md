@@ -1,6 +1,21 @@
 # slintcn roadmap
 
-## Planned (v0.23+)
+## v0.24.1 — property docs (current)
+
+A Slint maintainer reviewed the v0.24 docs and pointed out that no component
+exposed property docs — a real gap. Fix it across the catalog in one pass.
+
+- [x] Inline `//` doc comment above every `in` / `in-out` / `out` property and
+      `callback` in all 43 components and 8 blocks (181 inserted; 20 already
+      had docs from manual passes).
+- [x] `scripts/build-docs.mjs` parses those comments via `propsOf(item)` and
+      renders a **Properties** section on each docs page — name, kind tag
+      (in / in-out / out / callback), Slint type, one-line description.
+- [x] TOC ("On this page") gains a Properties entry when the section is present.
+- [x] Single source of truth — docs live next to the `.slint` declaration; no
+      separate metadata file to drift.
+
+## Planned (v0.25+)
 
 The distribution system (CLI · registry · docs · adoption mode) is at parity
 with shadcn and ahead in places. The remaining gap is purely **component
@@ -70,7 +85,7 @@ heavy, separate R&D track; the Game/HUD layer is the long-term differentiator.
 
 ---
 
-## v0.24 — menu family (current)
+## v0.24 — menu family
 
 PopupWindow + the verified preferred-* exposure pattern (from Tooltip/Select/
 Popover/ContextMenu) reused for four new overlay/nav primitives:
