@@ -8,7 +8,7 @@
 
 [Live docs](https://stevekwon211.github.io/slintcn/docs/) · [Live demo](https://stevekwon211.github.io/slintcn) · [npm](https://www.npmjs.com/package/slintcn)
 
-36 UI primitives, 5 installable blocks, a theme system, and a static registry you can host yourself.
+39 UI components, 5 installable blocks, a theme system, and a static registry you can host yourself.
 
 <p align="center">
   <img src="docs/img/snapshots/section-6-dashboard.png" alt="slintcn dashboard components" width="31%">
@@ -78,6 +78,7 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.20** | **Adoption W2** — headless overlay panels (DialogPanel/AlertDialogPanel/SheetPanel) + external enums (`--external-enums`) | ✅ |
 | **v0.21** | **Adoption W3** — docs API section (variants/sizes auto-derived) + per-item a11y/behavior contract (`a11y.json`, surfaced in docs + `export`) | ✅ |
 | **v0.22** | **Adoption W4** (from Zero adoption testing) — unified add/diff/export pipeline (diff+export now apply external-enums), adoption flags persist to slintcn.json, per-file `routes` (route overlay panels out of `componentsDir`) | ✅ |
+| **v0.22.1** | **Responsive + polish** — mobile nav drawer for the docs, demo fills the window (no letterbox, no resize flicker), Popover/ContextMenu layout fix, Firefox first-click focus | ✅ |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
@@ -332,7 +333,7 @@ closed modals don't block interaction with the underlying UI.
 registry/default/         # Source of truth (published with npm package)
   theme/palette.slint     #   raw color/alpha primitives
   theme/tokens.slint      #   semantic layer (components read this)
-  components/*.slint      #   37 primitives + popup-helpers + lucide-paths
+  components/*.slint      #   39 components + popup-helpers + lucide-paths
 examples/showcase/        # Runnable gallery (regenerated via `slintcn add`)
 bin/slintcn.mjs           # init + add CLI (transitive deps)
 bin/__test__/             # node:test suite — `make test`

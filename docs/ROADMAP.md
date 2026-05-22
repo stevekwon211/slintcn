@@ -1,6 +1,20 @@
 # slintcn roadmap
 
-## v0.22 — adoption W4 (Zero adoption-test fixes) (current)
+## v0.22.1 — responsive site + polish (current)
+
+- [x] **Docs mobile nav** — off-canvas drawer (☰ → sidebar over a scrim; closes on
+      scrim/Esc/select; body scroll lock). Restores component navigation on phones.
+- [x] **Playground sizing** — the WASM showcase fills the window like a maximized
+      app (no letterbox, no clip); resize is debounced so Slint doesn't realloc its
+      WebGL surface every frame (the Safari/Firefox flicker). `<760px` shows a note +
+      docs link and skips the 7 MB download.
+- [x] **Landing mobile** — fluid hero, condensed nav, overflow-safe install/commands.
+- [x] **Popover/ContextMenu layout** — expose `preferred-*` so they don't collapse
+      to 0 width and overlap siblings (same class as the earlier Tooltip/Select fix).
+- [x] **Firefox first-click** — focus the canvas/iframe so the first click reaches
+      the component (Select/Switch no longer need two clicks).
+
+## v0.22 — adoption W4 (Zero adoption-test fixes)
 
 The Zero desktop team ran v0.21 against their apps/desktop checkout and found
 four real gaps — all fixed here:
