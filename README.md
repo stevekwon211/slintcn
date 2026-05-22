@@ -74,7 +74,8 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.16** | **Theming** — base-color variants (neutral/zinc/slate/stone) via `slintcn init --base-color` + Colors reference | ✅ |
 | **v0.17** | **Docs IA** — showcase as a docs site: install command + usage code per component section | ✅ |
 | **v0.18** | **Docs site (ui.shadcn.com clone)** — generated per-component pages with live WASM preview + install tabs + usage code + sidebar IA at `/docs` | ✅ |
-| **v0.19** | Docs getting-started pages (Introduction/Installation/Theming/CLI/Registry) + components index | upcoming |
+| **v0.19** | **Adoption mode** — install into an existing design system: external tokens, import map, filename style, dry-run/diff/no-overwrite, lockfile, `export` | ✅ |
+| **v0.20** | Adoption W2 — external enums (`--no-local-enums`) + headless Dialog→DialogPanel split | upcoming |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
@@ -142,6 +143,50 @@ against the same registry. The official registry is served at
 
 > **Maintainers:** publish to npm with `npm login && npm publish` (the package
 > ships `bin`, `registry`, `templates`, `schema`; `prepublishOnly` runs tests).
+
+## Adopting into an existing design system
+
+The default `slintcn add` creates a standalone `ui/slintcn` island with its own
+`Tokens`. If you already have a design system — generated tokens, your own
+overlay root, `snake_case` filenames — slintcn can install **into** it instead
+of beside it. Every flag below is opt-in (set on the CLI or in `slintcn.json`);
+absent, behavior is unchanged.
+
+```bash
+# Point components at YOUR Tokens (theme not installed); land them in your dir;
+# rename to snake_case; preview the plan before touching disk.
+slintcn add button card \
+  --external-tokens ./generated/native/tokens.slint \
+  --components-dir apps/desktop/ui/primitives \
+  --filename-style snake \
+  --dry-run
+```
+
+| Flag / `slintcn.json` key | Effect |
+|---|---|
+| `--external-tokens <path>` / `externalTokens` | Don't install the theme; rewrite every `import { Tokens } from "../theme/tokens.slint"` to `<path>`. Your file must export a `Tokens` global with the roles components read. |
+| `--components-dir <dir>` / `componentsDir` (also `themeDir`/`blocksDir`) | Where files land — fully relocatable; imports are rewritten to match. |
+| `--filename-style snake` / `fileNameStyle` | `kebab` (default) or `snake` — `slot-tile.slint → slot_tile.slint`, and sibling/cross-file imports follow. |
+| `--import-map <file.json>` / `importMap` | Arbitrary `{ "<import>": "<target>" }` overrides, highest precedence. |
+| `--dry-run` | Print the plan (`+ new` · `~ overwrite` · `= skip`) and write nothing (won't even create `slintcn.json`). |
+| `--no-overwrite` / `overwrite: false` | Skip files that already exist. |
+
+**Diff against upstream — reference, not just install.** Every real `add`
+records `slintcn.lock.json` (a sha256 per written file). Then:
+
+```bash
+slintcn diff button     # unified diff: installed (rewritten for your config) vs registry
+                        # annotates "locally modified since install" vs "upstream changed"
+```
+
+**Feed your own codegen.** `export` emits one resolved item as JSON — metadata
+plus file content **already rewritten for your config** — so a monorepo codegen
+step can consume slintcn deterministically without a build.rs island:
+
+```bash
+slintcn export button --stdout        # JSON to stdout (pipeable)
+slintcn export button                 # → dist/export/button.json
+```
 
 ## Components (default registry)
 

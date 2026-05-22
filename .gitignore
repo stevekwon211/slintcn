@@ -34,3 +34,6 @@ dist/
 
 # npm auth token — never commit
 .npmrc
+
+# showcase build.rs runs `slintcn add`, which now writes a lockfile
+examples/showcase/slintcn.lock.json

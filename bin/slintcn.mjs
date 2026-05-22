@@ -4,8 +4,12 @@
  */
 import { copyFile, mkdir, readFile, writeFile, access } from "node:fs/promises";
 import { constants, realpathSync } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+const sha256 = (s) => createHash("sha256").update(s).digest("hex");
+const toPosix = (p) => p.split(path.sep).join("/");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -98,7 +102,20 @@ export function resolveConfig(rawConfig, cwd) {
     themeDir,
     componentsDir,
     blocksDir,
+    // Adoption mode (all opt-in; absent = standalone behavior unchanged):
+    externalTokens: rawConfig?.externalTokens ? path.resolve(cwd, rawConfig.externalTokens) : null,
+    importMap: rawConfig?.importMap ?? {},
+    fileNameStyle: rawConfig?.fileNameStyle ?? "kebab",
+    overwrite: rawConfig?.overwrite ?? true,
   };
+}
+
+/** Apply the configured filename style to a path's .slint basename (snake ⇒ '-'→'_'). */
+export function styleFileName(p, style) {
+  if (style !== "snake") return p;
+  const slash = p.lastIndexOf("/");
+  const dir = slash >= 0 ? p.slice(0, slash + 1) : "";
+  return dir + p.slice(dir.length).replace(/-/g, "_");
 }
 
 /**
@@ -133,14 +150,15 @@ export async function fetchRegistryItem(url, fetchFn = fetch) {
  * absolute destination based on the user's themeDir / componentsDir.
  */
 export function routeDest(rel, config) {
+  const style = (n) => styleFileName(n, config.fileNameStyle ?? "kebab");
   if (rel.startsWith("theme/")) {
-    return path.join(config.themeDir, rel.slice("theme/".length));
+    return path.join(config.themeDir, style(rel.slice("theme/".length)));
   }
   if (rel.startsWith("components/")) {
-    return path.join(config.componentsDir, rel.slice("components/".length));
+    return path.join(config.componentsDir, style(rel.slice("components/".length)));
   }
   if (rel.startsWith("blocks/")) {
-    return path.join(config.blocksDir, rel.slice("blocks/".length));
+    return path.join(config.blocksDir, style(rel.slice("blocks/".length)));
   }
   return path.join(config.outDir, rel);
 }
@@ -151,42 +169,59 @@ export function routeDest(rel, config) {
  * own location, so the user's themeDir / componentsDir layout choices are
  * honored. Other imports pass through untouched.
  */
-export function rewriteImports(content, { destAbs, themeDir, componentsDir }) {
-  const resolveTarget = (importPath) => {
-    if (importPath.startsWith("../theme/")) {
-      return path.join(themeDir, importPath.slice("../theme/".length));
-    }
-    if (importPath.startsWith("../components/")) {
-      return path.join(componentsDir, importPath.slice("../components/".length));
-    }
-    return null;
+export function rewriteImports(content, config, destAbs) {
+  const { themeDir, componentsDir, blocksDir, externalTokens } = config;
+  const importMap = config.importMap ?? {};
+  const style = (n) => styleFileName(n, config.fileNameStyle ?? "kebab");
+  const toRel = (absTarget) => {
+    let rel = path.relative(path.dirname(destAbs), absTarget);
+    if (!rel.startsWith(".") && !rel.startsWith("/")) rel = "./" + rel;
+    return rel.split(path.sep).join("/"); // Slint uses '/' on every OS
   };
 
-  return content.replace(/from\s+"([^"]+)"/g, (match, importPath) => {
-    const targetAbs = resolveTarget(importPath);
-    if (!targetAbs) return match;
-    let rel = path.relative(path.dirname(destAbs), targetAbs);
-    if (!rel.startsWith(".") && !rel.startsWith("/")) rel = "./" + rel;
-    // Slint imports use forward slashes regardless of host OS.
-    rel = rel.split(path.sep).join("/");
-    return `from "${rel}"`;
+  return content.replace(/from\s+"([^"]+)"/g, (match, imp) => {
+    // 1. explicit import-map override (highest precedence)
+    if (Object.prototype.hasOwnProperty.call(importMap, imp)) return `from "${importMap[imp]}"`;
+    // 2. theme — redirect to external Tokens when configured
+    if (imp.startsWith("../theme/")) {
+      const file = imp.slice("../theme/".length);
+      if (externalTokens && file.startsWith("tokens.")) return `from "${toRel(externalTokens)}"`;
+      return `from "${toRel(path.join(themeDir, style(file)))}"`;
+    }
+    // 3. blocks
+    if (imp.startsWith("../blocks/")) {
+      return `from "${toRel(path.join(blocksDir, style(imp.slice("../blocks/".length))))}"`;
+    }
+    // 4. components (block → component refs)
+    if (imp.startsWith("../components/")) {
+      return `from "${toRel(path.join(componentsDir, style(imp.slice("../components/".length))))}"`;
+    }
+    // 5. bare sibling component import (same dir) — honor filename style
+    if (!imp.includes("/") && imp.endsWith(".slint") && !imp.startsWith("std-widgets")) {
+      return `from "${style(imp)}"`;
+    }
+    return match; // std-widgets / unrecognized → untouched
   });
 }
 
 // `srcRel` lets the source differ from the destination path (used for
 // base-color palette variants: read palette-zinc.slint, write palette.slint).
-async function copyRegistryFile(rel, config, srcRel = rel) {
+// Resolve a registry file → its rewritten content + destination + planned
+// action. Writes unless `dryRun`; skips an existing file unless `overwrite`.
+// `srcRel` lets the source differ from the dest (base-color palette variants).
+async function copyRegistryFile(rel, config, opts = {}) {
+  const { srcRel = rel, dryRun = false, overwrite = config.overwrite ?? true } = opts;
   const src = path.join(ROOT, "registry", config.style, srcRel);
   const dest = routeDest(rel, config);
-  await mkdir(path.dirname(dest), { recursive: true });
-  let content = await readFile(src, "utf8");
-  content = rewriteImports(content, {
-    destAbs: dest,
-    themeDir: config.themeDir,
-    componentsDir: config.componentsDir,
-  });
-  await writeFile(dest, content);
-  return dest;
+  const content = rewriteImports(await readFile(src, "utf8"), config, dest);
+  const existed = await exists(dest);
+  if (existed && !overwrite) return { dest, content, status: "skip" };
+  const status = existed ? "overwrite" : "new";
+  if (!dryRun) {
+    await mkdir(path.dirname(dest), { recursive: true });
+    await writeFile(dest, content);
+  }
+  return { dest, content, status };
 }
 
 async function cmdInit(cwd, opts = {}) {
@@ -256,31 +291,38 @@ export function resolveInstallOrder(requestedNames, registry) {
   return ordered;
 }
 
-async function installItem(name, config, registry, cwd) {
+const STATUS_MARK = { new: "+", overwrite: "~", skip: "=" };
+
+async function installItem(name, config, registry, cwd, opts = {}) {
+  const { dryRun = false, overwrite = config.overwrite ?? true } = opts;
+  const records = [];
+  const record = (r) => { records.push(r); console.log(`  ${STATUS_MARK[r.status]} ${path.relative(cwd, r.dest)}`); };
+
   if (name === "theme") {
+    // Adoption: with external tokens, don't install the theme at all — the
+    // import rewriter points components at the host's Tokens.
+    if (config.externalTokens) {
+      console.log(`  = theme — external (${path.relative(cwd, config.externalTokens)}), skipped`);
+      return records;
+    }
     for (const rel of registry.theme.files) {
-      // base-color: swap the default palette for the chosen variant's source,
-      // still writing to palette.slint so tokens.slint's import resolves.
+      // base-color: read the chosen palette variant, still write palette.slint.
       let srcRel = rel;
       if (rel === "theme/palette.slint" && config.baseColor && config.baseColor !== "neutral") {
         const variant = `theme/palette-${config.baseColor}.slint`;
-        if (await exists(path.join(ROOT, "registry", config.style, variant))) {
-          srcRel = variant;
-        }
+        if (await exists(path.join(ROOT, "registry", config.style, variant))) srcRel = variant;
       }
-      const dest = routeDest(rel, config);
-      if (!(await exists(dest))) {
-        await copyRegistryFile(rel, config, srcRel);
-        console.log(`  + ${path.relative(cwd, dest)}`);
-      }
+      // theme is a shared dep → install once; never clobber an existing theme.
+      record(await copyRegistryFile(rel, config, { srcRel, dryRun, overwrite: false }));
     }
-    return;
+    return records;
   }
+
   const spec = registry.components[name];
   for (const rel of spec.files) {
-    const dest = await copyRegistryFile(rel, config);
-    console.log(`  + ${path.relative(cwd, dest)}`);
+    record(await copyRegistryFile(rel, config, { dryRun, overwrite }));
   }
+  return records;
 }
 
 /**
@@ -302,23 +344,39 @@ export async function installRemoteItem(url, config, cwd, opts = {}) {
   for (const file of item.files ?? []) {
     const dest = routeDest(file.path, config);
     await mkdir(path.dirname(dest), { recursive: true });
-    const content = rewriteImports(file.content, {
-      destAbs: dest,
-      themeDir: config.themeDir,
-      componentsDir: config.componentsDir,
-    });
-    await writeFile(dest, content);
+    await writeFile(dest, rewriteImports(file.content, config, dest));
     log(`  + ${path.relative(cwd, dest)}`);
   }
 }
 
-async function cmdAdd(cwd, tokens) {
+async function buildAddConfig(cwd, opts) {
   let rawConfig = await loadRawConfig(cwd);
   if (!rawConfig) {
-    await cmdInit(cwd);
-    rawConfig = await loadRawConfig(cwd);
+    if (opts.dryRun) rawConfig = {};            // don't create slintcn.json on a dry run
+    else { await cmdInit(cwd); rawConfig = await loadRawConfig(cwd); }
   }
-  const config = resolveConfig(rawConfig, cwd);
+  rawConfig = { ...rawConfig };
+  if (opts.componentsDir) rawConfig.componentsDir = opts.componentsDir;
+  if (opts.externalTokens) rawConfig.externalTokens = opts.externalTokens;
+  if (opts.fileNameStyle) rawConfig.fileNameStyle = opts.fileNameStyle;
+  if (opts.overwrite === false) rawConfig.overwrite = false;
+  if (opts.importMapFile) {
+    const m = JSON.parse(await readFile(path.resolve(cwd, opts.importMapFile), "utf8"));
+    rawConfig.importMap = { ...(rawConfig.importMap || {}), ...m };
+  }
+  return resolveConfig(rawConfig, cwd);
+}
+
+async function writeLock(cwd, entries) {
+  if (!Object.keys(entries).length) return;
+  const p = path.join(cwd, "slintcn.lock.json");
+  const lock = (await exists(p)) ? JSON.parse(await readFile(p, "utf8")) : {};
+  await writeFile(p, JSON.stringify({ ...lock, ...entries }, null, 2) + "\n");
+}
+
+async function cmdAdd(cwd, tokens, opts = {}) {
+  const dryRun = !!opts.dryRun;
+  const config = await buildAddConfig(cwd, opts);
 
   let classified;
   try {
@@ -328,7 +386,7 @@ async function cmdAdd(cwd, tokens) {
     process.exit(1);
   }
 
-  // Local items: one topological batch (preserves dedup + order).
+  const lock = {};
   const localNames = classified.filter((c) => c.kind === "local").map((c) => c.name);
   if (localNames.length > 0) {
     const registry = await loadRegistry(config.style);
@@ -339,10 +397,18 @@ async function cmdAdd(cwd, tokens) {
       console.error(err.message);
       process.exit(1);
     }
-    for (const name of order) await installItem(name, config, registry, cwd);
+    for (const name of order) {
+      const recs = await installItem(name, config, registry, cwd, { dryRun, overwrite: config.overwrite });
+      const written = recs.filter((r) => r.status !== "skip");
+      if (written.length) {
+        lock[name] = {
+          version: registry.version ?? null,
+          files: Object.fromEntries(written.map((r) => [toPosix(path.relative(cwd, r.dest)), sha256(r.content)])),
+        };
+      }
+    }
   }
 
-  // Remote items: shared visited set across all requested URLs.
   const visited = new Set();
   for (const { url } of classified.filter((c) => c.kind === "url")) {
     try {
@@ -353,6 +419,11 @@ async function cmdAdd(cwd, tokens) {
     }
   }
 
+  if (dryRun) {
+    console.log(`\nDry run — nothing written. (+ new · ~ overwrite · = skip)`);
+    return;
+  }
+  await writeLock(cwd, lock);
   console.log(`\nInstalled. Import e.g. from "${path.relative(cwd, config.componentsDir)}/button.slint".`);
 }
 
@@ -456,6 +527,88 @@ async function cmdBuild(cwd, opts = {}) {
   console.log(`  r/<name>.json  (${items.length} resolved items)`);
 }
 
+// Minimal LCS line diff → array of "  ctx" / "- removed" / "+ added" lines.
+export function unifiedDiff(a, b) {
+  const n = a.length, m = b.length;
+  const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  const out = [];
+  let i = 0, j = 0;
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { out.push("  " + a[i]); i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) { out.push("- " + a[i++]); }
+    else { out.push("+ " + b[j++]); }
+  }
+  while (i < n) out.push("- " + a[i++]);
+  while (j < m) out.push("+ " + b[j++]);
+  return out;
+}
+
+async function cmdDiff(cwd, name) {
+  const config = resolveConfig(await loadRawConfig(cwd), cwd);
+  const registry = await loadRegistry(config.style);
+  const item = itemByName(registry, name);
+  if (!item) {
+    console.error(`Unknown item: ${name}.`);
+    process.exit(1);
+  }
+  const lockPath = path.join(cwd, "slintcn.lock.json");
+  const lock = (await exists(lockPath)) ? JSON.parse(await readFile(lockPath, "utf8")) : {};
+  let changed = false;
+  for (const rel of item.files) {
+    const src = path.join(ROOT, "registry", config.style, rel);
+    const dest = routeDest(rel, config);
+    const would = rewriteImports(await readFile(src, "utf8"), config, dest);
+    const relDest = toPosix(path.relative(cwd, dest));
+    if (!(await exists(dest))) { console.log(`  ${relDest}: not installed`); continue; }
+    const onDisk = await readFile(dest, "utf8");
+    if (onDisk === would) { console.log(`  ${relDest}: no changes`); continue; }
+    changed = true;
+    const locked = lock[name]?.files?.[relDest];
+    const note = locked ? (sha256(onDisk) !== locked ? " [locally modified since install]" : " [upstream changed]") : "";
+    console.log(`\n--- ${relDest} (installed)${note}\n+++ ${relDest} (registry, rewritten for your config)`);
+    console.log(unifiedDiff(onDisk.split("\n"), would.split("\n")).filter((l) => l[0] === "+" || l[0] === "-").join("\n"));
+  }
+  if (!changed) console.log(`\n${name}: in sync with the registry.`);
+}
+
+async function cmdExport(cwd, name, opts = {}) {
+  const config = resolveConfig(await loadRawConfig(cwd), cwd);
+  const registry = await loadRegistry(config.style);
+  const item = itemByName(registry, name);
+  if (!item) {
+    console.error(`Unknown item: ${name}.`);
+    process.exit(1);
+  }
+  const files = [];
+  for (const rel of item.files) {
+    const src = path.join(ROOT, "registry", config.style, rel);
+    const dest = routeDest(rel, config);
+    files.push({
+      path: toPosix(path.relative(cwd, dest)),
+      content: rewriteImports(await readFile(src, "utf8"), config, dest),
+      type: "text/slint",
+    });
+  }
+  const out = {
+    name,
+    type: item.type ?? "registry:ui",
+    title: item.title ?? name,
+    description: item.description ?? "",
+    category: item.category ?? "misc",
+    registryDependencies: item.requires ?? [],
+    files,
+  };
+  const json = JSON.stringify(out, null, 2);
+  if (opts.stdout) { process.stdout.write(json + "\n"); return; }
+  const outDir = path.resolve(cwd, "dist/export");
+  await mkdir(outDir, { recursive: true });
+  await writeFile(path.join(outDir, `${name}.json`), json);
+  console.log(`Exported ${name} → ${path.relative(cwd, outDir)}/${name}.json`);
+}
+
 function usage() {
   console.log(`slintcn — copy-paste Slint components
 
@@ -466,13 +619,23 @@ Usage:
   slintcn add @ns/name        Install from a configured registry namespace
   slintcn list [--json]       List available components by category
   slintcn view <name> [--files]  Show an item's metadata, deps, and files
+  slintcn diff <name>         Diff installed files vs the registry (rewritten)
+  slintcn export <name> [--stdout]  Emit one resolved item JSON (for codegen)
   slintcn build [-o <dir>]    Emit a static registry (registry.json + r/*.json)
 
+Adoption flags (install into an existing design system):
+  --external-tokens <path>    Don't install theme; import Tokens from <path>
+  --components-dir <dir>      Where component files land
+  --filename-style snake      kebab (default) | snake  (slot-tile → slot_tile)
+  --import-map <file.json>    Arbitrary "<import>": "<target>" overrides
+  --dry-run                   Print the plan (+ new · ~ overwrite · = skip), write nothing
+  --no-overwrite              Skip files that already exist
+
 Examples:
-  slintcn init
   slintcn add button card input
-  slintcn list
-  slintcn view dialog
+  slintcn add button --external-tokens ./generated/tokens.slint --filename-style snake --dry-run
+  slintcn diff button
+  slintcn export button --stdout
 `);
 }
 
@@ -488,13 +651,29 @@ async function main() {
       await cmdAdd(cwd, ["theme"]);
       break;
     }
-    case "add":
-      if (args.length === 0) {
+    case "add": {
+      const VALUE_FLAGS = new Set(["--external-tokens", "--components-dir", "--filename-style", "--import-map"]);
+      const flag = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : undefined; };
+      const names = [];
+      for (let k = 0; k < args.length; k++) {
+        const a = args[k];
+        if (a.startsWith("-")) { if (VALUE_FLAGS.has(a)) k++; continue; } // skip flag (+ its value)
+        names.push(a);
+      }
+      if (names.length === 0) {
         console.error("Specify at least one component: button, card, input, badge");
         process.exit(1);
       }
-      await cmdAdd(cwd, args.filter((a) => !a.startsWith("-")));
+      await cmdAdd(cwd, names, {
+        dryRun: args.includes("--dry-run"),
+        overwrite: args.includes("--no-overwrite") ? false : undefined,
+        externalTokens: flag("--external-tokens"),
+        componentsDir: flag("--components-dir"),
+        fileNameStyle: flag("--filename-style"),
+        importMapFile: flag("--import-map"),
+      });
       break;
+    }
     case "list":
       await cmdList(cwd, { json: args.includes("--json") });
       break;
@@ -505,6 +684,18 @@ async function main() {
         process.exit(1);
       }
       await cmdView(cwd, name, { files: args.includes("--files") });
+      break;
+    }
+    case "diff": {
+      const name = args.find((a) => !a.startsWith("-"));
+      if (!name) { console.error("Specify an item: slintcn diff button"); process.exit(1); }
+      await cmdDiff(cwd, name);
+      break;
+    }
+    case "export": {
+      const name = args.find((a) => !a.startsWith("-"));
+      if (!name) { console.error("Specify an item: slintcn export button"); process.exit(1); }
+      await cmdExport(cwd, name, { stdout: args.includes("--stdout") });
       break;
     }
     case "build": {
