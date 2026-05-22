@@ -66,7 +66,23 @@
 
     <script type="module">
         // Cache-bust: bump ?v= on each deploy so browsers fetch the fresh bundle.
-        import init from './pkg/slintcn-showcase.js?v=0.21.0';
+        import init from './pkg/slintcn-showcase.js?v=0.22.1';
+
+        // Keep the canvas a stable pixel size WHILE the window is being dragged.
+        // Letting it track the viewport continuously makes Slint reallocate its
+        // WebGL surface every frame, which blanks/flickers the canvas on Safari
+        // and Firefox. Re-fit only once the resize has settled.
+        const frame = document.getElementById('frame');
+        const fit = () => {
+            frame.style.width = window.innerWidth + 'px';
+            frame.style.height = window.innerHeight + 'px';
+        };
+        fit();
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(fit, 250);
+        });
 
         function reveal() { document.getElementById('loader').classList.add('hidden'); }
 
@@ -77,7 +93,7 @@
             return msg.includes('control flow') || msg.includes("isn't actually an error");
         }
 
-        init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.21.0' })
+        init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.22.1' })
             .then(reveal)
             .catch((err) => {
                 if (isWinitControlFlow(err)) { reveal(); return; }
