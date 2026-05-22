@@ -63,7 +63,7 @@ Variants are typed enums, so `ButtonVariant.outlin` is a compile error. That is
 the main Rust/Slint advantage I wanted to preserve: customization without losing
 static feedback.
 
-## What v0.18.1 includes
+## What v0.22 includes
 
 - 36 UI primitives.
 - 5 installable blocks.
