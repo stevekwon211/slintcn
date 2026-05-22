@@ -7,7 +7,11 @@
 <style>
   :root { color-scheme: dark; }
   html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #0a0a0a; overflow: hidden; }
-  #frame { width: 100vw; height: 100vh; }
+  /* Pin the canvas to 1100×760 and scale it with a CSS transform — Slint's
+     ResizeObserver never fires, so no WebGL surface re-alloc / flicker on
+     Safari + Firefox. See demo.html for the full rationale. */
+  body { display: flex; align-items: center; justify-content: center; }
+  #frame { width: 1100px; height: 760px; flex: none; transform-origin: center center; }
   canvas { outline: none; display: block; width: 100% !important; height: 100% !important; }
   #loader { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
     background: #0a0a0a; transition: opacity 200ms ease; }
@@ -25,14 +29,15 @@
 <script type="module">
   import init from './pkg/slintcn-showcase.js?v=0.22.1';
 
-  // Keep the canvas a stable pixel size while the (parent) window resizes;
-  // continuous canvas resize flickers/blanks Slint's WebGL surface on Safari
-  // and Firefox. Re-fit only once resizing settles.
+  // Scale the fixed 1100×760 canvas to fit the iframe (transform-only, so
+  // Slint's ResizeObserver never fires → no flicker on any browser).
   const frame = document.getElementById('frame');
-  const fit = () => { frame.style.width = window.innerWidth + 'px'; frame.style.height = window.innerHeight + 'px'; };
+  const fit = () => {
+    const s = Math.min(window.innerWidth / 1100, window.innerHeight / 760);
+    frame.style.transform = `scale(${s})`;
+  };
   fit();
-  let resizeTimer;
-  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fit, 250); });
+  window.addEventListener('resize', fit);
 
   const reveal = () => document.getElementById('loader').classList.add('hidden');
   const isWinitControlFlow = (err) => {

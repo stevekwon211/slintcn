@@ -18,10 +18,15 @@
             color: #fafafa;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
         }
-        /* Slint's winit-web backend sizes the canvas to its laid-out box, so we
-           give it a full-viewport frame: the showcase fills the window like a
-           real maximized desktop app (no floating card, no dead matting). */
-        #frame { width: 100vw; height: 100vh; }
+        /* Responsive without resizing Slint's canvas. Slint watches the canvas
+           box via ResizeObserver and reallocates its WebGL surface whenever the
+           box changes — that's what flickered/blanked on Safari + Firefox while
+           dragging. So we PIN the canvas to its native 1100×760 layout box and
+           scale it visually with a CSS transform (which doesn't change the
+           layout box, so the observer never fires). Result: fits any viewport,
+           live + smooth on every browser, zero surface re-alloc. */
+        body { display: flex; align-items: center; justify-content: center; }
+        #frame { width: 1100px; height: 760px; flex: none; transform-origin: center center; }
         canvas { outline: none; display: block; width: 100% !important; height: 100% !important; }
         #loader {
             position: fixed;
@@ -68,21 +73,16 @@
         // Cache-bust: bump ?v= on each deploy so browsers fetch the fresh bundle.
         import init from './pkg/slintcn-showcase.js?v=0.22.1';
 
-        // Keep the canvas a stable pixel size WHILE the window is being dragged.
-        // Letting it track the viewport continuously makes Slint reallocate its
-        // WebGL surface every frame, which blanks/flickers the canvas on Safari
-        // and Firefox. Re-fit only once the resize has settled.
+        // Scale the fixed 1100×760 canvas to fit the viewport (aspect preserved,
+        // centered). Transform-only, so Slint's ResizeObserver never fires — no
+        // surface re-alloc, no flicker, smooth on every browser, even mid-drag.
         const frame = document.getElementById('frame');
         const fit = () => {
-            frame.style.width = window.innerWidth + 'px';
-            frame.style.height = window.innerHeight + 'px';
+            const s = Math.min(window.innerWidth / 1100, window.innerHeight / 760);
+            frame.style.transform = `scale(${s})`;
         };
         fit();
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(fit, 250);
-        });
+        window.addEventListener('resize', fit);
 
         function reveal() { document.getElementById('loader').classList.add('hidden'); }
 
