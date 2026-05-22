@@ -84,6 +84,7 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.24.1** | **Property docs** — every `in` / `in-out` / `out` / callback has a one-line description; docs site surfaces them in a per-component Properties section | ✅ |
 | **v0.24.2** | **Menu keyboard nav** — Esc / ↑↓ / Enter inside DropdownMenu + Menubar popups; ←→ / Enter for NavigationMenu; a11y contracts for all four | ✅ |
 | **v0.25** | **Command & Combobox** — Combobox (searchable Select); Command (⌘K palette modal) → 45 components | ✅ |
+| **v0.25.1** | **Combobox + Command keyboard nav** — ↑/↓ move highlight, Enter selects, Esc closes (ancestor FocusScope catches keys bubbling from the search Input) | ✅ |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics

@@ -1,6 +1,25 @@
 # slintcn roadmap
 
-## v0.25 — Command & Combobox (current)
+## v0.25.1 — Combobox + Command keyboard nav (current)
+
+Closing the v0.25 keyboard gap. The trick is **ancestor FocusScope key
+bubbling**: place a `popup-focus := FocusScope { … }` around the search Input
++ item list, set `forward-focus: search`, and let unhandled keys bubble from
+the inner TextInput up to the FocusScope's `key-pressed` handler.
+
+- [x] **Combobox** popup — `Esc` closes, `↑/↓` move `highlighted-index`,
+      `Enter` (still via `Input.accepted`) selects and closes.
+- [x] **Command** popup — `Esc` dismisses (`open = false` + `dismissed()`),
+      `↑/↓` move `highlighted-index`, `Enter` selects via `Input.accepted`.
+- [x] Trigger / open also resets `highlighted-index` to 0 so the user starts
+      at the top each time.
+- [x] `a11y.json` for both: `keyboard: ["text entry", "Arrow keys", "Enter"]`,
+      `escapeDismiss: true`.
+
+In-component substring filtering still waits on Slint adding `.contains()` /
+`.starts-with()` to `string` — see `combobox.slint` / `command.slint` comments.
+
+## v0.25 — Command & Combobox
 
 - [x] **Combobox** — Select-style trigger + popup with a search Input and an
       item list. Click selects, Enter on the search Input selects the

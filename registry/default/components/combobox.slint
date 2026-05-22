@@ -4,9 +4,9 @@ import { Icon } from "icon.slint";
 import { LucidePaths } from "lucide-paths.slint";
 
 // Searchable Select — click the trigger to open, type into the search field,
-// Enter selects the highlighted row. The popup exposes a two-way `query`
-// property; v1 leaves the actual filtering to the consumer (bind `items` to
-// a query-derived list in your model). Click any row to select it.
+// ↑/↓ move the highlight, Enter selects it, Esc closes. The popup exposes a
+// two-way `query` property; filtering is consumer-side (bind `items` to a
+// query-derived list in your model) since Slint 1.16 has no substring methods.
 export struct ComboboxItem { label: string, value: string }
 
 export component Combobox inherits Rectangle {
@@ -34,7 +34,10 @@ export component Combobox inherits Rectangle {
 
     touch := TouchArea {
         mouse-cursor: pointer;
-        clicked => { popup.show(); }
+        clicked => {
+            root.highlighted-index = 0;
+            popup.show();
+        }
     }
 
     popup := PopupWindow {
@@ -51,10 +54,32 @@ export component Combobox inherits Rectangle {
             drop-shadow-blur:     Tokens.shadow-e2-blur;
             drop-shadow-offset-y: Tokens.shadow-e2-offset-y;
             drop-shadow-color:    Tokens.shadow-e2-color;
-            height: body.preferred-height;
-            forward-focus: search;
+            height: popup-focus.preferred-height;
+            forward-focus: popup-focus;
 
-            body := VerticalLayout {
+            // Ancestor FocusScope — catches unhandled keys (↑/↓/Esc) that
+            // bubble from the search Input's inner TextInput while typing
+            // falls through.
+            popup-focus := FocusScope {
+                forward-focus: search;
+                key-pressed(event) => {
+                    if (event.text == "\u{1b}") { popup.close(); return accept; }
+                    if (event.text == Key.DownArrow) {
+                        if (root.items.length > 0) {
+                            root.highlighted-index = mod(root.highlighted-index + 1, root.items.length);
+                        }
+                        return accept;
+                    }
+                    if (event.text == Key.UpArrow) {
+                        if (root.items.length > 0) {
+                            root.highlighted-index = mod(root.highlighted-index + root.items.length - 1, root.items.length);
+                        }
+                        return accept;
+                    }
+                    return reject;
+                }
+
+                body := VerticalLayout {
                 padding: 6px;
                 spacing: 4px;
 
@@ -110,6 +135,7 @@ export component Combobox inherits Rectangle {
                         }
                     }
                 }
+            }
             }
         }
     }

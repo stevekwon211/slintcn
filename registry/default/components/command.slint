@@ -1,11 +1,12 @@
 import { Tokens } from "../theme/tokens.slint";
 import { Input } from "input.slint";
 
-// Command palette (⌘K). Open it from your app shortcut; the search Input two-
-// way binds `query` so the consumer can derive a filtered `items` list. Enter
-// selects the highlighted row, click selects directly. v1 is a flat item list
-// (groups arrive in v0.25.1). Mount as the LAST child of Window so the
-// backdrop covers everything.
+// Command palette (⌘K). Open from your app shortcut; type in the search Input,
+// ↑/↓ move the highlight, Enter selects the highlighted item, Esc dismisses.
+// `query` is two-way; consumer derives a filtered `items` list (Slint 1.16
+// has no substring methods, so filter lives in the consumer for now). v1 is a
+// flat item list; groups arrive in v0.25.2. Mount as the LAST child of Window
+// so the backdrop covers everything.
 export struct CommandItem { label: string, id: string, hint: string }
 
 export component Command inherits Rectangle {
@@ -45,7 +46,8 @@ export component Command inherits Rectangle {
         x: (parent.width - 540px) / 2;
         y: parent.height * 0.16;
         width: 540px;
-        height: body.preferred-height;
+        height: popup-focus.preferred-height;
+        forward-focus: popup-focus;
         background: Tokens.color-card;
         border-color: Tokens.color-border-hairline;
         border-width: 1px;
@@ -57,7 +59,32 @@ export component Command inherits Rectangle {
         // Absorb clicks so they don't bubble to the backdrop.
         TouchArea { mouse-cursor: default; clicked => { } }
 
-        body := VerticalLayout {
+        // Ancestor FocusScope — catches ↑/↓/Esc bubbling from the search Input
+        // while typing falls through.
+        popup-focus := FocusScope {
+            forward-focus: search;
+            key-pressed(event) => {
+                if (event.text == "\u{1b}") {
+                    root.open = false;
+                    root.dismissed();
+                    return accept;
+                }
+                if (event.text == Key.DownArrow) {
+                    if (root.items.length > 0) {
+                        root.highlighted-index = mod(root.highlighted-index + 1, root.items.length);
+                    }
+                    return accept;
+                }
+                if (event.text == Key.UpArrow) {
+                    if (root.items.length > 0) {
+                        root.highlighted-index = mod(root.highlighted-index + root.items.length - 1, root.items.length);
+                    }
+                    return accept;
+                }
+                return reject;
+            }
+
+            body := VerticalLayout {
             padding: 8px;
             spacing: 6px;
 
@@ -111,6 +138,7 @@ export component Command inherits Rectangle {
                     }
                 }
             }
+        }
         }
     }
 }
