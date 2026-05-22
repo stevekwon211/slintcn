@@ -55,6 +55,28 @@
             color: #a1a1a1; text-decoration: none; font-size: 13px; font-weight: 500;
         }
         #home-link:hover { color: #fafafa; }
+        /* The showcase is a 1100×760 desktop app; below this it scales down too
+           far to use. Swap in a short note + a link to the responsive docs. */
+        #narrow { display: none; }
+        @media (max-width: 760px) {
+            #frame, #loader { display: none !important; }
+            /* Fixed + inset:0 so it centers in the viewport regardless of the
+               winit canvas elements that share the body. */
+            #narrow {
+                display: flex; position: fixed; inset: 0;
+                flex-direction: column; gap: 16px;
+                align-items: center; justify-content: center;
+                padding: 0 28px; text-align: center; box-sizing: border-box;
+            }
+            #narrow .t { font-size: 17px; font-weight: 600; }
+            #narrow .d { font-size: 14px; color: #a1a1a1; line-height: 1.5; max-width: 300px; }
+            #narrow a {
+                display: inline-flex; align-items: center; justify-content: center;
+                height: 44px; padding: 0 20px; border-radius: 10px;
+                background: #fafafa; color: #0a0a0a; font-size: 14px; font-weight: 600;
+                text-decoration: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -62,6 +84,12 @@
     <!-- Slint's winit backend (wasm) renders into the canvas with this id;
          the #frame wrapper caps + centers the window. -->
     <div id="frame"><canvas id="canvas"></canvas></div>
+
+    <div id="narrow">
+        <div class="t">Best on a wider screen</div>
+        <div class="d">The interactive playground is a desktop-sized Slint app. Open it on a laptop, or browse the components in the docs.</div>
+        <a href="./docs/">Browse the docs →</a>
+    </div>
 
     <div id="loader">
         <div class="brand">slintcn</div>
@@ -93,17 +121,23 @@
             return msg.includes('control flow') || msg.includes("isn't actually an error");
         }
 
-        init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.22.1' })
-            .then(reveal)
-            .catch((err) => {
-                if (isWinitControlFlow(err)) { reveal(); return; }
-                const loader = document.getElementById('loader');
-                loader.innerHTML = `
-                    <div class="brand">slintcn</div>
-                    <div class="err">Failed to load WebAssembly bundle.\n${(err && err.stack) || err}</div>
-                `;
-                console.error('slintcn init failed:', err);
-            });
+        // The showcase is a desktop-sized Slint app. On narrow screens we show a
+        // note + docs link instead (see the media query), and skip the 7 MB WASM
+        // download entirely — also keeps the winit canvas from interfering with
+        // the centered note's layout.
+        if (window.matchMedia("(min-width: 761px)").matches) {
+            init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.22.1' })
+                .then(reveal)
+                .catch((err) => {
+                    if (isWinitControlFlow(err)) { reveal(); return; }
+                    const loader = document.getElementById('loader');
+                    loader.innerHTML = `
+                        <div class="brand">slintcn</div>
+                        <div class="err">Failed to load WebAssembly bundle.\n${(err && err.stack) || err}</div>
+                    `;
+                    console.error('slintcn init failed:', err);
+                });
+        }
     </script>
 </body>
 </html>
