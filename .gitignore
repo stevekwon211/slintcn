@@ -26,6 +26,8 @@ web/pkg/
 # static registry built by `slintcn build` (regenerated for Pages + npm)
 web/r/
 web/registry.json
+# landing-page screenshots (copied from docs/img/snapshots in CI)
+web/img/
 dist/
 
 # npm auth token — never commit

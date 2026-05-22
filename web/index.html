@@ -1,101 +1,176 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>slintcn — copy-paste Slint components</title>
-    <meta name="description" content="Copy-paste Slint components that don't look like 2009 desktop widgets. Live interactive showcase built with Slint compiled to WebAssembly.">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23fafafa%22&gt;&lt;circle cx=%2212%22 cy=%2212%22 r=%229%22 fill=%22%23171717%22 stroke=%22%23fafafa%22 stroke-width=%221.5%22/&gt;&lt;/svg&gt;">
-    <style>
-        :root { color-scheme: dark; }
-        html, body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background: #0a0a0a;
-            color: #fafafa;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
-        }
-        /* Slint's winit backend renders into the canvas with id="canvas". */
-        canvas {
-            outline: none;
-            display: block;
-            margin: 0 auto;
-        }
-        #loader {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            background: #0a0a0a;
-            transition: opacity 200ms ease;
-            z-index: 10;
-        }
-        #loader.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 2px solid #262626;
-            border-top-color: #fafafa;
-            border-radius: 50%;
-            animation: spin 700ms linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .label { color: #a1a1a1; font-size: 13px; font-weight: 500; }
-        .brand { color: #fafafa; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
-        .err   { color: #ff6467; font-size: 12px; max-width: 520px; text-align: center; white-space: pre-wrap; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>slintcn — copy-paste Slint components</title>
+<meta name="description" content="Beautiful copy-paste Slint components — shadcn for native UI. 37 components, 5 blocks, dark-glass theming, a real CLI, and a games/HUD layer. npx slintcn add button.">
+<meta property="og:title" content="slintcn — copy-paste Slint components">
+<meta property="og:description" content="shadcn for native UI. Own the code. npx slintcn add button.">
+<meta property="og:image" content="img/section-6-dashboard.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23fafafa%22&gt;&lt;circle cx=%2212%22 cy=%2212%22 r=%229%22 fill=%22%23171717%22 stroke=%22%23fafafa%22 stroke-width=%221.5%22/&gt;&lt;/svg&gt;">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0a0a0a; --fg: #fafafa; --muted: #a1a1a1; --subtle: #737373;
+    --card: #171717; --line: rgba(255,255,255,0.10); --line-strong: rgba(255,255,255,0.20);
+    --surface: rgba(255,255,255,0.04); --radius: 12px;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.5; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* nav */
+  nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px);
+    background: rgba(10,10,10,0.7); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; gap: 20px; height: 56px; }
+  .logo { display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: -0.01em; }
+  .logo .dot { width: 18px; height: 18px; border-radius: 50%; background: #171717; border: 1.5px solid #fafafa; }
+  nav .spacer { flex: 1; }
+  nav a.link { color: var(--muted); font-size: 14px; font-weight: 500; }
+  nav a.link:hover { color: var(--fg); }
+  .pill { font-size: 11px; font-weight: 600; color: var(--muted); border: 1px solid var(--line);
+    border-radius: 999px; padding: 2px 8px; }
+
+  /* hero */
+  .hero { text-align: center; padding: 96px 0 64px; }
+  .hero .tag { display: inline-block; font-size: 13px; color: var(--muted); border: 1px solid var(--line);
+    border-radius: 999px; padding: 5px 12px; margin-bottom: 28px; }
+  .hero h1 { font-size: 56px; line-height: 1.05; letter-spacing: -0.03em; margin: 0 0 20px; font-weight: 700; }
+  .hero h1 .grad { background: linear-gradient(180deg,#fff,#a1a1a1); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { font-size: 19px; color: var(--muted); max-width: 620px; margin: 0 auto 32px; }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+  .btn { font-size: 14px; font-weight: 600; padding: 0 20px; height: 44px; display: inline-flex; align-items: center;
+    border-radius: 10px; border: 1px solid transparent; cursor: pointer; transition: background 150ms, border-color 150ms; }
+  .btn-primary { background: #fafafa; color: #0a0a0a; }
+  .btn-primary:hover { background: #e5e5e5; }
+  .btn-ghost { background: transparent; color: var(--fg); border-color: var(--line-strong); }
+  .btn-ghost:hover { background: var(--surface); }
+
+  /* install */
+  .install { display: inline-flex; align-items: center; gap: 12px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; font-family: var(--mono); font-size: 14px; }
+  .install .dollar { color: var(--subtle); }
+  .install code { color: var(--fg); }
+  .install button { background: transparent; border: 0; color: var(--muted); cursor: pointer; font-size: 12px;
+    border-left: 1px solid var(--line); padding-left: 12px; }
+  .install button:hover { color: var(--fg); }
+
+  /* section */
+  section.block { padding: 56px 0; border-top: 1px solid var(--line); }
+  .eyebrow { color: var(--subtle); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+  h2 { font-size: 30px; letter-spacing: -0.02em; margin: 8px 0 8px; }
+  .lede { color: var(--muted); font-size: 16px; margin: 0 0 32px; max-width: 640px; }
+
+  /* feature grid */
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .feature { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .feature h3 { margin: 0 0 6px; font-size: 16px; }
+  .feature p { margin: 0; color: var(--muted); font-size: 14px; }
+
+  /* gallery */
+  .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .shot { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--card); }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot .cap { padding: 10px 14px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); }
+
+  footer { border-top: 1px solid var(--line); padding: 40px 0; color: var(--subtle); font-size: 13px; }
+  footer .wrap { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--fg); }
+
+  @media (max-width: 760px) {
+    .hero h1 { font-size: 40px; }
+    .features, .gallery { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
-    <!-- Slint's winit backend (wasm) renders into the canvas with this id. -->
-    <canvas id="canvas"></canvas>
+<nav>
+  <div class="wrap">
+    <a class="logo" href="./"><span class="dot"></span> slintcn <span class="pill">v0.17</span></a>
+    <span class="spacer"></span>
+    <a class="link" href="./demo.html">Live demo</a>
+    <a class="link" href="https://github.com/stevekwon211/slintcn">GitHub</a>
+    <a class="link" href="https://www.npmjs.com/package/slintcn">npm</a>
+  </div>
+</nav>
 
-    <div id="loader">
-        <div class="brand">slintcn</div>
-        <div class="spinner"></div>
-        <div class="label">Compiling Slint WebAssembly bundle (~7 MB)…</div>
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">37 components · 5 blocks · dark-glass + games/HUD</span>
+    <h1><span class="grad">Copy-paste Slint components<br>that don't look like 2009.</span></h1>
+    <p>shadcn for native UI. Own the code — primitives + tokens you copy into your
+       Slint app and customize. Not a dependency you fight.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="./demo.html">Open live demo →</a>
+      <a class="btn btn-ghost" href="https://github.com/stevekwon211/slintcn">View on GitHub</a>
     </div>
+    <div class="install">
+      <span class="dollar">$</span><code id="cmd">npx slintcn@latest add button</code>
+      <button onclick="navigator.clipboard&amp;&amp;navigator.clipboard.writeText(document.getElementById('cmd').textContent)">copy</button>
+    </div>
+  </div>
+</header>
 
-    <script type="module">
-        // Cache-bust: bump ?v= on each deploy so browsers fetch the fresh
-        // bundle without a manual hard-refresh. The JS import query busts the
-        // glue; the explicit wasm URL below busts the 7 MB binary.
-        import init from './pkg/slintcn-showcase.js?v=0.17.0';
+<section class="block">
+  <div class="wrap">
+    <div class="eyebrow">Why slintcn</div>
+    <h2>A distribution system, not a library.</h2>
+    <p class="lede">The shadcn model, ported to Slint: a CLI + registry that copies
+       source into your repo. You own every file.</p>
+    <div class="features">
+      <div class="feature"><h3>Own the code</h3><p>`slintcn add` copies .slint source into your project — edit freely, no lock-in. Imports auto-rewrite to your layout.</p></div>
+      <div class="feature"><h3>A real CLI + registry</h3><p>init · add · list · view · build. Install from the bundled registry, a remote URL, or a custom `@ns/name`.</p></div>
+      <div class="feature"><h3>Dark-glass + theming</h3><p>Measured-from-shadcn tokens. Pick a base color (neutral · zinc · slate · stone) at init; runtime dark/light.</p></div>
+      <div class="feature"><h3>37 components</h3><p>Buttons to Dialogs to Tables to Tooltips — typed enum variants, focus rings, keyboard nav, animations.</p></div>
+      <div class="feature"><h3>5 blocks</h3><p>Composed templates — sign-in, login, pricing, dashboard, settings — installable like any component.</p></div>
+      <div class="feature"><h3>Slint for games + tools</h3><p>A HUD layer most kits skip: Keycap, HudPill, SlotTile — keyboard hints, status pills, inventory slots.</p></div>
+    </div>
+  </div>
+</section>
 
-        function reveal() {
-            document.getElementById('loader').classList.add('hidden');
-        }
+<section class="block">
+  <div class="wrap">
+    <div class="eyebrow">Built with slintcn</div>
+    <h2>Real surfaces, copy-paste fast.</h2>
+    <p class="lede">Every screenshot below is the live showcase, rendered by Slint
+       compiled to WebAssembly. <a style="color:var(--fg);text-decoration:underline" href="./demo.html">Open the interactive demo →</a></p>
+    <div class="gallery">
+      <div class="shot"><img src="img/section-4-signin.png" alt="Sign-in block" loading="lazy"><div class="cap">Sign-in — Card + Input + Checkbox + Button</div></div>
+      <div class="shot"><img src="img/section-6-dashboard.png" alt="Dashboard block" loading="lazy"><div class="cap">Dashboard — metric cards + activity feed</div></div>
+      <div class="shot"><img src="img/section-0-buttons.png" alt="Buttons" loading="lazy"><div class="cap">Buttons — 8 variants × sizes, install + usage</div></div>
+      <div class="shot"><img src="img/section-13-hud.png" alt="HUD components" loading="lazy"><div class="cap">HUD — Keycap, HudPill, SlotTile</div></div>
+    </div>
+  </div>
+</section>
 
-        function isWinitControlFlow(err) {
-            // winit hands control to the browser from EventLoop::run() by
-            // THROWING a JS exception that unwinds the Rust stack. It's not a
-            // failure — the app is already running behind it. The message is
-            // winit's own: "Using exceptions for control flow…".
-            const msg = (err && (err.message || err.toString())) || '';
-            return msg.includes('control flow') || msg.includes("isn't actually an error");
-        }
+<section class="block">
+  <div class="wrap">
+    <div class="eyebrow">Get started</div>
+    <h2>Three commands.</h2>
+    <p class="lede">Node 20+ and a Slint project. Files land in <code>ui/slintcn/</code> — yours to keep.</p>
+    <div class="install" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:13px;line-height:1.9;">
+      <div><span class="dollar">$</span> npx slintcn@latest init</div>
+      <div><span class="dollar">$</span> npx slintcn@latest add button card dialog</div>
+      <div><span class="dollar">$</span> npx slintcn@latest list <span style="color:var(--subtle)"># browse the catalog</span></div>
+    </div>
+  </div>
+</section>
 
-        init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.17.0' })
-            .then(reveal)
-            .catch((err) => {
-                if (isWinitControlFlow(err)) {
-                    // Expected. The Slint canvas is live; just show it.
-                    reveal();
-                    return;
-                }
-                const loader = document.getElementById('loader');
-                loader.innerHTML = `
-                    <div class="brand">slintcn</div>
-                    <div class="err">Failed to load WebAssembly bundle.\n${(err && err.stack) || err}</div>
-                `;
-                console.error('slintcn init failed:', err);
-            });
-    </script>
+<footer>
+  <div class="wrap">
+    <span class="logo"><span class="dot"></span> slintcn</span>
+    <span class="spacer" style="flex:1"></span>
+    <a href="./demo.html">Live demo</a>
+    <a href="https://github.com/stevekwon211/slintcn">GitHub</a>
+    <a href="https://www.npmjs.com/package/slintcn">npm</a>
+    <span>MIT</span>
+  </div>
+</footer>
 </body>
 </html>

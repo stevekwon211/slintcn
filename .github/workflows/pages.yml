@@ -60,6 +60,11 @@ jobs:
       - name: Build static registry (index at /registry.json, items at /r/<name>.json)
         run: node bin/slintcn.mjs build -o web
 
+      - name: Copy screenshots for the landing page
+        run: |
+          mkdir -p web/img
+          cp docs/img/snapshots/*.png web/img/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
