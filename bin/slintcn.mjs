@@ -106,6 +106,11 @@ export function resolveConfig(rawConfig, cwd) {
     externalTokens: rawConfig?.externalTokens ? path.resolve(cwd, rawConfig.externalTokens) : null,
     externalEnums: rawConfig?.externalEnums ? path.resolve(cwd, rawConfig.externalEnums) : null,
     importMap: rawConfig?.importMap ?? {},
+    // Per-file destination overrides (registry-rel path → dest path), e.g. route
+    // overlay panels to ui/surfaces while their deps stay in componentsDir.
+    routes: Object.fromEntries(
+      Object.entries(rawConfig?.routes ?? {}).map(([k, v]) => [k, path.resolve(cwd, v)]),
+    ),
     fileNameStyle: rawConfig?.fileNameStyle ?? "kebab",
     overwrite: rawConfig?.overwrite ?? true,
   };
@@ -166,6 +171,8 @@ export async function fetchRegistryItem(url, fetchFn = fetch) {
  * absolute destination based on the user's themeDir / componentsDir.
  */
 export function routeDest(rel, config) {
+  const routes = config.routes ?? {};
+  if (routes[rel]) return routes[rel]; // explicit per-file destination (used verbatim)
   const style = (n) => styleFileName(n, config.fileNameStyle ?? "kebab");
   if (rel.startsWith("theme/")) {
     return path.join(config.themeDir, style(rel.slice("theme/".length)));
@@ -185,10 +192,13 @@ export function routeDest(rel, config) {
  * own location, so the user's themeDir / componentsDir layout choices are
  * honored. Other imports pass through untouched.
  */
-export function rewriteImports(content, config, destAbs) {
-  const { themeDir, componentsDir, blocksDir, externalTokens } = config;
+export function rewriteImports(content, config, destAbs, srcRel = null) {
+  const { themeDir, blocksDir, externalTokens } = config;
   const importMap = config.importMap ?? {};
   const style = (n) => styleFileName(n, config.fileNameStyle ?? "kebab");
+  // Registry dir of the source file ("components", "theme", …) — bare sibling
+  // imports resolve within it. Falls back to "components" when unknown.
+  const srcDir = srcRel && srcRel.includes("/") ? srcRel.slice(0, srcRel.lastIndexOf("/")) : null;
   const toRel = (absTarget) => {
     let rel = path.relative(path.dirname(destAbs), absTarget);
     if (!rel.startsWith(".") && !rel.startsWith("/")) rel = "./" + rel;
@@ -208,13 +218,24 @@ export function rewriteImports(content, config, destAbs) {
     if (imp.startsWith("../blocks/")) {
       return `from "${toRel(path.join(blocksDir, style(imp.slice("../blocks/".length))))}"`;
     }
-    // 4. components (block → component refs)
+    // 4. components (block → component refs) — resolve to the dep's real dest
+    //    (honors `routes`, so a routed sibling resolves correctly).
     if (imp.startsWith("../components/")) {
-      return `from "${toRel(path.join(componentsDir, style(imp.slice("../components/".length))))}"`;
+      return `from "${toRel(routeDest("components/" + imp.slice("../components/".length), config))}"`;
     }
-    // 5. bare sibling component import (same dir) — honor filename style
+    // 5. bare sibling import — a file in the SAME registry dir as the source
+    //    (theme→theme, components→components). Resolve to that file's real
+    //    dest (route-aware). Same dir → bare name (byte-identical default);
+    //    routed elsewhere → a relative path that actually reaches it.
     if (!imp.includes("/") && imp.endsWith(".slint") && !imp.startsWith("std-widgets")) {
-      return `from "${style(imp)}"`;
+      // Without a known source dir, fall back to same-dir as the dest.
+      const target = srcDir
+        ? routeDest(`${srcDir}/${imp}`, config)
+        : path.join(path.dirname(destAbs), style(imp));
+      let rel = path.relative(path.dirname(destAbs), target).split(path.sep).join("/");
+      if (!rel.includes("/")) return `from "${rel}"`;            // same dir → bare
+      if (!rel.startsWith(".")) rel = "./" + rel;
+      return `from "${rel}"`;
     }
     return match; // std-widgets / unrecognized → untouched
   });
@@ -223,19 +244,25 @@ export function rewriteImports(content, config, destAbs) {
 // Resolve a registry file → its rewritten content + destination + planned
 // action. Writes unless `dryRun`; skips an existing file unless `overwrite`.
 // `srcRel` lets the source differ from the dest (base-color palette variants).
-async function copyRegistryFile(rel, config, opts = {}) {
-  const { srcRel = rel, dryRun = false, overwrite = config.overwrite ?? true } = opts;
-  const src = path.join(ROOT, "registry", config.style, srcRel);
-  const dest = routeDest(rel, config);
-  let content = rewriteImports(await readFile(src, "utf8"), config, dest);
-  // External enums: strip this component's local enums, import them from the
-  // host's generated enum file (same basename) instead.
+// The single source of truth for "what content lands at <dest>" — import
+// rewriting + external-enum stripping. Used by add, diff, AND export so all
+// three agree (a diff/export must reflect exactly what add would write).
+export function resolveFileContent(rawContent, rel, config, dest) {
+  let content = rewriteImports(rawContent, config, dest, rel);
   if (config.externalEnums && rel.startsWith("components/")) {
     const base = styleFileName(path.basename(rel), config.fileNameStyle ?? "kebab");
     let enumPath = path.relative(path.dirname(dest), path.join(config.externalEnums, base));
     if (!enumPath.startsWith(".") && !enumPath.startsWith("/")) enumPath = "./" + enumPath;
     content = stripLocalEnums(content, enumPath.split(path.sep).join("/"));
   }
+  return content;
+}
+
+async function copyRegistryFile(rel, config, opts = {}) {
+  const { srcRel = rel, dryRun = false, overwrite = config.overwrite ?? true } = opts;
+  const src = path.join(ROOT, "registry", config.style, srcRel);
+  const dest = routeDest(rel, config);
+  const content = resolveFileContent(await readFile(src, "utf8"), rel, config, dest);
   const existed = await exists(dest);
   if (existed && !overwrite) return { dest, content, status: "skip" };
   const status = existed ? "overwrite" : "new";
@@ -366,26 +393,44 @@ export async function installRemoteItem(url, config, cwd, opts = {}) {
   for (const file of item.files ?? []) {
     const dest = routeDest(file.path, config);
     await mkdir(path.dirname(dest), { recursive: true });
-    await writeFile(dest, rewriteImports(file.content, config, dest));
+    await writeFile(dest, resolveFileContent(file.content, file.path, config, dest));
     log(`  + ${path.relative(cwd, dest)}`);
   }
 }
 
 async function buildAddConfig(cwd, opts) {
-  let rawConfig = await loadRawConfig(cwd);
-  if (!rawConfig) {
-    if (opts.dryRun) rawConfig = {};            // don't create slintcn.json on a dry run
-    else { await cmdInit(cwd); rawConfig = await loadRawConfig(cwd); }
-  }
-  rawConfig = { ...rawConfig };
-  if (opts.componentsDir) rawConfig.componentsDir = opts.componentsDir;
-  if (opts.externalTokens) rawConfig.externalTokens = opts.externalTokens;
-  if (opts.externalEnums) rawConfig.externalEnums = opts.externalEnums;
-  if (opts.fileNameStyle) rawConfig.fileNameStyle = opts.fileNameStyle;
-  if (opts.overwrite === false) rawConfig.overwrite = false;
+  const existing = await loadRawConfig(cwd);
+
+  // Collect adoption settings passed as CLI flags (stored as-given, so they
+  // round-trip through slintcn.json and resolve relative to cwd later).
+  const flags = {};
+  if (opts.componentsDir) flags.componentsDir = opts.componentsDir;
+  if (opts.externalTokens) flags.externalTokens = opts.externalTokens;
+  if (opts.externalEnums) flags.externalEnums = opts.externalEnums;
+  if (opts.fileNameStyle) flags.fileNameStyle = opts.fileNameStyle;
+  if (opts.overwrite === false) flags.overwrite = false;
   if (opts.importMapFile) {
-    const m = JSON.parse(await readFile(path.resolve(cwd, opts.importMapFile), "utf8"));
-    rawConfig.importMap = { ...(rawConfig.importMap || {}), ...m };
+    flags.importMap = JSON.parse(await readFile(path.resolve(cwd, opts.importMapFile), "utf8"));
+  }
+  const hasFlags = Object.keys(flags).length > 0;
+
+  let rawConfig;
+  if (existing) {
+    rawConfig = { ...existing, ...flags, importMap: { ...(existing.importMap || {}), ...(flags.importMap || {}) } };
+    // Flags apply this run but we don't silently rewrite the user's config;
+    // warn so their on-disk config (which diff/export read) doesn't drift.
+    if (hasFlags && !opts.dryRun) {
+      console.warn("Note: adoption flags are NOT written to your existing slintcn.json — copy them in so `diff`/`export` use the same settings.");
+    }
+  } else {
+    // First add: seed slintcn.json from the template + the adoption flags, so
+    // follow-up diff/export/add use the same settings (no silent drift).
+    const template = JSON.parse(await readFile(path.join(ROOT, "templates", "slintcn.json"), "utf8"));
+    rawConfig = { ...template, ...flags };
+    if (!opts.dryRun) {
+      await writeFile(path.join(cwd, "slintcn.json"), JSON.stringify(rawConfig, null, 2) + "\n");
+      console.log(`Created slintcn.json${hasFlags ? " (adoption settings persisted)" : ""}`);
+    }
   }
   return resolveConfig(rawConfig, cwd);
 }
@@ -583,7 +628,7 @@ async function cmdDiff(cwd, name) {
   for (const rel of item.files) {
     const src = path.join(ROOT, "registry", config.style, rel);
     const dest = routeDest(rel, config);
-    const would = rewriteImports(await readFile(src, "utf8"), config, dest);
+    const would = resolveFileContent(await readFile(src, "utf8"), rel, config, dest);
     const relDest = toPosix(path.relative(cwd, dest));
     if (!(await exists(dest))) { console.log(`  ${relDest}: not installed`); continue; }
     const onDisk = await readFile(dest, "utf8");
@@ -611,7 +656,7 @@ async function cmdExport(cwd, name, opts = {}) {
     const dest = routeDest(rel, config);
     files.push({
       path: toPosix(path.relative(cwd, dest)),
-      content: rewriteImports(await readFile(src, "utf8"), config, dest),
+      content: resolveFileContent(await readFile(src, "utf8"), rel, config, dest),
       type: "text/slint",
     });
   }

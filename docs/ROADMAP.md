@@ -1,6 +1,25 @@
 # slintcn roadmap
 
-## v0.21 — adoption W3 (richer registry metadata) (current)
+## v0.22 — adoption W4 (Zero adoption-test fixes) (current)
+
+The Zero desktop team ran v0.21 against their apps/desktop checkout and found
+four real gaps — all fixed here:
+
+- [x] **Unified resolution pipeline** — `resolveFileContent()` (import rewrite +
+      external tokens + external enums + filename style + routes) is now the
+      single source of truth for `add`, `diff`, AND `export`. Previously `diff`
+      and `export` ran only `rewriteImports`, so they ignored `externalEnums`
+      and reported spurious upstream-changed deltas / shipped local enums.
+- [x] **Adoption flags persist** — a first `add` with adoption flags now writes
+      them into `slintcn.json` (so follow-up `diff`/`export`/`add` use the same
+      settings); passing flags when a config already exists warns instead of
+      silently drifting.
+- [x] **Per-file `routes`** — `routes: { "components/dialog-panel.slint":
+      "ui/surfaces/overlays/dialog_panel.slint" }` sends overlay panels (or any
+      file) somewhere other than `componentsDir`, and sibling imports resolve to
+      each dep's real destination (panel in surfaces, deps in primitives).
+
+## v0.21 — adoption W3 (richer registry metadata)
 
 - [x] **Docs API section** — `Variants` / `Sizes` auto-derived from each
       component's source enums (always in sync, zero maintenance); rendered as

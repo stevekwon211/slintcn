@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { resolveConfig, routeDest, rewriteImports, styleFileName, unifiedDiff, stripLocalEnums } from "../slintcn.mjs";
+import { resolveConfig, routeDest, rewriteImports, styleFileName, unifiedDiff, stripLocalEnums, resolveFileContent } from "../slintcn.mjs";
 
 const cwd = "/proj";
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "slintcn.mjs");
@@ -78,6 +78,37 @@ test("add --external-enums strips the component's local enums", async () => {
   const out = await readFile(path.join(dir, "ui/slintcn/components/button.slint"), "utf8");
   assert.ok(!/export enum/.test(out), "no local enum");
   assert.match(out, /from "[.\/]*gen\/enums\/button\.slint"/);
+  await rm(dir, { recursive: true, force: true });
+});
+
+test("routeDest: per-file routes override the destination", () => {
+  const c = resolveConfig({ componentsDir: "ui/primitives", routes: { "components/dialog-panel.slint": "ui/surfaces/dialog_panel.slint" } }, cwd);
+  assert.equal(routeDest("components/dialog-panel.slint", c), "/proj/ui/surfaces/dialog_panel.slint");
+  assert.equal(routeDest("components/button.slint", c), "/proj/ui/primitives/button.slint");
+});
+
+test("rewriteImports: a routed component's sibling import reaches the dep's real dir", () => {
+  const c = resolveConfig({ componentsDir: "ui/primitives", routes: { "components/dialog-panel.slint": "ui/surfaces/overlays/dialog_panel.slint" } }, cwd);
+  const dest = routeDest("components/dialog-panel.slint", c);
+  const out = rewriteImports(`import { Button } from "button.slint";`, c, dest, "components/dialog-panel.slint");
+  assert.match(out, /from "\.\.\/\.\.\/primitives\/button\.slint"/);
+});
+
+test("resolveFileContent: applies rewrite AND external-enum strip (add/diff/export parity)", () => {
+  const c = resolveConfig({ externalEnums: "gen", componentsDir: "ui/primitives" }, cwd);
+  const dest = routeDest("components/button.slint", c);
+  const raw = `export enum ButtonVariant { default }\nimport { Tokens } from "../theme/tokens.slint";\n`;
+  const out = resolveFileContent(raw, "components/button.slint", c, dest);
+  assert.ok(!/export enum/.test(out), "local enum stripped");
+  assert.match(out, /from "[^"]*gen\/button\.slint"/, "imports generated enum");
+});
+
+test("add with adoption flags persists them to slintcn.json", async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), "slintcn-persist-"));
+  spawnSync("node", [CLI, "add", "button", "--external-tokens", "gen/tokens.slint", "--filename-style", "snake"], { cwd: dir, encoding: "utf8" });
+  const cfg = JSON.parse(await readFile(path.join(dir, "slintcn.json"), "utf8"));
+  assert.equal(cfg.externalTokens, "gen/tokens.slint");
+  assert.equal(cfg.fileNameStyle, "snake");
   await rm(dir, { recursive: true, force: true });
 });
 

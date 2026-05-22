@@ -77,6 +77,7 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.19** | **Adoption mode** — install into an existing design system: external tokens, import map, filename style, dry-run/diff/no-overwrite, lockfile, `export` | ✅ |
 | **v0.20** | **Adoption W2** — headless overlay panels (DialogPanel/AlertDialogPanel/SheetPanel) + external enums (`--external-enums`) | ✅ |
 | **v0.21** | **Adoption W3** — docs API section (variants/sizes auto-derived) + per-item a11y/behavior contract (`a11y.json`, surfaced in docs + `export`) | ✅ |
+| **v0.22** | **Adoption W4** (from Zero adoption testing) — unified add/diff/export pipeline (diff+export now apply external-enums), adoption flags persist to slintcn.json, per-file `routes` (route overlay panels out of `componentsDir`) | ✅ |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
@@ -170,6 +171,7 @@ slintcn add button card \
 | `--components-dir <dir>` / `componentsDir` (also `themeDir`/`blocksDir`) | Where files land — fully relocatable; imports are rewritten to match. |
 | `--filename-style snake` / `fileNameStyle` | `kebab` (default) or `snake` — `slot-tile.slint → slot_tile.slint`, and sibling/cross-file imports follow. |
 | `--import-map <file.json>` / `importMap` | Arbitrary `{ "<import>": "<target>" }` overrides, highest precedence. |
+| `routes` (slintcn.json) | Per-file destination overrides — `{ "components/dialog-panel.slint": "ui/surfaces/overlays/dialog_panel.slint" }` — to send e.g. overlay panels somewhere other than `componentsDir` while their deps still import from `componentsDir`. |
 | `--dry-run` | Print the plan (`+ new` · `~ overwrite` · `= skip`) and write nothing (won't even create `slintcn.json`). |
 | `--no-overwrite` / `overwrite: false` | Skip files that already exist. |
 
@@ -195,6 +197,11 @@ step can consume slintcn deterministically without a build.rs island:
 slintcn export button --stdout        # JSON to stdout (pipeable)
 slintcn export button                 # → dist/export/button.json
 ```
+
+> `add`, `diff`, and `export` all run the **same** resolution pipeline (import
+> rewrite + external tokens + external enums + filename style + routes), so a
+> `diff`/`export` reflects exactly what `add` writes. A first `add` with adoption
+> flags also persists them into `slintcn.json` so follow-up commands match.
 
 ## Components (default registry)
 
