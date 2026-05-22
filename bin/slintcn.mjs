@@ -624,6 +624,13 @@ async function cmdExport(cwd, name, opts = {}) {
     registryDependencies: item.requires ?? [],
     files,
   };
+  // Attach the behavior/a11y contract (if any) so codegen consumers can adopt
+  // the keyboard/focus semantics, not just the visuals.
+  const a11yPath = path.join(ROOT, "registry", config.style, "a11y.json");
+  if (await exists(a11yPath)) {
+    const a11y = JSON.parse(await readFile(a11yPath, "utf8"))[name];
+    if (a11y) out.a11y = a11y;
+  }
   const json = JSON.stringify(out, null, 2);
   if (opts.stdout) { process.stdout.write(json + "\n"); return; }
   const outDir = path.resolve(cwd, "dist/export");

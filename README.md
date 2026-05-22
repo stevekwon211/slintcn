@@ -76,7 +76,7 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.18** | **Docs site (ui.shadcn.com clone)** — generated per-component pages with live WASM preview + install tabs + usage code + sidebar IA at `/docs` | ✅ |
 | **v0.19** | **Adoption mode** — install into an existing design system: external tokens, import map, filename style, dry-run/diff/no-overwrite, lockfile, `export` | ✅ |
 | **v0.20** | **Adoption W2** — headless overlay panels (DialogPanel/AlertDialogPanel/SheetPanel) + external enums (`--external-enums`) | ✅ |
-| **v0.21** | Adoption W3 — richer registry metadata (variants/sizes matrix + a11y/behavior contract) | upcoming |
+| **v0.21** | **Adoption W3** — docs API section (variants/sizes auto-derived) + per-item a11y/behavior contract (`a11y.json`, surfaced in docs + `export`) | ✅ |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics

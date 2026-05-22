@@ -84,8 +84,23 @@ function topnav() {
   </div></header>`;
 }
 
-function page(item, prev, next, items) {
+function page(item, prev, next, items, api = { enums: {}, a11y: null }) {
   const cmds = installCommands(item.name);
+  const enumNames = Object.keys(api.enums ?? {});
+  const hasApi = enumNames.length > 0 || api.a11y;
+  const a11yRows = api.a11y
+    ? [
+        `<div class="api-row"><code class="api-enum">focusable</code><span class="api-vals">${api.a11y.focusable ? "yes" : "no"}</span></div>`,
+        (api.a11y.keyboard ?? []).length ? `<div class="api-row"><code class="api-enum">keyboard</code><span class="api-vals">${api.a11y.keyboard.map((k) => `<span class="chip">${esc(k)}</span>`).join("")}</span></div>` : "",
+        api.a11y.focusTrap ? `<div class="api-row"><code class="api-enum">focus trap</code><span class="api-vals">yes</span></div>` : "",
+        api.a11y.escapeDismiss ? `<div class="api-row"><code class="api-enum">Escape</code><span class="api-vals">dismisses</span></div>` : "",
+      ].join("")
+    : "";
+  const apiSection = hasApi
+    ? `\n  <h2 id="api">API</h2>\n` +
+      enumNames.map((en) => `  <div class="api-row"><code class="api-enum">${esc(en)}</code><span class="api-vals">${api.enums[en].map((v) => `<span class="chip">${esc(v)}</span>`).join("")}</span></div>`).join("\n") +
+      (api.a11y ? `\n  <div class="api-sub">Accessibility</div>\n${a11yRows}` : "")
+    : "";
   const code = usage[item.name] ?? `import { } from "slintcn/components/${item.name}.slint";`;
   const deps = (item.requires ?? []).filter((d) => d !== "theme");
   const depChips = deps.length
@@ -143,6 +158,8 @@ ${sidebar(items, item.name)}
     <pre><code class="slint">${esc(code)}</code></pre>
   </div>
 
+${apiSection}
+
   <h2 id="dependencies">Dependencies</h2>
   <p class="deps">${depChips}</p>
   <p class="muted small">Installed automatically as transitive dependencies of <code>slintcn add ${esc(item.name)}</code>.</p>
@@ -154,6 +171,7 @@ ${sidebar(items, item.name)}
   <a href="#preview">Preview</a>
   <a href="#installation">Installation</a>
   <a href="#usage">Usage</a>
+  ${hasApi ? `<a href="#api">API</a>` : ""}
   <a href="#dependencies">Dependencies</a>
 </aside>
 </div>
@@ -200,6 +218,9 @@ async function main() {
   const registry = JSON.parse(
     await readFile(path.join(ROOT, "registry", "default", "registry.json"), "utf8"),
   );
+  const a11y = JSON.parse(
+    await readFile(path.join(ROOT, "registry", "default", "a11y.json"), "utf8"),
+  );
   // docs pages = user-facing items only (ui + blocks); skip theme + lib helpers.
   const items = catalogFromRegistry(registry).filter(
     (i) => i.type === "registry:ui" || i.type === "registry:block",
@@ -211,10 +232,25 @@ async function main() {
   await writeFile(path.join(outDir, "index.html"), indexPage(items));
 
   for (let i = 0; i < items.length; i++) {
-    const html = page(items[i], items[i - 1], items[i + 1], items);
+    const api = { enums: await enumsOf(items[i]), a11y: a11y[items[i].name] ?? null };
+    const html = page(items[i], items[i - 1], items[i + 1], items, api);
     await writeFile(path.join(outDir, `${items[i].name}.html`), html);
   }
   console.log(`Docs → ${path.relative(process.cwd(), outDir)}/ (${items.length} pages + index)`);
+}
+
+// Derive { EnumName: [members] } from an item's source — variants/sizes shown
+// in the docs API section, always in sync with the actual component.
+async function enumsOf(item) {
+  const enums = {};
+  for (const rel of item.files ?? []) {
+    let src;
+    try { src = await readFile(path.join(ROOT, "registry", "default", rel), "utf8"); } catch { continue; }
+    for (const m of src.matchAll(/export\s+enum\s+([A-Za-z0-9_]+)\s*\{([^}]*)\}/g)) {
+      enums[m[1]] = m[2].split(",").map((s) => s.trim()).filter(Boolean);
+    }
+  }
+  return enums;
 }
 
 const DOCS_CSS = `:root{color-scheme:dark;--bg:#0a0a0a;--fg:#fafafa;--muted:#a1a1a1;--subtle:#737373;--card:#171717;--line:rgba(255,255,255,.10);--line-strong:rgba(255,255,255,.18);--surface:rgba(255,255,255,.04);--accent:#fafafa;--radius:12px;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
@@ -262,6 +298,10 @@ h2{font-size:21px;letter-spacing:-.01em;margin:40px 0 14px;scroll-margin-top:72p
 .deps{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .chip{font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:4px 10px}
 .chip:hover{color:var(--fg);border-color:var(--line-strong)}
+.api-row{display:flex;gap:14px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line)}
+.api-enum{color:var(--fg);font-size:13px;min-width:120px}
+.api-vals{display:flex;gap:6px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+.api-sub{color:var(--subtle);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.04em;margin:18px 0 6px}
 .muted{color:var(--muted)}.small{font-size:13px}
 .toc{height:calc(100vh - 56px);position:sticky;top:56px;padding:36px 16px;font-size:13px}
 .toc-label{color:var(--subtle);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.04em;margin-bottom:10px}

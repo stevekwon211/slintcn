@@ -63,6 +63,18 @@ test("Usage: every imported symbol is actually exported by that item", async () 
   }
 });
 
+test("a11y.json: keys are real items, contracts well-formed", async () => {
+  const a11y = JSON.parse(await readFile(path.join(ROOT, "registry/default/a11y.json"), "utf8"));
+  for (const [k, v] of Object.entries(a11y)) {
+    if (k.startsWith("_")) continue;
+    assert.ok(byName[k], `a11y key "${k}" is a real registry item`);
+    assert.equal(typeof v.focusable, "boolean", `${k}.focusable`);
+    assert.ok(Array.isArray(v.keyboard), `${k}.keyboard`);
+    assert.equal(typeof v.focusTrap, "boolean", `${k}.focusTrap`);
+    assert.equal(typeof v.escapeDismiss, "boolean", `${k}.escapeDismiss`);
+  }
+});
+
 test("Usage: two-way (<=>) + callback (=>) bindings are real", async () => {
   for (const it of pages) {
     const code = stripComments(usage[it.name]);

@@ -1,6 +1,17 @@
 # slintcn roadmap
 
-## v0.20 — adoption W2 (headless panels + external enums) (current)
+## v0.21 — adoption W3 (richer registry metadata) (current)
+
+- [x] **Docs API section** — `Variants` / `Sizes` auto-derived from each
+      component's source enums (always in sync, zero maintenance); rendered as
+      chips on every component page + a TOC entry.
+- [x] **Behavior / a11y contract** — `registry/default/a11y.json` declares
+      `{ focusable, keyboard, focusTrap, escapeDismiss }` per interactive item.
+      Surfaced in the docs "Accessibility" block AND merged into `slintcn export`
+      output, so a consumer's design-system spec can adopt the keyboard/focus
+      semantics, not just the visuals.
+
+## v0.20 — adoption W2 (headless panels + external enums)
 
 - [x] **Headless overlay panels** — extracted `DialogPanel` / `AlertDialogPanel`
       / `SheetPanel` (the card, no Scrim/mount) into their own registry items;
