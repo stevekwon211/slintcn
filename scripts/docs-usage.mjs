@@ -55,7 +55,7 @@ dlg := Dialog {
     description: "This cannot be undone.";
 }`,
 
-  "alert-dialog": `import { AlertDialog, ButtonVariant } from "slintcn/components/alert-dialog.slint";
+  "alert-dialog": `import { AlertDialog } from "slintcn/components/alert-dialog.slint";
 
 AlertDialog {
     width: parent.width;
