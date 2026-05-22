@@ -22,6 +22,7 @@ fn main() {
             "scroll-area", "popover", "context-menu",
             "dropdown-menu", "hover-card", "menubar", "navigation-menu",
             "combobox", "command", "data-table",
+            "calendar", "date-picker",
             "sign-in", "login", "pricing", "dashboard", "settings",
             "team", "profile", "stats",
         ])

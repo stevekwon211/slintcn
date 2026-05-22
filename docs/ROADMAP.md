@@ -1,6 +1,20 @@
 # slintcn roadmap
 
-## v0.26 — Data Table (current)
+## v0.27 — Calendar + Date Picker (current)
+
+Two new form components. Slint 1.16 has no `Date` type and no date arithmetic,
+so the **consumer owns the date math**: pass `days-in-month` + `first-day-
+offset` (0 = Sun) for the displayed month, and respond to `prev-month` /
+`next-month` callbacks by rolling your model. The components handle the grid
++ selection + popup chrome.
+
+- [x] `Calendar` — 6×7 month grid (header chevrons + S/M/T/W/T/F/S labels +
+      day cells with hover / selected / out-of-month states), `day-selected`
+      callback, two-way `selected-day`.
+- [x] `DatePicker` — `@children` trigger that opens a `Calendar` in a
+      PopupWindow; closes on selection or click-outside.
+
+## v0.26 — Data Table
 
 A new `DataTable` component — clickable headers with sort indicators, body
 rows (hover + click), and optional `Pagination` underneath. Filter/sort/page
@@ -90,12 +104,6 @@ must keep working under adoption mode (external tokens/enums, routes).
 Lead with the menu family (we already have the overlay infra) and the app-shell
 primitives (they serve real adopters like the Zero desktop app). Charts are a
 heavy, separate R&D track; the Game/HUD layer is the long-term differentiator.
-
-### v0.27 — Date & Calendar
-- **Calendar** (month grid + keyboard), **Date Picker** (Calendar in a Popover),
-  basic range select.
-- Why: forms / scheduling.
-- Risk: date math in Rust glue, locale / first-day-of-week, range selection.
 
 ### v0.28 — App-shell primitives
 - **Sidebar** (collapsible app sidebar), **Resizable** (split panes), **Drawer**

@@ -27,5 +27,7 @@
   "hover-card":        { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
   "combobox":          { "focusable": true,  "keyboard": ["text entry", "Arrow keys", "Enter"], "focusTrap": false, "escapeDismiss": true },
   "command":           { "focusable": true,  "keyboard": ["text entry", "Arrow keys", "Enter"], "focusTrap": false, "escapeDismiss": true },
-  "data-table":        { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false }
+  "data-table":        { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
+  "calendar":          { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
+  "date-picker":       { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": true  }
 }

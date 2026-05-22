@@ -348,6 +348,31 @@ DataTable {
     row-clicked(r)  => { /* … */ }
 }`,
 
+  calendar: `import { Calendar } from "slintcn/components/calendar.slint";
+
+Calendar {
+    month-label: "May 2026";
+    days-in-month: 31;
+    first-day-offset: 5;      // 1 May 2026 = Friday
+    selected-day <=> day;
+    day-selected(d) => { day = d }
+    prev-month => { /* roll model back one month */ }
+    next-month => { /* roll model forward one month */ }
+}`,
+
+  "date-picker": `import { DatePicker } from "slintcn/components/date-picker.slint";
+
+DatePicker {
+    month-label: "May 2026";
+    days-in-month: 31;
+    first-day-offset: 5;
+    selected-day <=> day;
+    day-selected(d) => { day = d }
+    prev-month => { /* … */ }
+    next-month => { /* … */ }
+    Button { text: "Pick a date"; }   // trigger = @children
+}`,
+
   // ── blocks ──
   "sign-in": `import { SignIn } from "slintcn/blocks/sign-in.slint";
 

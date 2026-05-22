@@ -1,0 +1,69 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Calendar } from "calendar.slint";
+
+// Date picker — click `@children` (typically a Button showing the selected
+// date) to open a Calendar popup. Like Calendar, dates are consumer-owned
+// (Slint 1.16 has no Date arithmetic), so wire the same year / month /
+// days-in-month / first-day-offset properties the Calendar needs.
+export component DatePicker inherits Rectangle {
+    // Header text inside the popup (e.g. "May 2026").
+    in property <string> month-label;
+    // Number of days in the visible month.
+    in property <int> days-in-month: 30;
+    // Day-of-week of day 1 (0 = Sun … 6 = Sat).
+    in property <int> first-day-offset: 0;
+    // Two-way; selected day-of-month (1 … days-in-month), or -1 for none.
+    in-out property <int> selected-day: -1;
+    // Pixel width of the popup panel.
+    in property <length> content-width: 296px;
+    // Fired with the chosen day; the popup closes automatically.
+    callback day-selected(int);
+    // Forwarded from the inner Calendar header chevrons.
+    callback prev-month();
+    callback next-month();
+
+    background: transparent;
+    // Expose the trigger's size so a parent layout allocates real space.
+    preferred-width:  trigger.preferred-width;
+    preferred-height: trigger.preferred-height;
+
+    trigger := HorizontalLayout {
+        @children
+    }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { popup.show(); }
+    }
+
+    popup := PopupWindow {
+        x: 0;
+        y: root.height + 6px;
+        width: root.content-width;
+        close-policy: close-on-click-outside;
+
+        Rectangle {
+            background: Tokens.color-card;
+            border-color: Tokens.color-border-hairline;
+            border-width: 1px;
+            border-radius: Tokens.radius-lg;
+            drop-shadow-blur:     Tokens.shadow-e3-blur;
+            drop-shadow-offset-y: Tokens.shadow-e3-offset-y;
+            drop-shadow-color:    Tokens.shadow-e3-color;
+            height: cal.preferred-height;
+
+            cal := Calendar {
+                month-label: root.month-label;
+                days-in-month: root.days-in-month;
+                first-day-offset: root.first-day-offset;
+                selected-day <=> root.selected-day;
+                day-selected(d) => {
+                    root.day-selected(d);
+                    popup.close();
+                }
+                prev-month => { root.prev-month(); }
+                next-month => { root.next-month(); }
+            }
+        }
+    }
+}

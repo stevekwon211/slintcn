@@ -60,6 +60,8 @@ import { NavigationMenu, NavigationItem }       from "slintcn/components/navigat
 import { Combobox, ComboboxItem }               from "slintcn/components/combobox.slint";
 import { Command, CommandItem }                 from "slintcn/components/command.slint";
 import { DataTable, DataTableRow }              from "slintcn/components/data-table.slint";
+import { Calendar }                             from "slintcn/components/calendar.slint";
+import { DatePicker }                           from "slintcn/components/date-picker.slint";
 import { SignIn }                               from "slintcn/blocks/sign-in.slint";
 import { Login }                                from "slintcn/blocks/login.slint";
 import { Pricing }                              from "slintcn/blocks/pricing.slint";
@@ -298,6 +300,17 @@ component PreviewHost inherits Rectangle {
                     { label: "Toggle theme", id: "app.theme",   hint: "" },
                 ];
             }
+            if root.name == "calendar": Calendar {
+                month-label: "May 2026";
+                days-in-month: 31;
+                first-day-offset: 5;
+            }
+            if root.name == "date-picker": DatePicker {
+                month-label: "May 2026";
+                days-in-month: 31;
+                first-day-offset: 5;
+                Button { variant: ButtonVariant.outline; text: "Pick a date"; }
+            }
             if root.name == "data-table": Rectangle {
                 width: 760px;
                 DataTable {
@@ -395,7 +408,7 @@ export component AppWindow inherits Window {
                         font-weight: Tokens.typography-weight-semibold;
                     }
                     Badge {
-                        text: "v0.26";
+                        text: "v0.27";
                         variant: BadgeVariant.secondary;
                         size: BadgeSize.sm;
                     }
@@ -603,7 +616,7 @@ export component AppWindow inherits Window {
                             spacing: 8px;
                             alignment: start;
                             Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
-                            Badge { text: "v0.26"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Badge { text: "v0.27"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
                         }
 
                         VerticalLayout {

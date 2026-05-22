@@ -1,0 +1,154 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Icon } from "icon.slint";
+import { LucidePaths } from "lucide-paths.slint";
+
+// Month-grid calendar. Slint 1.16 has no Date type or date arithmetic, so the
+// consumer provides `days-in-month` + `first-day-offset` (0 = Sun … 6 = Sat)
+// computed from `year`/`month` in your model — the component renders the grid,
+// handles selection, and fires prev / next so you can flip the page.
+//
+// Wire it like:
+//   Calendar {
+//     month-label: "May 2026";
+//     days-in-month: 31;
+//     first-day-offset: 5;            // 1 May 2026 is a Friday
+//     selected-day <=> day;
+//     day-selected(d)  => { day = d }
+//     prev-month       => { /* roll your model back one month */ }
+//     next-month       => { /* roll your model forward one month */ }
+//   }
+export component Calendar inherits Rectangle {
+    // Header text, e.g. "May 2026". The component does no date formatting.
+    in property <string> month-label;
+    // Number of days in the displayed month — 28 / 29 / 30 / 31.
+    in property <int> days-in-month: 30;
+    // Day-of-week of the first day of the month (0 = Sun, 6 = Sat). Leading
+    // empty cells render before day 1.
+    in property <int> first-day-offset: 0;
+    // Two-way; the selected day-of-month (1 … days-in-month), or -1 for none.
+    in-out property <int> selected-day: -1;
+    // Fired when the user clicks a valid day cell.
+    callback day-selected(int);
+    // Fired when the previous-month chevron is clicked.
+    callback prev-month();
+    // Fired when the next-month chevron is clicked.
+    callback next-month();
+
+    background: transparent;
+    preferred-width:  layout.preferred-width;
+    preferred-height: layout.preferred-height;
+
+    layout := VerticalLayout {
+        padding: 12px;
+        spacing: 8px;
+
+        // Header: ◀ Month Year ▶
+        HorizontalLayout {
+            spacing: 8px;
+            // Prev-month chevron — same tap target as the next-month one.
+            Rectangle {
+                width: 28px;
+                height: 28px;
+                border-radius: Tokens.radius-sm;
+                background: prev-touch.has-hover
+                    ? Tokens.color-surface-1 : transparent;
+                Icon {
+                    commands: LucidePaths.chevron-left;
+                    size: 16px;
+                    tint: Tokens.color-foreground;
+                }
+                prev-touch := TouchArea {
+                    mouse-cursor: pointer;
+                    clicked => { root.prev-month(); }
+                }
+            }
+            VerticalLayout {
+                horizontal-stretch: 1;
+                alignment: center;
+                Text {
+                    text: root.month-label;
+                    color: Tokens.color-foreground;
+                    font-size: Tokens.typography-body-size;
+                    font-weight: Tokens.typography-weight-semibold;
+                    horizontal-alignment: center;
+                }
+            }
+            Rectangle {
+                width: 28px;
+                height: 28px;
+                border-radius: Tokens.radius-sm;
+                background: next-touch.has-hover
+                    ? Tokens.color-surface-1 : transparent;
+                Icon {
+                    commands: LucidePaths.chevron-right;
+                    size: 16px;
+                    tint: Tokens.color-foreground;
+                }
+                next-touch := TouchArea {
+                    mouse-cursor: pointer;
+                    clicked => { root.next-month(); }
+                }
+            }
+        }
+
+        // Day-of-week labels — Sun-first; localize in the consumer.
+        HorizontalLayout {
+            spacing: 0;
+            for label in ["S", "M", "T", "W", "T", "F", "S"]: Rectangle {
+                horizontal-stretch: 1;
+                height: 28px;
+                Text {
+                    text: label;
+                    color: Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-body-sm-size;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+        }
+
+        // 6-row × 7-col day grid. Each cell computes its day number from its
+        // grid index minus the leading offset; cells outside the month render
+        // muted (no day text, no click).
+        for w in 6: HorizontalLayout {
+            spacing: 0;
+            for d in 7: Rectangle {
+                property <int> cell-idx: w * 7 + d;
+                property <int> day-num: cell-idx - root.first-day-offset + 1;
+                property <bool> in-month: day-num >= 1 && day-num <= root.days-in-month;
+                property <bool> selected: in-month && day-num == root.selected-day;
+                horizontal-stretch: 1;
+                height: 36px;
+                border-radius: Tokens.radius-sm;
+                background: selected
+                    ? Tokens.color-foreground
+                    : (cell-touch.has-hover && in-month
+                        ? Tokens.color-surface-1
+                        : transparent);
+                Text {
+                    text: in-month ? day-num : "";
+                    color: selected
+                        ? Tokens.color-background
+                        : (in-month
+                            ? Tokens.color-foreground
+                            : Tokens.color-muted-foreground);
+                    font-size: Tokens.typography-body-sm-size;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+                cell-touch := TouchArea {
+                    enabled: in-month;
+                    mouse-cursor: pointer;
+                    clicked => {
+                        root.selected-day = day-num;
+                        root.day-selected(day-num);
+                    }
+                }
+                animate background {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
+                }
+            }
+        }
+    }
+}

@@ -2,7 +2,7 @@
   "$schema": "https://slintcn.dev/schema/registry.schema.json",
   "name": "default",
   "homepage": "https://stevekwon211.github.io/slintcn",
-  "version": "0.26.0",
+  "version": "0.27.0",
   "description": "Dark glass theme — shadcn-adjacent primitives for Slint",
   "slintVersion": ">=1.16",
   "theme": {
@@ -396,6 +396,22 @@
       "category": "data",
       "files": ["components/data-table.slint"],
       "requires": ["theme", "pagination", "icon", "lucide-paths"]
+    },
+    "calendar": {
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "Month-grid date picker; the consumer owns the date math.",
+      "category": "form",
+      "files": ["components/calendar.slint"],
+      "requires": ["theme", "icon", "lucide-paths"]
+    },
+    "date-picker": {
+      "type": "registry:ui",
+      "title": "Date Picker",
+      "description": "Trigger that opens a Calendar in a popup.",
+      "category": "form",
+      "files": ["components/date-picker.slint"],
+      "requires": ["theme", "calendar"]
     },
     "sign-in": {
       "type": "registry:block",
