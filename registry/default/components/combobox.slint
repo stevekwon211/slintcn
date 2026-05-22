@@ -73,8 +73,11 @@ export component Combobox inherits Rectangle {
                     edited(_) => { root.highlighted-index = 0; }
                 }
 
-                // Rows — derive `items` from `query` in the consumer; this
-                // component just shows whatever you pass.
+                // Rows — derive `items` from `query` in the consumer; Slint
+                // 1.16 has no substring/prefix string methods, so in-component
+                // filtering is blocked until Slint adds `contains` / `starts-
+                // with`. The component otherwise wires the search field + the
+                // selection + the keyboard contract cleanly.
                 for item[idx] in root.items: Rectangle {
                     height: 30px;
                     border-radius: Tokens.radius-sm;
