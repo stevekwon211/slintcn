@@ -9,8 +9,11 @@ export component Popover inherits Rectangle {
     in property <length> content-width: 260px;
 
     background: transparent;
-    width:  trigger.preferred-width;
-    height: trigger.preferred-height;
+    // Expose the trigger's size as preferred-* (not width/height) so a parent
+    // HorizontalLayout/VerticalLayout allocates real space — otherwise the slot
+    // collapses to 0 and the trigger overlaps its siblings.
+    preferred-width:  trigger.preferred-width;
+    preferred-height: trigger.preferred-height;
 
     trigger := HorizontalLayout {
         @children

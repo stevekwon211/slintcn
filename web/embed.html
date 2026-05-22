@@ -26,7 +26,7 @@
 <div id="frame"><canvas id="canvas"></canvas></div>
 <div id="loader"><div class="spinner"></div></div>
 <script type="module">
-  import init from './pkg/slintcn-showcase.js?v=0.22.2';
+  import init from './pkg/slintcn-showcase.js?v=0.22.3';
 
   // Fill the iframe; freeze the canvas box during a resize and re-fit 200ms
   // after it settles (debounced) so Slint doesn't re-alloc its surface (flicker).
@@ -36,12 +36,16 @@
   let resizeTimer;
   window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fit, 200); });
 
-  const reveal = () => document.getElementById('loader').classList.add('hidden');
+  const reveal = () => {
+    document.getElementById('loader').classList.add('hidden');
+    const c = document.getElementById('canvas');
+    if (c) { c.setAttribute('tabindex', '0'); c.focus(); }
+  };
   const isWinitControlFlow = (err) => {
     const msg = (err && (err.message || err.toString())) || '';
     return msg.includes('control flow') || msg.includes("isn't actually an error");
   };
-  init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.22.2' })
+  init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.22.3' })
     .then(reveal)
     .catch((err) => { if (isWinitControlFlow(err)) { reveal(); return; } console.error('slintcn preview failed:', err); });
 </script>

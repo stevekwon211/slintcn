@@ -97,7 +97,7 @@
 
     <script type="module">
         // Cache-bust: bump ?v= on each deploy so browsers fetch the fresh bundle.
-        import init from './pkg/slintcn-showcase.js?v=0.22.2';
+        import init from './pkg/slintcn-showcase.js?v=0.22.3';
 
         // Fill the viewport, but freeze the canvas box during a drag: set it in
         // px and only re-fit 200ms after the resize settles. Continuous box
@@ -115,7 +115,13 @@
             resizeTimer = setTimeout(fit, 200);
         });
 
-        function reveal() { document.getElementById('loader').classList.add('hidden'); }
+        function reveal() {
+            document.getElementById('loader').classList.add('hidden');
+            // Focus the canvas so the FIRST click reaches Slint. On Firefox an
+            // unfocused canvas spends the first click on focusing itself.
+            const c = document.getElementById('canvas');
+            if (c) { c.setAttribute('tabindex', '0'); c.focus(); }
+        }
 
         function isWinitControlFlow(err) {
             // winit hands control to the browser from EventLoop::run() by THROWING
@@ -129,7 +135,7 @@
         // download entirely — also keeps the winit canvas from interfering with
         // the centered note's layout.
         if (window.matchMedia("(min-width: 761px)").matches) {
-            init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.22.2' })
+            init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.22.3' })
                 .then(reveal)
                 .catch((err) => {
                     if (isWinitControlFlow(err)) { reveal(); return; }

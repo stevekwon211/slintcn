@@ -10,11 +10,17 @@ export component ContextMenu inherits Rectangle {
     callback selected(int);
 
     background: transparent;
+    // Expose the wrapped area's size so a parent layout allocates real space
+    // (otherwise the slot collapses to 0 and overlaps siblings).
+    preferred-width:  area.preferred-width;
+    preferred-height: area.preferred-height;
 
     in-out property <length> menu-x;
     in-out property <length> menu-y;
 
-    @children
+    area := HorizontalLayout {
+        @children
+    }
 
     touch := TouchArea {
         // Capture right-clicks anywhere in the area; ignore other buttons.

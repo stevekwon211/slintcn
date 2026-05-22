@@ -398,6 +398,11 @@ if(heads.length&&tl.length){
   sc&&sc.addEventListener("click",()=>set(false));
   sb.querySelectorAll(".s-item").forEach((a)=>a.addEventListener("click",()=>set(false)));
   document.addEventListener("keydown",(e)=>{if(e.key==="Escape")set(false);});
-})();`;
+})();
+// Pre-focus the live-preview iframe on hover so the FIRST click reaches the
+// component — Firefox otherwise spends the first click focusing the iframe.
+document.querySelectorAll(".preview-card iframe").forEach((f)=>{
+  f.addEventListener("pointerenter",()=>{try{f.focus({preventScroll:true});}catch(e){}});
+});`;
 
 main().catch((e) => { console.error(e); process.exit(1); });
