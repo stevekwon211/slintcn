@@ -20,6 +20,7 @@ fn main() {
             "slider", "breadcrumb", "pagination", "table",
             "text", "keycap", "hud-pill", "slot-tile",
             "scroll-area", "popover", "context-menu",
+            "dropdown-menu", "hover-card", "menubar", "navigation-menu",
             "sign-in", "login", "pricing", "dashboard", "settings",
             "team", "profile", "stats",
         ])

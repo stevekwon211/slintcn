@@ -1,0 +1,97 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Application menu bar — a horizontal row of menus (File/Edit/View/…). Each
+// menu label opens its own PopupWindow with `items`; selecting one fires
+// `selected(menu-index, item-index)`. Self-contained per-trigger popups
+// (simple v1 — no cross-menu keyboard navigation yet).
+export struct MenubarItem { label: string }
+export struct MenubarMenu { label: string, items: [MenubarItem] }
+
+export component Menubar inherits Rectangle {
+    in property <[MenubarMenu]> menus;
+    callback selected(int /* menu */, int /* item */);
+
+    background: transparent;
+    preferred-width:  row.preferred-width;
+    preferred-height: row.preferred-height;
+
+    row := HorizontalLayout {
+        spacing: 2px;
+        for m[mi] in root.menus: trigger := Rectangle {
+            height: 32px;
+            border-radius: Tokens.radius-sm;
+            background: ta.has-hover ? Tokens.color-surface-1 : transparent;
+
+            HorizontalLayout {
+                padding-left: 10px;
+                padding-right: 10px;
+                label := Text {
+                    text: m.label;
+                    color: Tokens.color-foreground;
+                    font-size: Tokens.typography-body-sm-size;
+                    font-weight: Tokens.typography-weight-medium;
+                    vertical-alignment: center;
+                }
+            }
+
+            ta := TouchArea {
+                mouse-cursor: pointer;
+                clicked => { popup.show(); }
+            }
+
+            popup := PopupWindow {
+                x: 0;
+                y: parent.height + 4px;
+                width: 200px;
+                close-policy: close-on-click-outside;
+
+                Rectangle {
+                    background: Tokens.color-card;
+                    border-color: Tokens.color-border-hairline;
+                    border-width: 1px;
+                    border-radius: Tokens.radius-md;
+                    drop-shadow-blur:     Tokens.shadow-e2-blur;
+                    drop-shadow-offset-y: Tokens.shadow-e2-offset-y;
+                    drop-shadow-color:    Tokens.shadow-e2-color;
+                    height: items-layout.preferred-height;
+
+                    items-layout := VerticalLayout {
+                        padding: 4px;
+                        spacing: 0;
+                        for it[ii] in m.items: Rectangle {
+                            height: 30px;
+                            border-radius: Tokens.radius-sm;
+                            background: it-touch.has-hover
+                                ? Tokens.color-surface-1 : transparent;
+
+                            HorizontalLayout {
+                                padding-left: 8px;
+                                padding-right: 8px;
+                                Text {
+                                    text: it.label;
+                                    color: Tokens.color-foreground;
+                                    font-size: Tokens.typography-body-size;
+                                    vertical-alignment: center;
+                                    horizontal-stretch: 1;
+                                }
+                            }
+
+                            it-touch := TouchArea {
+                                mouse-cursor: pointer;
+                                clicked => {
+                                    root.selected(mi, ii);
+                                    popup.close();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            animate background {
+                duration: Tokens.motion-fast;
+                easing: Tokens.motion-easing-standard;
+            }
+        }
+    }
+}

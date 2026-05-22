@@ -14,13 +14,6 @@ Lead with the menu family (we already have the overlay infra) and the app-shell
 primitives (they serve real adopters like the Zero desktop app). Charts are a
 heavy, separate R&D track; the Game/HUD layer is the long-term differentiator.
 
-### v0.24 — Menu family (overlay expansion)
-- **Dropdown Menu, Menubar, Navigation Menu, Hover Card.**
-- Why: the highest-frequency missing primitives — every toolbar / profile menu.
-- Reuse: `PopupWindow` + the Popover/ContextMenu/Select patterns (close-on-
-  click-outside, cursor/anchor positioning, arrow-key nav).
-- Risk: nested submenus (Menubar) need careful PopupWindow stacking + focus.
-
 ### v0.25 — Command & Combobox (search / filter)
 - **Combobox** (searchable Select), **Command** (⌘K palette: groups + filter).
 - Why: ⌘K is table-stakes in modern tools; Combobox unblocks large option sets.
@@ -77,7 +70,24 @@ heavy, separate R&D track; the Game/HUD layer is the long-term differentiator.
 
 ---
 
-## v0.23 — blocks expansion (current)
+## v0.24 — menu family (current)
+
+PopupWindow + the verified preferred-* exposure pattern (from Tooltip/Select/
+Popover/ContextMenu) reused for four new overlay/nav primitives:
+
+- [x] **DropdownMenu** — click-triggered action menu anchored below `@children`;
+      list of items, `selected(int)`.
+- [x] **HoverCard** — hover-triggered floating card (title + description) using
+      Tooltip's `has-hover → popup.show/close` pattern with richer card chrome.
+- [x] **Menubar** — horizontal row of menus (File/Edit/View) with per-trigger
+      PopupWindows; `selected(menu, item)`. (v1 — no cross-menu keyboard nav.)
+- [x] **NavigationMenu** — horizontal nav strip with active highlight;
+      distinct from Tabs (no content slot, you drive routing).
+
+43 components total. Each registered, usage verified by docs-accuracy (50/50),
+wired into PreviewHost so docs previews are live.
+
+## v0.23 — blocks expansion
 
 shadcn's signature strength is **Blocks** — drop-in full screens. We had 5;
 ship three more, composed from existing components (no new primitives):

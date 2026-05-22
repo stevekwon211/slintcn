@@ -272,6 +272,40 @@ ContextMenu {
     // right-clickable area = @children
 }`,
 
+  "dropdown-menu": `import { DropdownMenu, DropdownMenuItem } from "slintcn/components/dropdown-menu.slint";
+
+DropdownMenu {
+    items: [{ label: "Profile" }, { label: "Billing" }, { label: "Sign out" }];
+    selected(i) => { /* … */ }
+    Button { text: "Open menu"; }   // trigger = @children
+}`,
+
+  "hover-card": `import { HoverCard } from "slintcn/components/hover-card.slint";
+
+HoverCard {
+    title: "@sofia";
+    description: "Product designer. Building tools for makers.";
+    Button { text: "@sofia"; }   // trigger = @children
+}`,
+
+  menubar: `import { Menubar, MenubarMenu, MenubarItem } from "slintcn/components/menubar.slint";
+
+Menubar {
+    menus: [
+        { label: "File", items: [{ label: "New" }, { label: "Save" }] },
+        { label: "Edit", items: [{ label: "Undo" }, { label: "Redo" }] },
+    ];
+    selected(mi, ii) => { /* … */ }
+}`,
+
+  "navigation-menu": `import { NavigationMenu, NavigationItem } from "slintcn/components/navigation-menu.slint";
+
+NavigationMenu {
+    items: [{ label: "Overview" }, { label: "Customers" }, { label: "Products" }];
+    active <=> page;
+    navigate(i) => { /* … */ }
+}`,
+
   // ── blocks ──
   "sign-in": `import { SignIn } from "slintcn/blocks/sign-in.slint";
 

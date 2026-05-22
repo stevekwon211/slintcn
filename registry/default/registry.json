@@ -2,7 +2,7 @@
   "$schema": "https://slintcn.dev/schema/registry.schema.json",
   "name": "default",
   "homepage": "https://stevekwon211.github.io/slintcn",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Dark glass theme — shadcn-adjacent primitives for Slint",
   "slintVersion": ">=1.16",
   "theme": {
@@ -339,6 +339,38 @@
       "description": "Right-click menu over an area; opens at the cursor.",
       "category": "overlay",
       "files": ["components/context-menu.slint"],
+      "requires": ["theme"]
+    },
+    "dropdown-menu": {
+      "type": "registry:ui",
+      "title": "Dropdown Menu",
+      "description": "Click-triggered action menu anchored below the trigger.",
+      "category": "overlay",
+      "files": ["components/dropdown-menu.slint"],
+      "requires": ["theme"]
+    },
+    "hover-card": {
+      "type": "registry:ui",
+      "title": "Hover Card",
+      "description": "Hover-triggered floating card (title + description).",
+      "category": "overlay",
+      "files": ["components/hover-card.slint"],
+      "requires": ["theme"]
+    },
+    "menubar": {
+      "type": "registry:ui",
+      "title": "Menubar",
+      "description": "Horizontal menu bar (File/Edit/View); each label opens its own menu.",
+      "category": "overlay",
+      "files": ["components/menubar.slint"],
+      "requires": ["theme"]
+    },
+    "navigation-menu": {
+      "type": "registry:ui",
+      "title": "Navigation Menu",
+      "description": "Horizontal navigation strip with an active highlight; you drive routing.",
+      "category": "navigation",
+      "files": ["components/navigation-menu.slint"],
       "requires": ["theme"]
     },
     "sign-in": {

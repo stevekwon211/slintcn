@@ -1,0 +1,57 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Horizontal navigation strip — a list of items with an active highlight, like
+// a header nav. The active item is yours to drive (bind `active`); clicks fire
+// `navigate(index)`. Distinct from Tabs (Tabs owns its content; NavigationMenu
+// is just the nav surface — you switch screens / routes yourself).
+export struct NavigationItem { label: string }
+
+export component NavigationMenu inherits Rectangle {
+    in property <[NavigationItem]> items;
+    in-out property <int> active: 0;
+    callback navigate(int);
+
+    background: transparent;
+    preferred-width:  row.preferred-width;
+    preferred-height: row.preferred-height;
+
+    row := HorizontalLayout {
+        spacing: 4px;
+        for it[i] in root.items: Rectangle {
+            height: 36px;
+            border-radius: Tokens.radius-sm;
+            background: i == root.active
+                ? Tokens.color-surface-2
+                : (ta.has-hover ? Tokens.color-surface-1 : transparent);
+
+            HorizontalLayout {
+                padding-left: 14px;
+                padding-right: 14px;
+                Text {
+                    text: it.label;
+                    color: i == root.active
+                        ? Tokens.color-foreground
+                        : Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-body-sm-size;
+                    font-weight: i == root.active
+                        ? Tokens.typography-weight-semibold
+                        : Tokens.typography-weight-medium;
+                    vertical-alignment: center;
+                }
+            }
+
+            ta := TouchArea {
+                mouse-cursor: pointer;
+                clicked => {
+                    root.active = i;
+                    root.navigate(i);
+                }
+            }
+
+            animate background {
+                duration: Tokens.motion-fast;
+                easing: Tokens.motion-easing-standard;
+            }
+        }
+    }
+}

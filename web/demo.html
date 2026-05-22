@@ -97,7 +97,7 @@
 
     <script type="module">
         // Cache-bust: bump ?v= on each deploy so browsers fetch the fresh bundle.
-        import init from './pkg/slintcn-showcase.js?v=0.23.0';
+        import init from './pkg/slintcn-showcase.js?v=0.24.0';
 
         // Fill the viewport, but freeze the canvas box during a drag: set it in
         // px and only re-fit 200ms after the resize settles. Continuous box
@@ -135,7 +135,7 @@
         // download entirely — also keeps the winit canvas from interfering with
         // the centered note's layout.
         if (window.matchMedia("(min-width: 761px)").matches) {
-            init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.23.0' })
+            init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.24.0' })
                 .then(reveal)
                 .catch((err) => {
                     if (isWinitControlFlow(err)) { reveal(); return; }

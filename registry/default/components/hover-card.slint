@@ -1,0 +1,63 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Hover-triggered floating card. The trigger is `@children`; hovering opens a
+// PopupWindow showing `title` + `description`. Closes when the pointer leaves
+// the trigger (like Tooltip, with richer card chrome).
+export component HoverCard inherits Rectangle {
+    in property <string> title;
+    in property <string> description;
+    in property <length> content-width: 280px;
+
+    background: transparent;
+
+    // Size to the wrapped child (so a parent layout allocates real space).
+    preferred-width:  child-layout.preferred-width;
+    preferred-height: child-layout.preferred-height;
+
+    child-layout := HorizontalLayout {
+        @children
+    }
+
+    trigger-area := TouchArea { }
+
+    property <bool> trigger-hovered: trigger-area.has-hover;
+    changed trigger-hovered => {
+        if (self.trigger-hovered) { popup.show(); }
+        else                       { popup.close(); }
+    }
+
+    popup := PopupWindow {
+        close-policy: no-auto-close;
+        x: 0;
+        y: parent.height + 8px;
+        width: root.content-width;
+
+        Rectangle {
+            background: Tokens.color-card;
+            border-color: Tokens.color-border-hairline;
+            border-width: 1px;
+            border-radius: Tokens.radius-lg;
+            drop-shadow-blur:     Tokens.shadow-e3-blur;
+            drop-shadow-offset-y: Tokens.shadow-e3-offset-y;
+            drop-shadow-color:    Tokens.shadow-e3-color;
+            height: body.preferred-height;
+
+            body := VerticalLayout {
+                padding: Tokens.spacing-lg;
+                spacing: Tokens.spacing-sm;
+                if root.title != "": Text {
+                    text: root.title;
+                    color: Tokens.color-foreground;
+                    font-size: Tokens.typography-body-size;
+                    font-weight: Tokens.typography-weight-semibold;
+                }
+                if root.description != "": Text {
+                    text: root.description;
+                    color: Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-body-size;
+                    wrap: word-wrap;
+                }
+            }
+        }
+    }
+}

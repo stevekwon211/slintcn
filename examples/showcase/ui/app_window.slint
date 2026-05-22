@@ -53,6 +53,10 @@ import { TabsVariant }                          from "slintcn/components/tabs.sl
 import { ScrollArea }                           from "slintcn/components/scroll-area.slint";
 import { Popover }                              from "slintcn/components/popover.slint";
 import { ContextMenu, ContextMenuItemData }     from "slintcn/components/context-menu.slint";
+import { DropdownMenu, DropdownMenuItem }       from "slintcn/components/dropdown-menu.slint";
+import { HoverCard }                            from "slintcn/components/hover-card.slint";
+import { Menubar, MenubarMenu, MenubarItem }    from "slintcn/components/menubar.slint";
+import { NavigationMenu, NavigationItem }       from "slintcn/components/navigation-menu.slint";
 import { SignIn }                               from "slintcn/blocks/sign-in.slint";
 import { Login }                                from "slintcn/blocks/login.slint";
 import { Pricing }                              from "slintcn/blocks/pricing.slint";
@@ -248,6 +252,28 @@ component PreviewHost inherits Rectangle {
                 Card { card-padding: CardPadding.md; width: 260px; height: 64px; VerticalLayout { padding: parent.padding-l; Typography { text: "Right-click anywhere here"; variant: TextVariant.body-sm; tone: TextTone.muted; } } } }
             if root.name == "toast": Button { variant: ButtonVariant.default; text: "Show toast"; clicked => { ToastQueue.show("Event created", ToastVariant.success); } }
 
+            // menu family (v0.24)
+            if root.name == "dropdown-menu": DropdownMenu {
+                items: [{ label: "Profile" }, { label: "Billing" }, { label: "Team" }, { label: "Sign out" }];
+                Button { variant: ButtonVariant.outline; text: "Open menu"; }
+            }
+            if root.name == "hover-card": HoverCard {
+                title: "@sofia";
+                description: "Product designer. Building tools for makers.";
+                Button { variant: ButtonVariant.outline; text: "@sofia"; }
+            }
+            if root.name == "menubar": Menubar {
+                menus: [
+                    { label: "File", items: [{ label: "New" }, { label: "Open…" }, { label: "Save" }] },
+                    { label: "Edit", items: [{ label: "Undo" }, { label: "Redo" }, { label: "Cut" }] },
+                    { label: "View", items: [{ label: "Zoom in" }, { label: "Zoom out" }] },
+                ];
+            }
+            if root.name == "navigation-menu": NavigationMenu {
+                items: [{ label: "Overview" }, { label: "Customers" }, { label: "Products" }, { label: "Settings" }];
+                active <=> root.p-int;
+            }
+
             // blocks
             if root.name == "sign-in": SignIn { }
             if root.name == "login": Login { }
@@ -330,7 +356,7 @@ export component AppWindow inherits Window {
                         font-weight: Tokens.typography-weight-semibold;
                     }
                     Badge {
-                        text: "v0.23";
+                        text: "v0.24";
                         variant: BadgeVariant.secondary;
                         size: BadgeSize.sm;
                     }
@@ -538,7 +564,7 @@ export component AppWindow inherits Window {
                             spacing: 8px;
                             alignment: start;
                             Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
-                            Badge { text: "v0.23"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Badge { text: "v0.24"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
                         }
 
                         VerticalLayout {

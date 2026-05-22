@@ -1,0 +1,82 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Click-triggered menu. The trigger is `@children` (typically a Button);
+// clicking it opens a PopupWindow with `items`, each firing `selected(index)`.
+// Anchored below the trigger; closes on click outside.
+export struct DropdownMenuItem { label: string }
+
+export component DropdownMenu inherits Rectangle {
+    in property <[DropdownMenuItem]> items;
+    in property <length> content-width: 200px;
+    callback selected(int);
+
+    background: transparent;
+
+    // Expose the trigger's size so a parent layout allocates real space
+    // (otherwise the slot collapses to 0 and the trigger overlaps siblings).
+    preferred-width:  trigger.preferred-width;
+    preferred-height: trigger.preferred-height;
+
+    trigger := HorizontalLayout {
+        @children
+    }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { popup.show(); }
+    }
+
+    popup := PopupWindow {
+        x: 0;
+        y: root.height + 6px;
+        width: root.content-width;
+        close-policy: close-on-click-outside;
+
+        Rectangle {
+            background: Tokens.color-card;
+            border-color: Tokens.color-border-hairline;
+            border-width: 1px;
+            border-radius: Tokens.radius-md;
+            drop-shadow-blur:     Tokens.shadow-e2-blur;
+            drop-shadow-offset-y: Tokens.shadow-e2-offset-y;
+            drop-shadow-color:    Tokens.shadow-e2-color;
+            height: menu.preferred-height;
+
+            menu := VerticalLayout {
+                padding: 4px;
+                spacing: 0;
+                for item[idx] in root.items: Rectangle {
+                    height: 30px;
+                    border-radius: Tokens.radius-sm;
+                    background: item-touch.has-hover
+                        ? Tokens.color-surface-1 : transparent;
+
+                    HorizontalLayout {
+                        padding-left: 8px;
+                        padding-right: 8px;
+                        Text {
+                            text: item.label;
+                            color: Tokens.color-foreground;
+                            font-size: Tokens.typography-body-size;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
+                        }
+                    }
+
+                    item-touch := TouchArea {
+                        mouse-cursor: pointer;
+                        clicked => {
+                            root.selected(idx);
+                            popup.close();
+                        }
+                    }
+
+                    animate background {
+                        duration: Tokens.motion-fast;
+                        easing: Tokens.motion-easing-standard;
+                    }
+                }
+            }
+        }
+    }
+}
