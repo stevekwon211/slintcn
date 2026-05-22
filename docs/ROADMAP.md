@@ -1,6 +1,28 @@
 # slintcn roadmap
 
-## v0.18 — docs site (ui.shadcn.com clone) (current)
+## v0.19 — adoption mode (install into an existing design system) (current)
+
+Prompted by Zero-desktop-team feedback: slintcn's *components* were fine but its
+*integration model* assumed a standalone `ui/slintcn` island. This wave makes the
+CLI adopt into an existing Slint design system — generic + opt-in, not coupled to
+any one consumer.
+
+- [x] **Config-driven rewrite engine** — `rewriteImports(content, config, destAbs)`
+      resolves per precedence: `importMap` → external-tokens redirect → theme/
+      components/blocks → bare sibling, applying `fileNameStyle`. Default output
+      byte-identical (regression-tested).
+- [x] **External tokens** — `--external-tokens <path>` / `externalTokens`: skip
+      installing the theme; rewrite `Tokens` imports to the host file.
+- [x] **Filename style** — `--filename-style snake` / `fileNameStyle`:
+      `slot-tile.slint → slot_tile.slint`, imports follow.
+- [x] **Import map** — `--import-map <file>` / `importMap`: arbitrary overrides.
+- [x] **Non-destructive** — `--dry-run` (plan, no writes), `--no-overwrite`,
+      `slintcn diff <name>` (vs registry, lockfile-annotated), `slintcn.lock.json`.
+- [x] **Export** — `slintcn export <name> [--stdout]`: one resolved item as JSON,
+      content rewritten for the config, for monorepo codegen.
+- Next (W2): external enums / `--no-local-enums`; headless Dialog→DialogPanel split.
+
+## v0.18 — docs site (ui.shadcn.com clone)
 
 `/demo.html` (one cramped WASM window) didn't read as "quality" next to
 ui.shadcn.com. This wave builds a real docs site at `/docs`.

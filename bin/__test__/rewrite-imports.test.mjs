@@ -57,11 +57,7 @@ describe("rewriteImports", () => {
     const config = resolveConfig({}, cwd);
     const dest = routeDest("components/button.slint", config);
     const src = `import { Tokens } from "../theme/tokens.slint";\nexport component Button {}\n`;
-    const out = rewriteImports(src, {
-      destAbs: dest,
-      themeDir: config.themeDir,
-      componentsDir: config.componentsDir,
-    });
+    const out = rewriteImports(src, config, dest);
     assert.match(out, /from "\.\.\/theme\/tokens\.slint"/);
   });
 
@@ -72,11 +68,7 @@ describe("rewriteImports", () => {
     // theme = /proj/shared/tokens/tokens.slint
     // expected: ../../../shared/tokens/tokens.slint
     const src = `import { Tokens } from "../theme/tokens.slint";`;
-    const out = rewriteImports(src, {
-      destAbs: dest,
-      themeDir: config.themeDir,
-      componentsDir: config.componentsDir,
-    });
+    const out = rewriteImports(src, config, dest);
     assert.match(out, /from "\.\.\/\.\.\/\.\.\/shared\/tokens\/tokens\.slint"/);
   });
 
@@ -91,11 +83,7 @@ describe("rewriteImports", () => {
     // sibling button = /proj/src/ui/parts/button.slint
     // expected: ./button.slint
     const src = `import { Button } from "../components/button.slint";`;
-    const out = rewriteImports(src, {
-      destAbs: dest,
-      themeDir: config.themeDir,
-      componentsDir: config.componentsDir,
-    });
+    const out = rewriteImports(src, config, dest);
     assert.match(out, /from "\.\/button\.slint"/);
   });
 
@@ -111,11 +99,7 @@ describe("rewriteImports", () => {
       `import { Foo } from "std-widgets.slint";`,
       ``,
     ].join("\n");
-    const out = rewriteImports(src, {
-      destAbs: dest,
-      themeDir: config.themeDir,
-      componentsDir: config.componentsDir,
-    });
+    const out = rewriteImports(src, config, dest);
     // Theme path goes up to /proj/, into shared/tokens.
     assert.match(out, /from ".*shared\/tokens\/tokens\.slint"/);
     // Sibling component stays in same dir.
