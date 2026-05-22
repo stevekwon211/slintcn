@@ -3,7 +3,7 @@
  * slintcn CLI — init + add (copy-paste registry, shadcn-style).
  */
 import { copyFile, mkdir, readFile, writeFile, access } from "node:fs/promises";
-import { constants } from "node:fs";
+import { constants, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -525,8 +525,21 @@ async function main() {
   }
 }
 
-// Only run main() when invoked directly (not when imported by tests).
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Run main() when this file is the entry point — not when imported by tests.
+// Compare real paths so symlinked bins (npm/npx put the bin in node_modules/
+// .bin as a symlink) still match; a raw `file://` + argv[1] string compare
+// fails for those and silently no-ops the CLI.
+function invokedDirectly() {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  try {
+    return realpathSync(entry) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
+if (invokedDirectly()) {
   main().catch((err) => {
     console.error(err);
     process.exit(1);
