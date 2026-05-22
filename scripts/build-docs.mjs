@@ -81,6 +81,7 @@ function topnav() {
     <span class="grow"></span>
     <a class="tn-link" href="../demo.html">Playground</a>
     <a class="tn-link" href="https://github.com/stevekwon211/slintcn">GitHub</a>
+    <a class="tn-link star-link" href="https://github.com/stevekwon211/slintcn" target="_blank" rel="noreferrer">Star <span data-stars></span></a>
     <a class="tn-link" href="https://www.npmjs.com/package/slintcn">npm</a>
   </div></header>
   <div id="scrim"></div>`;
@@ -264,6 +265,7 @@ a{color:inherit;text-decoration:none}code{font-family:var(--mono)}
 .logo .dot{width:18px;height:18px;border-radius:50%;background:#171717;border:1.5px solid #fafafa}
 .pill{font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
 .grow{flex:1}.tn-link{color:var(--muted);font-size:14px;font-weight:500}.tn-link:hover{color:var(--fg)}
+.star-link span{color:var(--subtle);font-weight:500}
 .shell{display:grid;grid-template-columns:248px minmax(0,1fr) 200px;max-width:1320px;margin:0 auto;gap:0}
 .sidebar{border-right:1px solid var(--line);height:calc(100vh - 56px);position:sticky;top:56px;overflow-y:auto}
 .s-inner{padding:22px 14px 60px}
@@ -342,6 +344,14 @@ h2{font-size:21px;letter-spacing:-.01em;margin:40px 0 14px;scroll-margin-top:72p
 }`;
 
 const DOCS_JS = `// package-manager pills → swap the shown command
+fetch("https://api.github.com/repos/stevekwon211/slintcn")
+  .then((res)=>res.ok?res.json():null)
+  .then((repo)=>{
+    if(!repo||typeof repo.stargazers_count!=="number")return;
+    document.querySelectorAll("[data-stars]").forEach((el)=>{el.textContent=repo.stargazers_count.toLocaleString();});
+  })
+  .catch(()=>{});
+
 document.querySelectorAll(".install").forEach((box)=>{
   const cmd=box.querySelector(".cmd");
   box.querySelectorAll(".pm").forEach((btn)=>{

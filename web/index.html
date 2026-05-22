@@ -44,12 +44,13 @@
   .hero h1 .grad { background: linear-gradient(180deg,#fff,#a1a1a1); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .hero p { font-size: 19px; color: var(--muted); max-width: 620px; margin: 0 auto 32px; }
   .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
-  .btn { font-size: 14px; font-weight: 600; padding: 0 20px; height: 44px; display: inline-flex; align-items: center;
+  .btn { font-size: 14px; font-weight: 600; padding: 0 20px; height: 44px; display: inline-flex; align-items: center; gap: 8px;
     border-radius: 10px; border: 1px solid transparent; cursor: pointer; transition: background 150ms, border-color 150ms; }
   .btn-primary { background: #fafafa; color: #0a0a0a; }
   .btn-primary:hover { background: #e5e5e5; }
   .btn-ghost { background: transparent; color: var(--fg); border-color: var(--line-strong); }
   .btn-ghost:hover { background: var(--surface); }
+  .star-count { color: var(--muted); font-weight: 500; }
 
   /* install */
   .install { display: inline-flex; align-items: center; gap: 12px; background: var(--surface);
@@ -106,6 +107,7 @@
     <a class="link" href="./docs/">Docs</a>
     <a class="link" href="./demo.html">Live demo</a>
     <a class="link" href="https://github.com/stevekwon211/slintcn">GitHub</a>
+    <a class="link" href="https://github.com/stevekwon211/slintcn" target="_blank" rel="noreferrer">Star <span class="star-count" data-stars></span></a>
     <a class="link" href="https://www.npmjs.com/package/slintcn">npm</a>
   </div>
 </nav>
@@ -119,7 +121,7 @@
     <div class="cta">
       <a class="btn btn-primary" href="./docs/">Browse the docs →</a>
       <a class="btn btn-ghost" href="./demo.html">Live demo</a>
-      <a class="btn btn-ghost" href="https://github.com/stevekwon211/slintcn">GitHub</a>
+      <a class="btn btn-ghost" href="https://github.com/stevekwon211/slintcn" target="_blank" rel="noreferrer">Star on GitHub <span class="star-count" data-stars></span></a>
     </div>
     <div class="install">
       <span class="dollar">$</span><code id="cmd">npx slintcn@latest add button</code>
@@ -183,5 +185,16 @@
     <span>MIT</span>
   </div>
 </footer>
+<script>
+  fetch("https://api.github.com/repos/stevekwon211/slintcn")
+    .then((res) => res.ok ? res.json() : null)
+    .then((repo) => {
+      if (!repo || typeof repo.stargazers_count !== "number") return;
+      document.querySelectorAll("[data-stars]").forEach((el) => {
+        el.textContent = repo.stargazers_count.toLocaleString();
+      });
+    })
+    .catch(() => {});
+</script>
 </body>
 </html>
