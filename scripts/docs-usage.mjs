@@ -336,6 +336,18 @@ Command {
     selected(id) => { /* dispatch by id */ }
 }`,
 
+  "data-table": `import { DataTable, DataTableRow } from "slintcn/components/data-table.slint";
+
+DataTable {
+    columns: ["Name", "Email", "Role"];
+    rows: visible-page;   // already sorted / filtered / paged in your model
+    total-pages: pages;
+    current-page <=> page;
+    sort(col)      => { /* re-sort your model by column index */ }
+    page-changed(p) => { /* slice rows for the new page */ }
+    row-clicked(r)  => { /* … */ }
+}`,
+
   // ── blocks ──
   "sign-in": `import { SignIn } from "slintcn/blocks/sign-in.slint";
 

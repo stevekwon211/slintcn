@@ -1,0 +1,158 @@
+import { Tokens } from "../theme/tokens.slint";
+import { Pagination } from "pagination.slint";
+import { Icon } from "icon.slint";
+import { LucidePaths } from "lucide-paths.slint";
+
+// Data table — sortable headers + rows + optional pagination. The component
+// handles the UX (click headers to sort, click rows to act, paginate); the
+// consumer owns the data (slint 1.16 has no string substring methods + no
+// sort primitive on arrays, so filter/sort/page slice live in your model).
+//
+// Wire it like this:
+//   DataTable {
+//     columns: [...];
+//     rows: page-of-rows-already-sorted-and-filtered;
+//     total-pages: ceil(total / page-size);
+//     sort(col)          => { /* re-sort your model */ }
+//     page-changed(p)    => { /* slice your model */ }
+//     row-clicked(r)     => { /* … */ }
+//   }
+export struct DataTableRow { cells: [string] }
+
+export component DataTable inherits Rectangle {
+    // Column headers (left-to-right). Each header is clickable to fire `sort`.
+    in property <[string]> columns;
+    // Visible rows (already sorted / filtered / paged by the consumer).
+    in property <[DataTableRow]> rows;
+
+    // Current sort column index (-1 = unsorted). Two-way so the indicator
+    // stays accurate as the consumer flips state.
+    in-out property <int> sort-column: -1;
+    // Current sort direction; flipping is automatic when the same header is
+    // clicked twice in a row.
+    in-out property <bool> sort-desc: false;
+    // Fired with the column index when a header is clicked. The component
+    // updates `sort-column` / `sort-desc` first.
+    callback sort(int);
+
+    // Optional pagination — set `total-pages > 1` to render the pager.
+    in property <int> total-pages: 1;
+    // Two-way; the active page (0-indexed).
+    in-out property <int> current-page: 0;
+    // Fired when the user picks a different page.
+    callback page-changed(int);
+
+    // Fired with the row index when a row is clicked.
+    callback row-clicked(int);
+
+    background: transparent;
+    preferred-width:  layout.preferred-width;
+    preferred-height: layout.preferred-height;
+
+    layout := VerticalLayout {
+        spacing: 0;
+
+        // Header strip — clickable, surface-1, semibold; sort chevron lives
+        // inside the active column's header cell.
+        Rectangle {
+            height: 40px;
+            background: Tokens.color-surface-1;
+            border-radius: Tokens.radius-md;
+            HorizontalLayout {
+                padding-left: 8px;
+                padding-right: 8px;
+                spacing: 4px;
+                for col[ci] in root.columns: Rectangle {
+                    horizontal-stretch: 1;
+                    border-radius: Tokens.radius-sm;
+                    background: header-touch.has-hover
+                        ? Tokens.color-surface-2 : transparent;
+                    HorizontalLayout {
+                        padding-left: 8px;
+                        padding-right: 8px;
+                        spacing: 4px;
+                        Text {
+                            text: col;
+                            color: Tokens.color-foreground;
+                            font-size: Tokens.typography-body-sm-size;
+                            font-weight: Tokens.typography-weight-semibold;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
+                        }
+                        if ci == root.sort-column: VerticalLayout {
+                            alignment: center;
+                            Icon {
+                                commands: root.sort-desc
+                                    ? LucidePaths.chevron-down
+                                    : LucidePaths.chevron-up;
+                                size: 14px;
+                                tint: Tokens.color-muted-foreground;
+                            }
+                        }
+                    }
+                    header-touch := TouchArea {
+                        mouse-cursor: pointer;
+                        clicked => {
+                            // Same column twice → flip direction. New column → reset asc.
+                            if (root.sort-column == ci) {
+                                root.sort-desc = !root.sort-desc;
+                            } else {
+                                root.sort-column = ci;
+                                root.sort-desc = false;
+                            }
+                            root.sort(ci);
+                        }
+                    }
+                    animate background {
+                        duration: Tokens.motion-fast;
+                        easing: Tokens.motion-easing-standard;
+                    }
+                }
+            }
+        }
+
+        // Body rows — hover-highlighted, click fires `row-clicked(index)`.
+        for row[ri] in root.rows: Rectangle {
+            height: 44px;
+            background: row-touch.has-hover
+                ? Tokens.color-surface-1 : transparent;
+            HorizontalLayout {
+                padding-left: 16px;
+                padding-right: 16px;
+                spacing: 4px;
+                for cell in row.cells: Rectangle {
+                    horizontal-stretch: 1;
+                    HorizontalLayout {
+                        padding-left: 8px;
+                        padding-right: 8px;
+                        Text {
+                            text: cell;
+                            color: Tokens.color-foreground;
+                            font-size: Tokens.typography-body-size;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
+                        }
+                    }
+                }
+            }
+            row-touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => { root.row-clicked(ri); }
+            }
+            animate background {
+                duration: Tokens.motion-fast;
+                easing: Tokens.motion-easing-standard;
+            }
+        }
+
+        // Optional pager (rendered only with multi-page data).
+        if root.total-pages > 1: HorizontalLayout {
+            padding-top: 12px;
+            Pagination {
+                total: root.total-pages;
+                current <=> root.current-page;
+                changed(p) => { root.page-changed(p); }
+            }
+        }
+    }
+}

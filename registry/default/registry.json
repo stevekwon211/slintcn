@@ -2,7 +2,7 @@
   "$schema": "https://slintcn.dev/schema/registry.schema.json",
   "name": "default",
   "homepage": "https://stevekwon211.github.io/slintcn",
-  "version": "0.25.1",
+  "version": "0.26.0",
   "description": "Dark glass theme — shadcn-adjacent primitives for Slint",
   "slintVersion": ">=1.16",
   "theme": {
@@ -388,6 +388,14 @@
       "category": "overlay",
       "files": ["components/command.slint"],
       "requires": ["theme", "input"]
+    },
+    "data-table": {
+      "type": "registry:ui",
+      "title": "Data Table",
+      "description": "Sortable / paginated table — click headers to sort, rows to act.",
+      "category": "data",
+      "files": ["components/data-table.slint"],
+      "requires": ["theme", "pagination", "icon", "lucide-paths"]
     },
     "sign-in": {
       "type": "registry:block",

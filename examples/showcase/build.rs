@@ -21,7 +21,7 @@ fn main() {
             "text", "keycap", "hud-pill", "slot-tile",
             "scroll-area", "popover", "context-menu",
             "dropdown-menu", "hover-card", "menubar", "navigation-menu",
-            "combobox", "command",
+            "combobox", "command", "data-table",
             "sign-in", "login", "pricing", "dashboard", "settings",
             "team", "profile", "stats",
         ])

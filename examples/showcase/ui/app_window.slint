@@ -59,6 +59,7 @@ import { Menubar, MenubarMenu, MenubarItem }    from "slintcn/components/menubar
 import { NavigationMenu, NavigationItem }       from "slintcn/components/navigation-menu.slint";
 import { Combobox, ComboboxItem }               from "slintcn/components/combobox.slint";
 import { Command, CommandItem }                 from "slintcn/components/command.slint";
+import { DataTable, DataTableRow }              from "slintcn/components/data-table.slint";
 import { SignIn }                               from "slintcn/blocks/sign-in.slint";
 import { Login }                                from "slintcn/blocks/login.slint";
 import { Pricing }                              from "slintcn/blocks/pricing.slint";
@@ -297,6 +298,20 @@ component PreviewHost inherits Rectangle {
                     { label: "Toggle theme", id: "app.theme",   hint: "" },
                 ];
             }
+            if root.name == "data-table": Rectangle {
+                width: 760px;
+                DataTable {
+                    columns: ["Name", "Email", "Role"];
+                    rows: [
+                        { cells: ["Sofia Davis",     "sofia@acme.dev",    "Owner"]  },
+                        { cells: ["Jackson Lee",     "jackson@acme.dev",  "Member"] },
+                        { cells: ["Isabella Nguyen", "isabella@acme.dev", "Member"] },
+                        { cells: ["William Kim",     "william@acme.dev",  "Admin"]  },
+                        { cells: ["Olivia Park",     "olivia@acme.dev",   "Member"] },
+                    ];
+                    total-pages: 5;
+                }
+            }
 
             // blocks
             if root.name == "sign-in": SignIn { }
@@ -380,7 +395,7 @@ export component AppWindow inherits Window {
                         font-weight: Tokens.typography-weight-semibold;
                     }
                     Badge {
-                        text: "v0.25";
+                        text: "v0.26";
                         variant: BadgeVariant.secondary;
                         size: BadgeSize.sm;
                     }
@@ -588,7 +603,7 @@ export component AppWindow inherits Window {
                             spacing: 8px;
                             alignment: start;
                             Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
-                            Badge { text: "v0.25"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Badge { text: "v0.26"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
                         }
 
                         VerticalLayout {

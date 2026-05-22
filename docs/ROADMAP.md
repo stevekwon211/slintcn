@@ -1,6 +1,19 @@
 # slintcn roadmap
 
-## v0.25.1 — Combobox + Command keyboard nav (current)
+## v0.26 — Data Table (current)
+
+A new `DataTable` component — clickable headers with sort indicators, body
+rows (hover + click), and optional `Pagination` underneath. Filter/sort/page
+logic stays consumer-side (Slint 1.16 has no sort primitive on arrays and no
+substring methods, so the consumer slices its model and passes the visible
+page); the component handles the UX.
+
+- [x] Clickable headers with up/down chevron showing `sort-column` + `sort-desc`.
+- [x] `sort(int)` callback fires after slintcn flips the state.
+- [x] Hover-highlighted rows + `row-clicked(int)` callback.
+- [x] Built-in `Pagination` when `total-pages > 1`.
+
+## v0.25.1 — Combobox + Command keyboard nav
 
 Closing the v0.25 keyboard gap. The trick is **ancestor FocusScope key
 bubbling**: place a `popup-focus := FocusScope { … }` around the search Input
@@ -77,12 +90,6 @@ must keep working under adoption mode (external tokens/enums, routes).
 Lead with the menu family (we already have the overlay infra) and the app-shell
 primitives (they serve real adopters like the Zero desktop app). Charts are a
 heavy, separate R&D track; the Game/HUD layer is the long-term differentiator.
-
-### v0.26 — Data Table
-- Sortable / filterable / paginated / row-selectable table (extends `Table`).
-- Why: the single biggest "complex" gap; most-requested.
-- Reuse: Table + Checkbox (select) + Pagination + Input (filter) + Button (sort).
-- Risk: column sizing + virtualized scroll for large data (ScrollArea). Own wave.
 
 ### v0.27 — Date & Calendar
 - **Calendar** (month grid + keyboard), **Date Picker** (Calendar in a Popover),

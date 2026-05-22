@@ -8,7 +8,7 @@
 
 [Live docs](https://stevekwon211.github.io/slintcn/docs/) · [Live demo](https://stevekwon211.github.io/slintcn) · [npm](https://www.npmjs.com/package/slintcn)
 
-45 UI components, 8 installable blocks, a theme system, and a static registry you can host yourself.
+46 UI components, 8 installable blocks, a theme system, and a static registry you can host yourself.
 
 <p align="center">
   <img src="docs/img/snapshots/section-6-dashboard.png" alt="slintcn dashboard components" width="31%">
@@ -85,6 +85,7 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.24.2** | **Menu keyboard nav** — Esc / ↑↓ / Enter inside DropdownMenu + Menubar popups; ←→ / Enter for NavigationMenu; a11y contracts for all four | ✅ |
 | **v0.25** | **Command & Combobox** — Combobox (searchable Select); Command (⌘K palette modal) → 45 components | ✅ |
 | **v0.25.1** | **Combobox + Command keyboard nav** — ↑/↓ move highlight, Enter selects, Esc closes (ancestor FocusScope catches keys bubbling from the search Input) | ✅ |
+| **v0.26** | **Data Table** — sortable headers + paginated rows + row clicks; consumer owns data slicing → 46 components | ✅ |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
