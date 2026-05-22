@@ -154,11 +154,116 @@ component DocBlock inherits VerticalLayout {
     }
 }
 
+// Isolated single-component preview surface for the /docs live-embed iframes.
+// `name` selects which registry item to render, centered + chromeless.
+// Overlays render in their open/triggered state; everything stays live.
+component PreviewHost inherits Rectangle {
+    in property <string> name;
+    in-out property <int> p-int: 1;
+    in-out property <int> p-tab: 0;
+    in-out property <bool> p-bool: true;
+    in-out property <float> p-float: 60;
+
+    background: Tokens.color-background;
+
+    // Centered, content-sized previews (non-overlay components + blocks).
+    VerticalLayout {
+        alignment: center;
+        padding: 28px;
+        HorizontalLayout {
+            alignment: center;
+
+            if root.name == "button": Button { variant: ButtonVariant.default; size: ButtonSize.lg; text: "Ship it"; }
+            if root.name == "badge": Badge { text: "Badge"; variant: BadgeVariant.default; }
+            if root.name == "label": Label { text: "Email"; variant: LabelVariant.required; }
+            if root.name == "separator": Rectangle { width: 240px; height: 1px; Separator { orientation: SeparatorOrientation.horizontal; } }
+            if root.name == "icon": Icon { commands: LucidePaths.check; size: 40px; tint: Tokens.color-foreground; }
+            if root.name == "checkbox": Checkbox { label: "Accept terms"; checked <=> root.p-bool; }
+            if root.name == "switch": Switch { label: "Dark mode"; checked <=> root.p-bool; }
+            if root.name == "toggle": Toggle { text: "Bold"; pressed <=> root.p-bool; }
+            if root.name == "avatar": Avatar { fallback: "SK"; size: 56px; }
+            if root.name == "skeleton": VerticalLayout { spacing: 8px; Skeleton { width: 220px; height: 16px; } Skeleton { width: 180px; height: 16px; } Skeleton { width: 200px; height: 16px; } }
+            if root.name == "keycap": HorizontalLayout { spacing: 8px; Keycap { text: "⌘"; tone: KeycapTone.on-glass; } Keycap { text: "K"; tone: KeycapTone.on-glow; } }
+            if root.name == "hud-pill": HudPill { text: "120 FPS"; tone: HudPillTone.scrim1; }
+
+            if root.name == "input": Input { width: 280px; placeholder: "you@example.com"; }
+            if root.name == "textarea": Textarea { width: 300px; placeholder: "Tell us about yourself…"; }
+            if root.name == "progress": Progress { width: 280px; value: 64; }
+            if root.name == "slider": Slider { width: 280px; value <=> root.p-float; }
+            if root.name == "select": Select { items: [{ label: "Monthly" }, { label: "Yearly (-20%)" }]; selected-index <=> root.p-tab; }
+
+            if root.name == "tabs": Tabs { items: [{ label: "Account" }, { label: "Password" }, { label: "Team" }]; current <=> root.p-tab; }
+            if root.name == "toggle-group": ToggleGroup { items: [{ label: "Left" }, { label: "Center" }, { label: "Right" }]; selected <=> root.p-int; }
+            if root.name == "radio-group": RadioGroup { items: [{ label: "Free" }, { label: "Pro" }, { label: "Team" }]; selected <=> root.p-int; }
+            if root.name == "breadcrumb": Breadcrumb { items: [{ label: "Home" }, { label: "Components" }, { label: "Breadcrumb" }]; }
+            if root.name == "pagination": Pagination { total: 5; current <=> root.p-int; }
+            if root.name == "slot-tile": HorizontalLayout { spacing: 8px;
+                SlotTile { tone: SlotTileTone.stone; state: SlotTileState.active; interactive: true; Keycap { x: 4px; y: 4px; text: "1"; size: KeycapSize.sm; tone: KeycapTone.on-glass; } }
+                SlotTile { tone: SlotTileTone.accent; interactive: true; }
+                SlotTile { tone: SlotTileTone.empty; }
+            }
+
+            if root.name == "alert": Alert { width: 380px; icon: LucidePaths.check; title: "Deployed"; description: "Your changes are live."; }
+
+            if root.name == "card": Card { variant: CardVariant.solid; width: 300px; height: 140px; VerticalLayout { padding: parent.padding-l; spacing: 8px;
+                Text { text: "Card title"; color: Tokens.color-foreground; font-size: Tokens.typography-title-size; font-weight: Tokens.typography-weight-semibold; }
+                Text { text: "A surface container."; color: Tokens.color-muted-foreground; font-size: Tokens.typography-body-size; } } }
+
+            if root.name == "text": VerticalLayout { spacing: 6px;
+                Typography { text: "Display"; variant: TextVariant.display; }
+                Typography { text: "Title"; variant: TextVariant.title; }
+                Typography { text: "Body — muted"; variant: TextVariant.body; tone: TextTone.muted; } }
+
+            if root.name == "accordion": Card { variant: CardVariant.solid; width: 420px; height: 220px; VerticalLayout { padding: parent.padding-l;
+                Accordion { open-index <=> root.p-int; items: [
+                    { title: "Is it accessible?", content: "Yes — Enter / Space toggle, arrow keys navigate." },
+                    { title: "Is it styled?", content: "Dark glass by default; light via Theme.mode." },
+                    { title: "Is it animated?", content: "Content height animates on expand." } ]; } } }
+
+            if root.name == "table": Card { variant: CardVariant.solid; width: 460px; VerticalLayout { padding: parent.padding-l;
+                Table { columns: ["Invoice", "Status", "Amount"]; rows: [
+                    { cells: ["INV-001", "Paid", "$ 250.00"] },
+                    { cells: ["INV-002", "Pending", "$ 1,200.00"] },
+                    { cells: ["INV-003", "Paid", "$ 84.00"] } ]; } } }
+
+            if root.name == "scroll-area": Card { variant: CardVariant.solid; card-padding: CardPadding.none; width: 360px; height: 200px;
+                ScrollArea { content-height: 480px; VerticalLayout { padding: Tokens.spacing-lg; spacing: Tokens.spacing-md; height: 480px;
+                    for i in 12: HorizontalLayout { spacing: 12px; alignment: start; Avatar { fallback: "U"; size: 28px; } Typography { text: "Scrollable row — drag to scroll"; variant: TextVariant.body; } } } } }
+
+            // overlay triggers (live: hover / click / right-click inside the iframe)
+            if root.name == "tooltip": Tooltip { text: "Add to library"; side: TooltipSide.top; Button { variant: ButtonVariant.outline; text: "Hover me"; } }
+            if root.name == "popover": Popover { title: "Dimensions"; description: "Set the width and height."; Button { variant: ButtonVariant.outline; text: "Open popover"; } }
+            if root.name == "context-menu": ContextMenu { items: [{ label: "Cut" }, { label: "Copy" }, { label: "Paste" }];
+                Card { card-padding: CardPadding.md; width: 260px; height: 64px; VerticalLayout { padding: parent.padding-l; Typography { text: "Right-click anywhere here"; variant: TextVariant.body-sm; tone: TextTone.muted; } } } }
+            if root.name == "toast": Button { variant: ButtonVariant.default; text: "Show toast"; clicked => { ToastQueue.show("Event created", ToastVariant.success); } }
+
+            // blocks
+            if root.name == "sign-in": SignIn { }
+            if root.name == "login": Login { }
+            if root.name == "pricing": Pricing { }
+            if root.name == "dashboard": Rectangle { width: 760px; DashboardBlock { } }
+            if root.name == "settings": Rectangle { width: 620px; SettingsBlock { } }
+        }
+    }
+
+    // Full-window overlays render open.
+    if root.name == "dialog": Dialog { width: parent.width; height: parent.height; open: true; title: "Confirm your action"; description: "This is a slintcn Dialog. Press Escape or click the backdrop to dismiss."; }
+    if root.name == "alert-dialog": AlertDialog { width: parent.width; height: parent.height; open: true; title: "Delete this account?"; description: "This action cannot be undone."; }
+    if root.name == "sheet": Sheet { width: parent.width; height: parent.height; open: true; side: SheetSide.right; title: "Filters"; description: "Refine your results."; }
+
+    // Toaster mount for the toast preview.
+    if root.name == "toast": Toaster { x: 0; y: 0; width: parent.width; height: parent.height; }
+}
+
 export component AppWindow inherits Window {
     title: "slintcn showcase";
     preferred-width:  1100px;
     preferred-height: 760px;
     background: Tokens.color-background;
+
+    // Non-empty = isolated docs-preview mode: render only PreviewHost(name),
+    // chromeless, for the /docs live-preview iframes (set from ?preview= on WASM start).
+    in-out property <string> preview-name: "";
 
     in-out property <int>  active-section: 0;
     in-out property <bool> dialog-open: false;
@@ -179,7 +284,12 @@ export component AppWindow inherits Window {
     in-out property <float> volume: 60;
     in-out property <int>  page-current: 2;
 
-    HorizontalLayout {
+    if root.preview-name != "": PreviewHost {
+        x: 0; y: 0; width: 100%; height: 100%;
+        name: root.preview-name;
+    }
+
+    if root.preview-name == "": HorizontalLayout {
         padding: Tokens.spacing-xl;
         spacing: Tokens.spacing-xl;
 
@@ -206,7 +316,7 @@ export component AppWindow inherits Window {
                         font-weight: Tokens.typography-weight-semibold;
                     }
                     Badge {
-                        text: "v0.17";
+                        text: "v0.18";
                         variant: BadgeVariant.secondary;
                         size: BadgeSize.sm;
                     }
@@ -414,7 +524,7 @@ export component AppWindow inherits Window {
                             spacing: 8px;
                             alignment: start;
                             Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
-                            Badge { text: "v0.17"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Badge { text: "v0.18"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
                         }
 
                         VerticalLayout {

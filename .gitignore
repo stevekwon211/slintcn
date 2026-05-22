@@ -28,6 +28,8 @@ web/r/
 web/registry.json
 # landing-page screenshots (copied from docs/img/snapshots in CI)
 web/img/
+# generated docs site (scripts/build-docs.mjs, regenerated in CI)
+web/docs/
 dist/
 
 # npm auth token — never commit

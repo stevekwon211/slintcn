@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>slintcn preview</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #0a0a0a; overflow: hidden; }
+  /* Slint sizes the canvas drawing buffer to the window; fit it to the iframe. */
+  canvas { outline: none; display: block; width: 100% !important; height: 100% !important; object-fit: contain; }
+  #loader { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: #0a0a0a; transition: opacity 200ms ease; }
+  #loader.hidden { opacity: 0; pointer-events: none; }
+  .spinner { width: 22px; height: 22px; border: 2px solid #262626; border-top-color: #a1a1a1;
+    border-radius: 50%; animation: spin 700ms linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<!-- Slint's winit backend renders into this canvas; ?preview=<name> (read in
+     WASM) flips the AppWindow into chromeless single-component mode. -->
+<canvas id="canvas"></canvas>
+<div id="loader"><div class="spinner"></div></div>
+<script type="module">
+  import init from './pkg/slintcn-showcase.js?v=0.18.0';
+  const reveal = () => document.getElementById('loader').classList.add('hidden');
+  const isWinitControlFlow = (err) => {
+    const msg = (err && (err.message || err.toString())) || '';
+    return msg.includes('control flow') || msg.includes("isn't actually an error");
+  };
+  init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.18.0' })
+    .then(reveal)
+    .catch((err) => { if (isWinitControlFlow(err)) { reveal(); return; } console.error('slintcn preview failed:', err); });
+</script>
+</body>
+</html>

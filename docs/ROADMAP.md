@@ -1,6 +1,25 @@
 # slintcn roadmap
 
-## v0.17 — docs IA (current)
+## v0.18 — docs site (ui.shadcn.com clone) (current)
+
+`/demo.html` (one cramped WASM window) didn't read as "quality" next to
+ui.shadcn.com. This wave builds a real docs site at `/docs`.
+
+- [x] **Showcase isolated-preview mode** — `AppWindow.preview-name` renders a
+      chromeless single component via a `PreviewHost` (40 instances; overlays
+      open). `lib.rs` reads `?preview=<name>` on WASM start; `web/embed.html`
+      loads the bundle. (web-sys gained `Window`/`Location` features.)
+- [x] **Docs generator** — `scripts/build-docs.mjs` reads the registry (via
+      `catalogFromRegistry`) + `scripts/docs-usage.mjs` snippets → one page per
+      component/block + index, into `web/docs/`. Self-contained CSS/JS.
+- [x] **shadcn-clone page** — sidebar IA (Get started + Components by category +
+      Blocks), H1 + description, prev/next, **live WASM preview card** (iframe →
+      `embed.html?preview=`), Installation tabs (npm/pnpm/yarn/bun + copy),
+      Usage (`.slint`, hand-rolled syntax highlight + copy), dependency chips,
+      right-hand TOC. Dark glass.
+- [x] Deploy: pages.yml runs the generator → `/docs`; landing + demo link in.
+
+## v0.17 — docs IA
 
 The WASM showcase becomes a docs site: every component section now leads
 with a shadcn-docs-style **install command + usage code** above its live

@@ -22,11 +22,29 @@ mod web {
     #[wasm_bindgen(start)]
     pub fn start() {
         console_error_panic_hook::set_once();
-        web_sys::console::log_1(&"slintcn: WASM module starting".into());
         let ui = AppWindow::new().expect("AppWindow::new");
         toast_glue::setup(&ui);
-        web_sys::console::log_1(&"slintcn: calling ui.run()".into());
+        // /docs live-preview iframes load this bundle with ?preview=<name>;
+        // that flips the window into chromeless single-component mode.
+        if let Some(name) = preview_param() {
+            ui.set_preview_name(name.into());
+        }
         ui.run().expect("ui.run");
-        web_sys::console::log_1(&"slintcn: ui.run() returned".into());
+    }
+
+    // Minimal query parser (preview names are simple [a-z-] tokens — no decode).
+    fn preview_param() -> Option<String> {
+        let search = web_sys::window()?.location().search().ok()?;
+        let query = search.strip_prefix('?').unwrap_or(&search);
+        for pair in query.split('&') {
+            let mut kv = pair.splitn(2, '=');
+            if kv.next() == Some("preview") {
+                let value = kv.next().unwrap_or("");
+                if !value.is_empty() {
+                    return Some(value.to_string());
+                }
+            }
+        }
+        None
     }
 }
