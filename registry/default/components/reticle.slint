@@ -1,0 +1,65 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Reticle — a crosshair overlay for aiming / cursor focus. Four tick marks
+// + optional center dot. Drop into your viewport at the focal point; size
+// controls overall span.
+export component Reticle inherits Rectangle {
+    // Outer diameter / span of the reticle.
+    in property <length> size: 28px;
+    // Stroke color of the ticks + dot.
+    in property <color> tint: Tokens.color-foreground;
+    // Width of each tick bar.
+    in property <length> stroke-width: 2px;
+    // Length of each individual tick.
+    in property <length> tick-length: 8px;
+    // Gap between the center and each tick (lets the focal point breathe).
+    in property <length> gap: 6px;
+    // Render a small center dot if true.
+    in property <bool> show-center: true;
+
+    background: transparent;
+    width: root.size;
+    height: root.size;
+
+    // Top tick
+    Rectangle {
+        x: (parent.width - root.stroke-width) / 2;
+        y: (parent.height / 2) - root.gap - root.tick-length;
+        width: root.stroke-width;
+        height: root.tick-length;
+        background: root.tint;
+    }
+    // Bottom tick
+    Rectangle {
+        x: (parent.width - root.stroke-width) / 2;
+        y: (parent.height / 2) + root.gap;
+        width: root.stroke-width;
+        height: root.tick-length;
+        background: root.tint;
+    }
+    // Left tick
+    Rectangle {
+        x: (parent.width / 2) - root.gap - root.tick-length;
+        y: (parent.height - root.stroke-width) / 2;
+        width: root.tick-length;
+        height: root.stroke-width;
+        background: root.tint;
+    }
+    // Right tick
+    Rectangle {
+        x: (parent.width / 2) + root.gap;
+        y: (parent.height - root.stroke-width) / 2;
+        width: root.tick-length;
+        height: root.stroke-width;
+        background: root.tint;
+    }
+    // Center dot
+    if root.show-center: Rectangle {
+        x: (parent.width - root.stroke-width) / 2;
+        y: (parent.height - root.stroke-width) / 2;
+        width: root.stroke-width;
+        height: root.stroke-width;
+        background: root.tint;
+        border-radius: root.stroke-width / 2;
+    }
+}

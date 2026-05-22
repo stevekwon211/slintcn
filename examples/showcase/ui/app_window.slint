@@ -67,6 +67,9 @@ import { Empty }                                from "slintcn/components/empty.s
 import { AspectRatio }                          from "slintcn/components/aspect-ratio.slint";
 import { Collapsible }                          from "slintcn/components/collapsible.slint";
 import { ButtonGroup }                          from "slintcn/components/button-group.slint";
+import { Hotbar, HotbarSlot }                   from "slintcn/components/hotbar.slint";
+import { Reticle }                              from "slintcn/components/reticle.slint";
+import { CompassStrip }                         from "slintcn/components/compass-strip.slint";
 import { SignIn }                               from "slintcn/blocks/sign-in.slint";
 import { Login }                                from "slintcn/blocks/login.slint";
 import { Pricing }                              from "slintcn/blocks/pricing.slint";
@@ -349,6 +352,22 @@ component PreviewHost inherits Rectangle {
                 Button { variant: ButtonVariant.outline; text: "Week"; }
                 Button { variant: ButtonVariant.outline; text: "Month"; }
             }
+            if root.name == "hotbar": Hotbar {
+                slots: [
+                    { tone: SlotTileTone.stone, label: "1" },
+                    { tone: SlotTileTone.accent, label: "2" },
+                    { tone: SlotTileTone.empty,  label: "3" },
+                    { tone: SlotTileTone.stone, label: "4" },
+                    { tone: SlotTileTone.stone, label: "5" },
+                ];
+                active: 1;
+            }
+            if root.name == "reticle": Reticle {
+                size: 40px;
+            }
+            if root.name == "compass-strip": CompassStrip {
+                heading-deg: 45.0;
+            }
             if root.name == "aspect-ratio": AspectRatio {
                 ratio: 16 / 9;
                 width: 480px;
@@ -462,7 +481,7 @@ export component AppWindow inherits Window {
                         font-weight: Tokens.typography-weight-semibold;
                     }
                     Badge {
-                        text: "v0.29";
+                        text: "v0.30";
                         variant: BadgeVariant.secondary;
                         size: BadgeSize.sm;
                     }
@@ -670,7 +689,7 @@ export component AppWindow inherits Window {
                             spacing: 8px;
                             alignment: start;
                             Label { text: "Sign up for the beta"; variant: LabelVariant.default; }
-                            Badge { text: "v0.29"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
+                            Badge { text: "v0.30"; variant: BadgeVariant.secondary; size: BadgeSize.sm; }
                         }
 
                         VerticalLayout {

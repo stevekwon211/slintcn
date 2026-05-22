@@ -1,0 +1,72 @@
+import { Tokens } from "../theme/tokens.slint";
+
+// Compass strip — a horizontal bar showing N/E/S/W (and intermediates) with
+// the current heading centered. Bind `heading-deg` 0..360 (0 = north, 90 =
+// east, …); the strip slides so the active cardinal aligns to the center
+// indicator. Common in driving / flight / open-world HUDs.
+export component CompassStrip inherits Rectangle {
+    // Current heading in degrees, 0..360 (0 = N, 90 = E, 180 = S, 270 = W).
+    in property <float> heading-deg: 0;
+    // Pixel width of the visible strip; the marks scroll inside it.
+    in property <length> strip-width: 240px;
+    // Pixel height of the strip.
+    in property <length> strip-height: 32px;
+    // Color of the marks + cardinal labels.
+    in property <color> tint: Tokens.color-foreground;
+    // Surface color behind the marks.
+    in property <color> surface: Tokens.color-surface-1;
+
+    background: transparent;
+    width: root.strip-width;
+    height: root.strip-height;
+
+    // Surface
+    Rectangle {
+        width: 100%;
+        height: 100%;
+        background: root.surface;
+        border-radius: Tokens.radius-md;
+        border-width: 1px;
+        border-color: Tokens.color-border-hairline;
+    }
+
+    // Cardinal labels — N at 0°, E at 90°, S at 180°, W at 270°. Each label
+    // is positioned so its center sits at (cardinal-deg - heading-deg + 180)
+    // * px-per-deg from the strip's left edge. px-per-deg = strip-width / 360.
+    for cardinal[ci] in [
+        { label: "N", deg: 0   },
+        { label: "NE", deg: 45  },
+        { label: "E", deg: 90  },
+        { label: "SE", deg: 135 },
+        { label: "S", deg: 180 },
+        { label: "SW", deg: 225 },
+        { label: "W", deg: 270 },
+        { label: "NW", deg: 315 },
+    ]: Rectangle {
+        property <float> rel-deg: mod(cardinal.deg - root.heading-deg + 540.0, 360.0) - 180.0;
+        property <length> rel-x: rel-deg * (root.strip-width / 360.0);
+        x: (parent.width / 2) + self.rel-x - self.width / 2;
+        y: (parent.height - self.height) / 2;
+        width: 26px;
+        height: 22px;
+        visible: abs(self.rel-deg) <= 90;
+        Text {
+            text: cardinal.label;
+            color: root.tint;
+            font-size: Tokens.typography-body-sm-size;
+            font-weight: Tokens.typography-weight-semibold;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+    }
+
+    // Center indicator — small downward arrow at the top center marking the
+    // exact heading.
+    Rectangle {
+        x: (parent.width - 2px) / 2;
+        y: 2px;
+        width: 2px;
+        height: 6px;
+        background: root.tint;
+    }
+}

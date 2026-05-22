@@ -25,6 +25,7 @@ fn main() {
             "calendar", "date-picker",
             "sidebar", "empty", "aspect-ratio",
             "collapsible", "button-group",
+            "hotbar", "reticle", "compass-strip",
             "sign-in", "login", "pricing", "dashboard", "settings",
             "team", "profile", "stats",
         ])

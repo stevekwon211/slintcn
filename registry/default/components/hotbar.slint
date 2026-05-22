@@ -1,0 +1,51 @@
+import { Tokens } from "../theme/tokens.slint";
+import { SlotTile, SlotTileTone, SlotTileState } from "slot-tile.slint";
+
+// Hotbar — a horizontal strip of SlotTiles for the player's active inventory
+// / abilities. Bind `active` to the selected index; clicking a slot updates
+// it and fires `selected(int)`. Empty slots use `tone: stone` + `state: idle`
+// by convention.
+export struct HotbarSlot {
+    tone: SlotTileTone,
+    label: string,
+}
+
+export component Hotbar inherits Rectangle {
+    // Slot data left-to-right. Each `tone` drives the tile's surface, `label`
+    // is shown beneath each tile.
+    in property <[HotbarSlot]> slots;
+    // Two-way; index of the active slot (highlight + state: selected).
+    in-out property <int> active: 0;
+    // Pixel side length of each square slot.
+    in property <length> tile-size: 56px;
+    // Fired with the slot index when a tile is clicked.
+    callback selected(int);
+
+    background: transparent;
+    preferred-width:  row.preferred-width;
+    preferred-height: row.preferred-height;
+
+    row := HorizontalLayout {
+        spacing: 6px;
+        for slot[i] in root.slots: VerticalLayout {
+            spacing: 4px;
+            alignment: start;
+            SlotTile {
+                tone: slot.tone;
+                state: i == root.active ? SlotTileState.active : SlotTileState.idle;
+                interactive: true;
+                size: root.tile-size;
+                clicked => {
+                    root.active = i;
+                    root.selected(i);
+                }
+            }
+            if slot.label != "": Text {
+                text: slot.label;
+                color: Tokens.color-muted-foreground;
+                font-size: Tokens.typography-body-sm-size;
+                horizontal-alignment: center;
+            }
+        }
+    }
+}

@@ -424,6 +424,38 @@ ButtonGroup {
     Button { variant: ButtonVariant.outline; text: "Month"; }
 }`,
 
+  hotbar: `import { Hotbar, HotbarSlot } from "slintcn/components/hotbar.slint";
+import { SlotTileTone } from "slintcn/components/slot-tile.slint";
+
+Hotbar {
+    slots: [
+        { tone: SlotTileTone.stone, label: "1" },
+        { tone: SlotTileTone.accent, label: "2" },
+        { tone: SlotTileTone.empty,  label: "3" },
+        { tone: SlotTileTone.stone, label: "4" },
+    ];
+    active <=> slot;
+    selected(i) => { /* equip slot i */ }
+}`,
+
+  reticle: `import { Reticle } from "slintcn/components/reticle.slint";
+
+Reticle {
+    size: 28px;
+    tint: #fafafa;
+    stroke-width: 2px;
+    tick-length: 8px;
+    gap: 6px;
+    show-center: true;
+}`,
+
+  "compass-strip": `import { CompassStrip } from "slintcn/components/compass-strip.slint";
+
+CompassStrip {
+    heading-deg <=> player-heading;   // 0=N, 90=E, 180=S, 270=W
+    strip-width: 240px;
+}`,
+
   // ── blocks ──
   "sign-in": `import { SignIn } from "slintcn/blocks/sign-in.slint";
 

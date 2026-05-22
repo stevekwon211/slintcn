@@ -34,5 +34,8 @@
   "empty":             { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
   "aspect-ratio":      { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
   "collapsible":       { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
-  "button-group":      { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false }
+  "button-group":      { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
+  "hotbar":            { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
+  "reticle":           { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
+  "compass-strip":     { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false }
 }

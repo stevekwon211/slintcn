@@ -1,6 +1,22 @@
 # slintcn roadmap
 
-## v0.29 — catalog round-out (current)
+## v0.30 — Game HUD expansion (current)
+
+The slintcn differentiator. Three new HUD primitives composed from existing
+SlotTile / Rectangle math:
+
+- [x] **Hotbar** — horizontal strip of `SlotTile`s with an active highlight.
+      `slots: [{ tone, label }]`, `active <=> int`, `selected(int)`.
+- [x] **Reticle** — crosshair overlay: 4 tick bars + optional center dot.
+      Customizable `size`, `tint`, `stroke-width`, `tick-length`, `gap`.
+- [x] **CompassStrip** — horizontal heading indicator. Bind `heading-deg`
+      (0–360); marks scroll under a center pointer. Slint `mod(float, float)`
+      + `abs(float)` validated working in 1.16.
+
+56 components total. Existing HUD trio (Keycap, HudPill, SlotTile) plus the
+new three = a working "game / tools HUD" layer no shadcn equivalent covers.
+
+## v0.29 — catalog round-out
 
 - [x] **Collapsible** — single show / hide section with chevron-flip trigger.
       The body collapses via `max-height` (Slint forbids `@children` inside
@@ -147,11 +163,11 @@ heavy, separate R&D track; the Game/HUD layer is the long-term differentiator.
 - **Directory page** (shadcn `/docs/directory` analog) for community registries.
 - Optional **`/create`-style preset page** (pick components → copy command).
 
-### v1.0 — Game / HUD expansion (the differentiator)
-- Hotbar, reticle, health/mana/stamina bars, minimap frame, full keycap-hint
-  system, damage numbers.
+### v1.0+ — Game / HUD round-out (the differentiator)
+- Hotbar / Reticle / CompassStrip shipped in v0.30. Future: health / mana /
+  stamina bars (Progress variants), minimap frame, damage numbers, expanded
+  keycap-hint system.
 - Why: slintcn's unique angle ("Slint for games + tools"); no shadcn equivalent.
-  Widen this moat once catalog parity is "good enough."
 
 > Prioritization note: Slint's audience is smaller than React's, so depth on
 > app-shell + the components Slint apps actually need + the HUD differentiator
