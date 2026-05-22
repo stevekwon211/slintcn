@@ -4212,7 +4212,7 @@ dependencies = [
 
 [[package]]
 name = "slintcn-showcase"
-version = "0.24.0"
+version = "0.24.2"
 dependencies = [
  "console_error_panic_hook",
  "png 0.17.16",

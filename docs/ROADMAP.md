@@ -1,6 +1,19 @@
 # slintcn roadmap
 
-## v0.24.1 — property docs (current)
+## v0.24.2 — menu keyboard nav (current)
+
+Closing the v0.24 a11y gap. Mirroring Select's verified FocusScope pattern:
+
+- [x] **DropdownMenu** popup — `Esc` closes, `↑/↓` move `highlighted-index`,
+      `Enter` fires `selected(highlighted-index)` and closes.
+- [x] **Menubar** popup — same Esc/↑↓/Enter inside the open menu; the highlight
+      resets to 0 on every open; `selected(menu, item)` fires on Enter.
+- [x] **NavigationMenu** — row-level FocusScope: `←/→` move `active`,
+      `Enter` / `Space` fires `navigate(active)`.
+- [x] HoverCard intentionally stays hover-only (no interactive content).
+- [x] `a11y.json` entries for all four; surfaced in the docs Accessibility row.
+
+## v0.24.1 — property docs
 
 A Slint maintainer reviewed the v0.24 docs and pointed out that no component
 exposed property docs — a real gap. Fix it across the catalog in one pass.

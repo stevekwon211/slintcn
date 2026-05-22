@@ -20,5 +20,9 @@
   "sheet":             { "focusable": true,  "keyboard": ["Escape"],         "focusTrap": false, "escapeDismiss": true },
   "popover":           { "focusable": true,  "keyboard": ["Escape"],         "focusTrap": false, "escapeDismiss": true },
   "context-menu":      { "focusable": true,  "keyboard": ["Escape"],         "focusTrap": false, "escapeDismiss": true },
-  "tooltip":           { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false }
+  "tooltip":           { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false },
+  "dropdown-menu":     { "focusable": true,  "keyboard": ["Arrow keys", "Enter"], "focusTrap": false, "escapeDismiss": true  },
+  "menubar":           { "focusable": true,  "keyboard": ["Arrow keys", "Enter"], "focusTrap": false, "escapeDismiss": true  },
+  "navigation-menu":   { "focusable": true,  "keyboard": ["Arrow keys", "Enter"], "focusTrap": false, "escapeDismiss": false },
+  "hover-card":        { "focusable": false, "keyboard": [],                 "focusTrap": false, "escapeDismiss": false }
 }

@@ -82,6 +82,7 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.23** | **Blocks expansion** — Team (members + roles), Profile (account form), Stats (metrics + traffic bars) → 8 blocks total | ✅ |
 | **v0.24** | **Menu family** — DropdownMenu (click), HoverCard (hover), Menubar (per-trigger popups), NavigationMenu (active-state nav) → 43 components | ✅ |
 | **v0.24.1** | **Property docs** — every `in` / `in-out` / `out` / callback has a one-line description; docs site surfaces them in a per-component Properties section | ✅ |
+| **v0.24.2** | **Menu keyboard nav** — Esc / ↑↓ / Enter inside DropdownMenu + Menubar popups; ←→ / Enter for NavigationMenu; a11y contracts for all four | ✅ |
 | **v1.0** | Game HUD registry expansion — hotbar, reticle, full keycap hints | later |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics

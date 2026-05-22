@@ -26,7 +26,7 @@
 <div id="frame"><canvas id="canvas"></canvas></div>
 <div id="loader"><div class="spinner"></div></div>
 <script type="module">
-  import init from './pkg/slintcn-showcase.js?v=0.24.0';
+  import init from './pkg/slintcn-showcase.js?v=0.24.2';
 
   // Fill the iframe; freeze the canvas box during a resize and re-fit 200ms
   // after it settles (debounced) so Slint doesn't re-alloc its surface (flicker).
@@ -45,7 +45,7 @@
     const msg = (err && (err.message || err.toString())) || '';
     return msg.includes('control flow') || msg.includes("isn't actually an error");
   };
-  init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.24.0' })
+  init({ module_or_path: './pkg/slintcn-showcase_bg.wasm?v=0.24.2' })
     .then(reveal)
     .catch((err) => { if (isWinitControlFlow(err)) { reveal(); return; } console.error('slintcn preview failed:', err); });
 </script>

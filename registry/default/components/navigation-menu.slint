@@ -17,6 +17,31 @@ export component NavigationMenu inherits Rectangle {
     background: transparent;
     preferred-width:  row.preferred-width;
     preferred-height: row.preferred-height;
+    // Keyboard nav: ←/→ moves `active`, Enter / Space fires `navigate` on it.
+    forward-focus: nav-focus;
+    nav-focus := FocusScope {
+        key-pressed(event) => {
+            if (event.text == Key.LeftArrow) {
+                if (root.items.length > 0) {
+                    root.active = max(0, root.active - 1);
+                    root.navigate(root.active);
+                }
+                return accept;
+            }
+            if (event.text == Key.RightArrow) {
+                if (root.items.length > 0) {
+                    root.active = min(root.items.length - 1, root.active + 1);
+                    root.navigate(root.active);
+                }
+                return accept;
+            }
+            if (event.text == "\n" || event.text == " ") {
+                root.navigate(root.active);
+                return accept;
+            }
+            return reject;
+        }
+    }
 
     row := HorizontalLayout {
         spacing: 4px;

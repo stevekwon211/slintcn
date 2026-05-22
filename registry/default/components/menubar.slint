@@ -10,6 +10,8 @@ export struct MenubarMenu { label: string, items: [MenubarItem] }
 export component Menubar inherits Rectangle {
     // Top-level menus (File / Edit / View / …), each with its own `items`.
     in property <[MenubarMenu]> menus;
+    // Row highlighted by ↑/↓ inside the currently-open popup.
+    in-out property <int> highlighted-index: 0;
     // Fired with the menu index and the chosen item's index; the popup closes.
     callback selected(int /* menu */, int /* item */);
 
@@ -38,7 +40,10 @@ export component Menubar inherits Rectangle {
 
             ta := TouchArea {
                 mouse-cursor: pointer;
-                clicked => { popup.show(); }
+                clicked => {
+                    root.highlighted-index = 0;
+                    popup.show();
+                }
             }
 
             popup := PopupWindow {
@@ -56,6 +61,33 @@ export component Menubar inherits Rectangle {
                     drop-shadow-offset-y: Tokens.shadow-e2-offset-y;
                     drop-shadow-color:    Tokens.shadow-e2-color;
                     height: items-layout.preferred-height;
+                    forward-focus: popup-focus;
+
+                    popup-focus := FocusScope {
+                        key-pressed(event) => {
+                            if (event.text == "\u{1b}") { popup.close(); return accept; }
+                            if (event.text == "\n") {
+                                if (m.items.length > 0) {
+                                    root.selected(mi, root.highlighted-index);
+                                    popup.close();
+                                }
+                                return accept;
+                            }
+                            if (event.text == Key.DownArrow) {
+                                if (m.items.length > 0) {
+                                    root.highlighted-index = mod(root.highlighted-index + 1, m.items.length);
+                                }
+                                return accept;
+                            }
+                            if (event.text == Key.UpArrow) {
+                                if (m.items.length > 0) {
+                                    root.highlighted-index = mod(root.highlighted-index + m.items.length - 1, m.items.length);
+                                }
+                                return accept;
+                            }
+                            return reject;
+                        }
+                    }
 
                     items-layout := VerticalLayout {
                         padding: 4px;
@@ -63,7 +95,7 @@ export component Menubar inherits Rectangle {
                         for it[ii] in m.items: Rectangle {
                             height: 30px;
                             border-radius: Tokens.radius-sm;
-                            background: it-touch.has-hover
+                            background: (it-touch.has-hover || ii == root.highlighted-index)
                                 ? Tokens.color-surface-1 : transparent;
 
                             HorizontalLayout {
