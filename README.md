@@ -216,94 +216,43 @@ slintcn export button                 # → dist/export/button.json
 
 ## Components (default registry)
 
-### Form primitives
-| Component | Variants | Sizes |
-|-----------|----------|-------|
-| **Button** | default · outline · secondary · ghost · link · destructive · glow · glass | xs · sm · default · lg · icon (× 4 sizes) |
-| **Card** | solid · glass · glass-interactive · raised (+ CardHeader/Title/Description/Content/Footer) | sm · default |
-| **Input** | (focus ring · placeholder · password · auto-focus) | — |
-| **Textarea** | (multi-line, word-wrap) | — |
-| **Badge** | default · secondary · outline · destructive | sm · default |
-| **Label** | default · muted · required | — |
-| **Separator** | horizontal · vertical | — |
+56 components across 11 categories — **actions, form, layout, display, feedback,
+overlay, navigation, data, media, typography, hud** — plus 8 installable blocks.
+Every component has a live preview, an auto-generated Properties section, and an
+accessibility contract at **[stevekwon211.github.io/slintcn/docs](https://stevekwon211.github.io/slintcn/docs/)**
+— that's the canonical catalog and never drifts from the source.
 
-### Selection
-| Component | Variants | Notable props |
-|-----------|----------|---------------|
-| **Tabs** | segmented control (muted pill + raised active) | `items: [TabItem]`, `current: int`, `changed(int)` |
-| **Checkbox** | (Path-drawn check) | `checked`, `label`, `disabled`, `toggled(bool)` |
-| **Switch** | (sliding knob, 36 × 20 track) | `checked`, `label`, `disabled`, `toggled(bool)` |
-| **RadioGroup** | vertical · horizontal | `items: [RadioItem]`, `selected: int`, `orientation`, `changed(int)` |
-| **Select** | trigger + PopupWindow dropdown (close-on-click-outside) | `items: [SelectItem]`, `selected-index`, `highlighted-index`, `placeholder`, `changed(int)` |
-| **Toggle** | default · outline | `text`, `pressed`, `disabled`, `toggled(bool)` |
-| **ToggleGroup** | (single-select row) | `items: [ToggleGroupItem]`, `selected: int`, `changed(int)` |
+A quick map of the categories:
 
-### Display & feedback
-| Component | Purpose | Notable props |
-|-----------|---------|---------------|
-| **Accordion** | single-open collapsible (animated, chevron swap) | `items: [AccordionItem]`, `open-index: int`, `changed(int)` |
-| **Avatar** | circular image + initials fallback | `source: image`, `fallback: string`, `size: length` |
-| **Alert** | bordered callout with icon | `title`, `description`, `icon` (LucidePaths.*), `variant: default/destructive` |
-| **Progress** | horizontal bar | `value: float` (0–100) |
-| **Skeleton** | pulsing placeholder | `radius`; size via width/height |
+| Category | What's in it |
+|---|---|
+| **actions** | Button, ButtonGroup |
+| **form** | Input, Textarea, Label, Checkbox, Switch, RadioGroup, Select, Combobox, Toggle, ToggleGroup, Slider, Calendar, DatePicker |
+| **layout** | Card, Separator, AspectRatio |
+| **display** | Badge, Accordion, Collapsible, Empty |
+| **feedback** | Alert, Progress, Skeleton, Toast |
+| **overlay** | Dialog (+ Panel), AlertDialog (+ Panel), Sheet (+ Panel), Tooltip, Popover, ContextMenu, DropdownMenu, HoverCard, Menubar, Command |
+| **navigation** | Tabs, Breadcrumb, Pagination, NavigationMenu, Sidebar |
+| **data** | Table, DataTable |
+| **media** | Avatar, Icon |
+| **typography** | Text |
+| **hud** | Keycap, HudPill, SlotTile, Hotbar, Reticle, CompassStrip |
 
-### Navigation & data
-| Component | Purpose | Notable props |
-|-----------|---------|---------------|
-| **Breadcrumb** | navigation path with chevron separators | `items: [BreadcrumbItem]`, `navigate(int)` (last item = current) |
-| **Pagination** | prev / page-numbers / next | `total: int`, `current: int` (0-based), `changed(int)` |
-| **Slider** | draggable value slider + arrow keys | `value: float`, `minimum`, `maximum`, `changed(float)` |
-| **Table** | header + rows, equal-stretch columns | `columns: [string]`, `rows: [TableRow]` (`cells: [string]`) |
+**Blocks**: Sign-in, Login, Pricing, Dashboard, Settings, Team, Profile, Stats.
 
-### Typography & games/HUD
-| Component | Purpose | Notable props |
-|-----------|---------|---------------|
-| **Text** | typography scale (import `as Typography`) | `variant: display/headline/title/body-lg/body/body-sm/label/caption`, `tone: default/muted/subtle/accent/danger` |
-| **Keycap** | keyboard-hint cap for HUDs | `text`, `size: sm/md`, `tone: on-glow/on-glass/muted/affirm-*/deny-*` |
-| **HudPill** | rounded-full HUD status pill | `text`, `size: sm/md/lg`, `tone: scrim0/scrim1/scrim2` |
-| **SlotTile** | inventory / hotbar slot (holds `@children`) | `tone: stone/empty/accent`, `state: idle/active/disabled`, `interactive`, `size` |
+### Keyboard contracts (verified per component in `a11y.json`)
+- **Buttons / Checkbox / Switch / Toggle** — Enter / Space activates.
+- **Tabs / RadioGroup / Slider** — Arrow keys navigate.
+- **Select / DropdownMenu / Menubar / Combobox / Command** — Arrow keys + Enter inside an open popup; Escape closes.
+- **Dialog / AlertDialog** — Tab trapped inside; Escape dismisses.
+- **NavigationMenu** — ←/→ moves the active item, Enter fires `navigate`.
 
-### Interaction (overlay + scroll)
-| Component | Purpose | Notable props |
-|-----------|---------|---------------|
-| **ScrollArea** | clipped Flickable viewport + slim custom scrollbar | `content-height: length`; lay out `@children` to that height |
-| **Popover** | click-triggered floating panel (trigger = `@children`) | `title`, `description`, `content-width`; closes on click outside |
-| **ContextMenu** | right-click menu over an area (`@children`) | `items: [ContextMenuItemData]`, `selected(int)`; opens at cursor |
+### Composed examples
 
-### Iconography & theming
-| Component | Purpose | Notable props |
-|-----------|---------|---------------|
-| **Icon** | Path-stroke icon | `commands: string` (24-unit viewBox), `size`, `tint`, `stroke-width` |
-| **LucidePaths** | Bundled Lucide command strings | `check · x-mark · chevron-* · plus · minus · arrow-* · dot` |
-| **Theme** global | Runtime mode swap | `mode: ThemeMode { dark, light }` — set anywhere; every Tokens binding updates reactively |
-
-### Overlays
-| Component | Purpose | Notable props |
-|-----------|---------|---------------|
-| **Dialog** | General-purpose modal | `open`, `title`, `description`, `dismiss-on-backdrop`, `close-label`, `@children` body |
-| **AlertDialog** | Destructive confirm | `open`, `action-label`, `cancel-label`, `action-variant`, `confirmed()`, `cancelled()` |
-| **Sheet** | Side drawer | `open`, `side` (top/right/bottom/left), `panel-extent`, `@children` body |
-| **Tooltip** | Hover-revealed bubble (PopupWindow — escapes parent bounds) | `text`, `side`; wraps a trigger as `@children` |
-| **Toast** | Growable Sonner-shape queue (Rust-backed VecModel) | `ToastQueue.show(text, variant)` — variants: default · success · error |
-
-Keyboard activation (Enter / Space) and a visible 2 px focus ring are wired into
-every interactive primitive. Modals close on Escape; Dialog and Sheet close on
-backdrop click (configurable). Arrow-key navigation:
-
-- **Tabs** — ← / → cycle the active tab (wrap-around)
-- **RadioGroup vertical** — ↑ / ↓ move the selection (wrap)
-- **RadioGroup horizontal** — ← / → move the selection (wrap)
-- **Select (open dropdown)** — ↑ / ↓ move highlight, Enter commits, Escape closes
-- **Dialog / AlertDialog** — Tab trapped inside; AlertDialog cycles Cancel ↔ Action
-
-### Composed examples (showcase)
-
-`cd examples/showcase && cargo run` opens a sidebar-navigated app with three
-realistic composed surfaces alongside per-primitive galleries:
-
-- **Sign-in** — Card + Inputs + Checkbox + CTA + footer link
-- **Settings** — three-tab preferences (Account / Notifications / Appearance) with Switches and Inputs
-- **Dashboard** — 3-column metric Cards with delta Badges + activity feed with Separator-divided rows
+`cd examples/showcase && cargo run` opens a sidebar-navigated app exercising
+every primitive. The eight blocks ship as standalone screens: **Sign-in,
+Login, Pricing, Dashboard, Settings** (auth + product UI) and **Team, Profile,
+Stats** (members management, account form, analytics).
 
 ## Mounting overlays
 
@@ -343,7 +292,7 @@ closed modals don't block interaction with the underlying UI.
 registry/default/         # Source of truth (published with npm package)
   theme/palette.slint     #   raw color/alpha primitives
   theme/tokens.slint      #   semantic layer (components read this)
-  components/*.slint      #   39 components + popup-helpers + lucide-paths
+  components/*.slint      #   56 components + popup-helpers + lucide-paths
 examples/showcase/        # Runnable gallery (regenerated via `slintcn add`)
 bin/slintcn.mjs           # init + add CLI (transitive deps)
 bin/__test__/             # node:test suite — `make test`
