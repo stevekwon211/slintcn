@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create your install — slintcn</title>
+<meta name="description" content="Pick a base color + the slintcn components you want; the page emits the exact npx commands to install them.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23fafafa%22&gt;&lt;circle cx=%2212%22 cy=%2212%22 r=%229%22 fill=%22%23171717%22 stroke=%22%23fafafa%22 stroke-width=%221.5%22/&gt;&lt;/svg&gt;">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0a0a0a; --fg: #fafafa; --muted: #a1a1a1; --subtle: #737373;
+    --card: #171717; --line: rgba(255,255,255,0.10); --line-strong: rgba(255,255,255,0.20);
+    --surface: rgba(255,255,255,0.04); --surface-2: rgba(255,255,255,0.08); --radius: 12px;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.5; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+  nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px);
+    background: rgba(10,10,10,0.7); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; gap: 20px; height: 56px; }
+  .logo { display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: -0.01em; }
+  .logo .dot { width: 18px; height: 18px; border-radius: 50%; background: #171717; border: 1.5px solid #fafafa; }
+  .pill { font-size: 11px; font-weight: 600; color: var(--muted); border: 1px solid var(--line);
+    border-radius: 999px; padding: 2px 8px; }
+  nav .spacer { flex: 1; }
+  nav a.link { color: var(--muted); font-size: 14px; font-weight: 500; }
+  nav a.link:hover { color: var(--fg); }
+
+  header.hero { padding: 48px 0 24px; }
+  header.hero h1 { font-size: clamp(28px, 5vw, 40px); letter-spacing: -0.02em; margin: 0 0 8px; }
+  header.hero p  { color: var(--muted); font-size: 16px; max-width: 640px; margin: 0; }
+
+  /* Two-column layout — left builder, right sticky command pane. */
+  .grid { display: grid; grid-template-columns: 1fr 360px; gap: 28px; padding-bottom: 64px; }
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+
+  /* Base-color picker. */
+  .base { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0 24px; }
+  .base label { display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; cursor: pointer;
+    font-size: 13px; color: var(--muted); transition: all 150ms; }
+  .base label:hover { color: var(--fg); border-color: var(--line-strong); }
+  .base input[type=radio] { appearance: none; width: 12px; height: 12px; border-radius: 50%;
+    border: 1.5px solid currentColor; margin: 0; }
+  .base input[type=radio]:checked + .swatch { background: var(--fg); }
+  .base label:has(input:checked) { color: var(--fg); border-color: var(--line-strong); background: var(--surface); }
+  .swatch { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line-strong); display: inline-block; }
+  .swatch.neutral { background: #737373; } .swatch.zinc { background: #71717a; }
+  .swatch.slate { background: #64748b; }   .swatch.stone { background: #78716c; }
+
+  /* Category sections + rows. */
+  .cat { margin-top: 22px; }
+  .cat h2 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--subtle); margin: 0 0 10px; padding: 0 4px; }
+  .row { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center;
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--card); margin-bottom: 6px; cursor: pointer; transition: border-color 150ms; }
+  .row:hover { border-color: var(--line-strong); }
+  .row.on { border-color: rgba(255,255,255,0.35); background: var(--surface-2); }
+  .row img, .row .thumb-fallback { width: 64px; height: 40px; object-fit: cover;
+    border-radius: 6px; background: #0d0d0d; border: 1px solid var(--line); }
+  .thumb-fallback { display: flex; align-items: center; justify-content: center;
+    color: var(--subtle); font-size: 10px; font-family: var(--mono); }
+  .r-meta .t { font-weight: 600; font-size: 14px; }
+  .r-meta .d { font-size: 13px; color: var(--muted); }
+  .row input[type=checkbox] { appearance: none; width: 18px; height: 18px;
+    border: 1.5px solid var(--line-strong); border-radius: 5px; cursor: pointer;
+    position: relative; }
+  .row.on input[type=checkbox] { background: var(--fg); border-color: var(--fg); }
+  .row.on input[type=checkbox]::after { content: "✓"; position: absolute; inset: 0;
+    color: #0a0a0a; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+  /* Right pane — sticky on desktop, inlined on mobile. */
+  aside { position: sticky; top: 76px; height: fit-content; }
+  @media (max-width: 980px) { aside { position: static; } }
+  aside .card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card);
+    padding: 18px; }
+  aside h3 { font-size: 14px; font-weight: 600; margin: 0 0 6px; }
+  aside .count { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+  aside pre { margin: 0; padding: 14px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px; font-family: var(--mono); font-size: 12px; color: var(--fg);
+    overflow-x: auto; white-space: pre; line-height: 1.6; }
+  aside .row-actions { display: flex; gap: 8px; margin-top: 12px; }
+  aside button { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--fg); font-weight: 600; font-size: 13px; cursor: pointer;
+    transition: background 150ms; }
+  aside button:hover { background: var(--surface-2); }
+  aside button.primary { background: var(--fg); color: #0a0a0a; border-color: var(--fg); }
+  aside button.primary:hover { background: #e5e5e5; }
+  aside .empty { color: var(--subtle); font-size: 13px; font-style: italic; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0; color: var(--subtle); font-size: 13px; }
+  footer .wrap { display: flex; gap: 16px; flex-wrap: wrap; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap">
+    <a class="logo" href="./"><span class="dot"></span> slintcn <span class="pill">create</span></a>
+    <span class="spacer"></span>
+    <a class="link" href="./docs/">Docs</a>
+    <a class="link" href="./demo.html">Live demo</a>
+    <a class="link" href="https://github.com/stevekwon211/slintcn" target="_blank" rel="noreferrer">GitHub</a>
+    <a class="link" href="https://www.npmjs.com/package/slintcn">npm</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <header class="hero">
+    <h1>Create your install</h1>
+    <p>Pick a base color and the components you want. The right pane builds the exact
+       <code>npx</code> command to drop them into your Slint project.</p>
+  </header>
+
+  <div class="grid">
+    <section>
+      <h2 class="cat" style="margin-top:0">Base color</h2>
+      <div class="base" id="bases">
+        <label><input type="radio" name="base" value="neutral" checked><span class="swatch neutral"></span> Neutral</label>
+        <label><input type="radio" name="base" value="zinc"><span class="swatch zinc"></span> Zinc</label>
+        <label><input type="radio" name="base" value="slate"><span class="swatch slate"></span> Slate</label>
+        <label><input type="radio" name="base" value="stone"><span class="swatch stone"></span> Stone</label>
+      </div>
+
+      <div id="cats">
+        <p style="color:var(--muted);font-size:14px">Loading registry…</p>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <h3>Your install</h3>
+        <div class="count" id="count">0 items selected — pick what you want on the left.</div>
+        <pre id="out">npx slintcn@latest init --base-color neutral</pre>
+        <div class="row-actions">
+          <button id="copy" class="primary">Copy</button>
+          <button id="clear">Clear</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>slintcn — copy-paste Slint components.</span>
+    <a href="./docs/">Docs</a>
+    <a href="./docs/directory.html">Directory</a>
+    <a href="https://www.npmjs.com/package/slintcn">npm</a>
+  </div>
+</footer>
+
+<script>
+  // Category groupings — order matches the docs sidebar (registry items not
+  // listed here fall under "Other"). Internal lib items (popup-helpers,
+  // lucide-paths) are intentionally skipped — they install as transitive
+  // dependencies, not user picks.
+  const CATEGORY_ORDER = [
+    "actions", "form", "layout", "display", "feedback",
+    "overlay", "navigation", "data", "media", "typography", "hud", "block",
+  ];
+  const CATEGORY_LABEL = {
+    actions: "Actions", form: "Forms & inputs", layout: "Layout",
+    display: "Display", feedback: "Feedback", overlay: "Overlays",
+    navigation: "Navigation", data: "Data", media: "Media",
+    typography: "Typography", hud: "Games / HUD", block: "Blocks",
+  };
+
+  const selected = new Set();
+  let base = "neutral";
+
+  function rebuildCommand() {
+    const init = `npx slintcn@latest init --base-color ${base}`;
+    const out = document.getElementById("out");
+    if (!selected.size) {
+      out.textContent = init;
+    } else {
+      const add = `npx slintcn@latest add ${[...selected].sort().join(" ")}`;
+      out.textContent = `${init}\n${add}`;
+    }
+    const c = document.getElementById("count");
+    c.textContent = selected.size
+      ? `${selected.size} item${selected.size > 1 ? "s" : ""} selected.`
+      : "0 items selected — pick what you want on the left.";
+  }
+
+  function thumbFor(name) {
+    // Snapshots land at img/preview-<name>.png after the pages.yml deploy.
+    return `./img/preview-${name}.png`;
+  }
+
+  function renderCategories(items) {
+    const byCat = new Map();
+    for (const it of items) {
+      const c = CATEGORY_LABEL[it.category] ? it.category : "block"; // safety net
+      if (!byCat.has(c)) byCat.set(c, []);
+      byCat.get(c).push(it);
+    }
+    const cats = [...byCat.keys()].sort(
+      (a, b) => (CATEGORY_ORDER.indexOf(a) + 1 || 99) - (CATEGORY_ORDER.indexOf(b) + 1 || 99),
+    );
+    const host = document.getElementById("cats");
+    host.innerHTML = "";
+    for (const c of cats) {
+      const sec = document.createElement("section");
+      sec.className = "cat";
+      const h = document.createElement("h2");
+      h.textContent = CATEGORY_LABEL[c] ?? c;
+      sec.appendChild(h);
+      for (const it of byCat.get(c)) {
+        const row = document.createElement("label");
+        row.className = "row";
+        row.dataset.name = it.name;
+        row.innerHTML = `
+          <img loading="lazy" alt="" src="${thumbFor(it.name)}"
+               onerror="this.outerHTML='<div class=\\'thumb-fallback\\'>no preview</div>'">
+          <div class="r-meta">
+            <div class="t">${it.title}</div>
+            <div class="d">${it.description}</div>
+          </div>
+          <input type="checkbox">`;
+        row.querySelector("input").addEventListener("change", (e) => {
+          if (e.target.checked) { selected.add(it.name); row.classList.add("on"); }
+          else                  { selected.delete(it.name); row.classList.remove("on"); }
+          rebuildCommand();
+        });
+        sec.appendChild(row);
+      }
+      host.appendChild(sec);
+    }
+  }
+
+  // Fetch the live registry — pages.yml emits it via `slintcn build`. The
+  // built shape is `{ items: [{ name, type, title, description, category, … }] }`
+  // (the source registry uses a `components: { name: {...} }` object instead).
+  fetch("./registry.json").then((r) => r.json()).then((reg) => {
+    const items = (reg.items ?? Object.entries(reg.components ?? {}).map(([name, v]) => ({ name, ...v })))
+      .filter((it) => it.type === "registry:ui" || it.type === "registry:block");
+    renderCategories(items);
+  }).catch((e) => {
+    document.getElementById("cats").innerHTML =
+      `<p style="color:#ff6467">Failed to load registry: ${e}</p>`;
+  });
+
+  document.getElementById("bases").addEventListener("change", (e) => {
+    if (e.target.name === "base") { base = e.target.value; rebuildCommand(); }
+  });
+
+  document.getElementById("copy").addEventListener("click", () => {
+    const cmd = document.getElementById("out").textContent;
+    navigator.clipboard?.writeText(cmd);
+    const btn = document.getElementById("copy");
+    const t = btn.textContent; btn.textContent = "Copied"; setTimeout(() => (btn.textContent = t), 1200);
+  });
+  document.getElementById("clear").addEventListener("click", () => {
+    selected.clear();
+    document.querySelectorAll(".row.on").forEach((r) => { r.classList.remove("on"); r.querySelector("input").checked = false; });
+    rebuildCommand();
+  });
+</script>
+</body>
+</html>

@@ -1,6 +1,29 @@
 # slintcn roadmap
 
-## v0.32 — Directory page (current)
+## v0.33 — Discovery + completion (current)
+
+Closes the visual coverage + Tooling track gaps in one substantial wave.
+
+- [x] **Per-component snapshot pipeline.** Extended
+      `examples/showcase/src/bin/snapshot.rs` with a `--previews` mode that
+      iterates `registry/default/registry.json`, drives PreviewHost via
+      `ui.set_preview_name(name)`, and writes `docs/img/snapshots/preview-
+      <name>.png` for every UI + block (64 PNGs at 900×600). New
+      `make snapshot-previews` target. Pure SoftwareRenderer — no WASM
+      flakiness.
+- [x] **`/create` preset page.** New `web/create.html` — pure HTML/CSS/JS,
+      no build step. Fetches the live `registry.json` from the deploy,
+      groups components by category, lets the user pick a base color +
+      check items, and live-builds the exact `npx slintcn init && npx
+      slintcn add …` command with copy + clear actions. Sticky right pane
+      on desktop, stacked on mobile.
+- [x] **Gallery + README hero refresh.** Landing's `.gallery` now rotates 6
+      fresh captures (DataTable, Command, Calendar, Sidebar, Dashboard,
+      Hotbar). README hero trio swapped to DataTable / Command / Calendar
+      so the README signals 2026 state, not v0.13.
+- [x] Topnav gets a `Create` entry in both landing and docs sites.
+
+## v0.32 — Directory page
 
 shadcn's `/docs/directory` shipped here. The discovery surface for community
 + official registries.
@@ -192,10 +215,10 @@ heavy, separate R&D track; the Game/HUD layer is the long-term differentiator.
 - Risk: **heavy.** No Slint charting primitive exists; build one (Path/polyline
   drawing + axes/scales, geometry computed in Rust). Gate on actual demand.
 
-### Tooling track (parallel)
+### Tooling track (parallel) — 100% shipped
 - **MCP server** shipped in v0.31.
 - **Directory page** shipped in v0.32.
-- Optional **`/create`-style preset page** (pick components → copy command).
+- **`/create` preset page** shipped in v0.33.
 
 ### v1.0+ — Game / HUD round-out (the differentiator)
 - Hotbar / Reticle / CompassStrip shipped in v0.30. Future: health / mana /

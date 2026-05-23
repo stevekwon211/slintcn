@@ -1,4 +1,4 @@
-.PHONY: verify test build clippy clean snapshot
+.PHONY: verify test build clippy clean snapshot snapshot-previews
 
 # Single command for local pre-commit hygiene.
 verify: test build clippy
@@ -16,6 +16,10 @@ clippy:
 # SoftwareRenderer (no display server required).
 snapshot:
 	cd examples/showcase && cargo run --quiet --features snapshot --bin snapshot
+
+# Per-component PNGs via PreviewHost — one per registry item (UI + block).
+snapshot-previews:
+	cd examples/showcase && cargo run --quiet --features snapshot --bin snapshot -- --previews
 
 clean:
 	cd examples/showcase && cargo clean

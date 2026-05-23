@@ -11,9 +11,9 @@
 56 UI components, 8 installable blocks, a theme system, and a static registry you can host yourself.
 
 <p align="center">
-  <img src="docs/img/snapshots/section-6-dashboard.png" alt="slintcn dashboard components" width="31%">
-  <img src="docs/img/snapshots/section-4-signin.png" alt="slintcn sign-in form" width="31%">
-  <img src="docs/img/snapshots/section-2-overlays.png" alt="slintcn overlay components" width="31%">
+  <img src="docs/img/snapshots/preview-data-table.png" alt="slintcn Data Table" width="31%">
+  <img src="docs/img/snapshots/preview-command.png" alt="slintcn Command palette" width="31%">
+  <img src="docs/img/snapshots/preview-calendar.png" alt="slintcn Calendar" width="31%">
 </p>
 
 ## Install
@@ -92,6 +92,7 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.30** | **Game HUD expansion** — `Hotbar` (SlotTile strip), `Reticle` (crosshair overlay), `CompassStrip` (scrolling heading) → 56 components | ✅ |
 | **v0.31** | **MCP server** — `slintcn-mcp` bin exposes the registry to MCP-capable AI agents (Claude Desktop, Cursor, Windsurf). Tools: `list_components`, `list_blocks`, `view_component`, `install_command` | ✅ |
 | **v0.32** | **Directory page** — `/docs/directory` lists community + official registries; entries land via PR to `registry/directory.json` (ecosystem discovery surface) | ✅ |
+| **v0.33** | **Discovery + completion** — per-component snapshot pipeline (64 PNGs via `--previews`), `/create` preset page (pick components → copy install command), gallery + README hero refresh | ✅ |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
 exist, a second registry (`registry/game/`) is just more `.slint` files.

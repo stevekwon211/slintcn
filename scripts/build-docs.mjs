@@ -80,6 +80,7 @@ function topnav() {
     <button class="menu-btn" aria-label="Toggle navigation" aria-expanded="false">☰</button>
     <a class="logo" href="../"><span class="dot"></span> slintcn <span class="pill">docs</span></a>
     <span class="grow"></span>
+    <a class="tn-link" href="../create.html">Create</a>
     <a class="tn-link" href="../demo.html">Playground</a>
     <a class="tn-link star-link" href="https://github.com/stevekwon211/slintcn" target="_blank" rel="noreferrer">GitHub <span data-stars></span></a>
     <a class="tn-link" href="https://www.npmjs.com/package/slintcn">npm</a>

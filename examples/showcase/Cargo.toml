@@ -1,6 +1,6 @@
 [package]
 name = "slintcn-showcase"
-version = "0.32.0"
+version = "0.33.0"
 edition = "2021"
 publish = false
 
@@ -18,11 +18,12 @@ path = "src/bin/snapshot.rs"
 required-features = ["snapshot"]
 
 [features]
-snapshot = ["dep:png"]
+snapshot = ["dep:png", "dep:serde_json"]
 
 [dependencies]
 slint = { version = "1.16", features = ["compat-1-2", "renderer-software"] }
 png = { version = "0.17", optional = true }
+serde_json = { version = "1", optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "0.2"

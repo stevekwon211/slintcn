@@ -4212,10 +4212,11 @@ dependencies = [
 
 [[package]]
 name = "slintcn-showcase"
-version = "0.31.1"
+version = "0.32.0"
 dependencies = [
  "console_error_panic_hook",
  "png 0.17.16",
+ "serde_json",
  "slint",
  "slint-build",
  "wasm-bindgen",
