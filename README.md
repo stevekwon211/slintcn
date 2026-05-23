@@ -169,10 +169,13 @@ Wire it into your client's MCP config:
 ```json
 {
   "mcpServers": {
-    "slintcn": { "command": "npx", "args": ["-y", "slintcn-mcp"] }
+    "slintcn": { "command": "npx", "args": ["-y", "-p", "slintcn", "slintcn-mcp"] }
   }
 }
 ```
+
+(`slintcn-mcp` is a bin entry inside the `slintcn` package, not a separate
+package — `-p slintcn` tells npx which package to pull, then runs that bin.)
 
 Exposed tools:
 

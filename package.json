@@ -1,6 +1,6 @@
 {
   "name": "slintcn",
-  "version": "0.31.0",
+  "version": "0.31.1",
   "description": "Beautiful copy-paste Slint components — shadcn for native UI",
   "keywords": [
     "slint",
@@ -37,7 +37,8 @@
     "bin",
     "registry",
     "templates",
-    "schema"
+    "schema",
+    "scripts/docs-usage.mjs"
   ],
   "engines": {
     "node": ">=20"
