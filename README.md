@@ -90,6 +90,7 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.28** | **App-shell** — `Sidebar` (collapsible nav with icons + active highlight), `Empty` (zero-state surface), `AspectRatio` (layout helper) → 51 components | ✅ |
 | **v0.29** | **Catalog round-out** — `Collapsible` (single show/hide section), `ButtonGroup` (joined Buttons) → 53 components | ✅ |
 | **v0.30** | **Game HUD expansion** — `Hotbar` (SlotTile strip), `Reticle` (crosshair overlay), `CompassStrip` (scrolling heading) → 56 components | ✅ |
+| **v0.31** | **MCP server** — `slintcn-mcp` bin exposes the registry to MCP-capable AI agents (Claude Desktop, Cursor, Windsurf). Tools: `list_components`, `list_blocks`, `view_component`, `install_command` | ✅ |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
 exist, a second registry (`registry/game/`) is just more `.slint` files.
@@ -156,6 +157,35 @@ against the same registry. The official registry is served at
 
 > **Maintainers:** publish to npm with `npm login && npm publish` (the package
 > ships `bin`, `registry`, `templates`, `schema`; `prepublishOnly` runs tests).
+
+## MCP server (AI agents)
+
+slintcn ships a Model Context Protocol server so MCP-capable agents (Claude
+Desktop, Cursor, Windsurf, etc.) can browse the registry and emit the right
+install command without scraping docs. Zero runtime deps — pure stdio JSON-RPC.
+
+Wire it into your client's MCP config:
+
+```json
+{
+  "mcpServers": {
+    "slintcn": { "command": "npx", "args": ["-y", "slintcn-mcp"] }
+  }
+}
+```
+
+Exposed tools:
+
+| Tool | What it does |
+|---|---|
+| `list_components` | Every UI component with title / category / one-liner |
+| `list_blocks` | Every installable block (full-screen compositions) |
+| `view_component` | Full metadata + usage snippet for one item |
+| `install_command` | Exact `npx slintcn@latest add …` for N items |
+
+The server reads the bundled `registry/default/registry.json` + the same usage
+snippets the docs site renders, so what it tells the agent and what `slintcn
+add` actually installs always match.
 
 ## Adopting into an existing design system
 

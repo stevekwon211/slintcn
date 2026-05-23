@@ -1,6 +1,22 @@
 # slintcn roadmap
 
-## v0.30 — Game HUD expansion (current)
+## v0.31 — MCP server (current)
+
+shadcn's most-active growth lane is the AI-agent integration. Ship our own:
+
+- [x] New `bin/slintcn-mcp.mjs` — pure JSON-RPC over stdio, zero runtime deps,
+      reads the bundled registry + usage snippets so agent output and actual
+      install behaviour always match.
+- [x] Tools exposed: `list_components`, `list_blocks`, `view_component`
+      (metadata + usage snippet + docs link), `install_command(names[])`.
+- [x] Wires up in any MCP client via
+      `{ "command": "npx", "args": ["-y", "slintcn-mcp"] }`.
+- [x] README section + `bin: slintcn-mcp` entry in `package.json`.
+
+Smoke-tested with `initialize` / `tools/list` / `tools/call` — all four tools
+respond correctly against the live registry (56 components, 8 blocks).
+
+## v0.30 — Game HUD expansion
 
 The slintcn differentiator. Three new HUD primitives composed from existing
 SlotTile / Rectangle math:
@@ -158,8 +174,7 @@ heavy, separate R&D track; the Game/HUD layer is the long-term differentiator.
   drawing + axes/scales, geometry computed in Rust). Gate on actual demand.
 
 ### Tooling track (parallel)
-- **MCP server** — let AI agents discover + `slintcn add` (shadcn ships one);
-  reuse the registry + `bin/slintcn.mjs` helpers.
+- **MCP server** shipped in v0.31.
 - **Directory page** (shadcn `/docs/directory` analog) for community registries.
 - Optional **`/create`-style preset page** (pick components → copy command).
 
