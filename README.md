@@ -91,6 +91,7 @@ node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 | **v0.29** | **Catalog round-out** — `Collapsible` (single show/hide section), `ButtonGroup` (joined Buttons) → 53 components | ✅ |
 | **v0.30** | **Game HUD expansion** — `Hotbar` (SlotTile strip), `Reticle` (crosshair overlay), `CompassStrip` (scrolling heading) → 56 components | ✅ |
 | **v0.31** | **MCP server** — `slintcn-mcp` bin exposes the registry to MCP-capable AI agents (Claude Desktop, Cursor, Windsurf). Tools: `list_components`, `list_blocks`, `view_component`, `install_command` | ✅ |
+| **v0.32** | **Directory page** — `/docs/directory` lists community + official registries; entries land via PR to `registry/directory.json` (ecosystem discovery surface) | ✅ |
 
 SaaS-first is a **wedge**, not a ceiling. Once tokens + motion + hover semantics
 exist, a second registry (`registry/game/`) is just more `.slint` files.
@@ -157,6 +158,16 @@ against the same registry. The official registry is served at
 
 > **Maintainers:** publish to npm with `npm login && npm publish` (the package
 > ships `bin`, `registry`, `templates`, `schema`; `prepublishOnly` runs tests).
+
+## Community registries
+
+slintcn isn't tied to one registry. Any host that serves a `registry.json` +
+per-item `r/<name>.json` (the shape `slintcn build` emits) is a valid registry,
+and `slintcn add @namespace/name` installs from it once you wire the namespace
+into `slintcn.json`'s `registries` map.
+
+Browse + list yours at **[stevekwon211.github.io/slintcn/docs/directory](https://stevekwon211.github.io/slintcn/docs/directory.html)** —
+open a PR to [`registry/directory.json`](registry/directory.json) to be listed.
 
 ## MCP server (AI agents)
 

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://slintcn.dev/schema/directory.schema.json",
+  "_comment": "Community + official slintcn-compatible registries. To list your registry here, open a PR adding an entry to `registries`. The slintcn CLI consumes registries via slintcn.json's `registries` map; this directory is the public discovery surface.",
+  "registries": [
+    {
+      "namespace": "default",
+      "title": "slintcn (default)",
+      "description": "The official dark-glass registry — 56 components + 8 blocks, an a11y contract per item, and a games / tools HUD layer.",
+      "url": "https://stevekwon211.github.io/slintcn/r",
+      "homepage": "https://stevekwon211.github.io/slintcn/docs",
+      "repo": "https://github.com/stevekwon211/slintcn",
+      "maintainer": "stevekwon211",
+      "license": "MIT",
+      "components": 56,
+      "blocks": 8,
+      "tags": ["dark", "glass", "games", "hud", "shadcn-style"]
+    }
+  ]
+}

@@ -58,7 +58,8 @@ function sidebar(items, activeName) {
   html += `<div class="s-group"><div class="s-label">Get started</div>`;
   html += `<a class="s-item" href="./index.html">Introduction</a>`;
   html += `<a class="s-item" href="../">Landing</a>`;
-  html += `<a class="s-item" href="../demo.html">Playground</a></div>`;
+  html += `<a class="s-item" href="../demo.html">Playground</a>`;
+  html += `<a class="s-item" href="./directory.html">Directory</a></div>`;
   html += `<div class="s-group"><div class="s-label">Components</div>`;
   for (const c of cats) {
     html += `<div class="s-sub">${esc(CATEGORY_LABEL[c] ?? c)}</div>`;
@@ -193,6 +194,82 @@ ${apiSection}
 </html>`;
 }
 
+function directoryPage(items, directory) {
+  // Card per registry — namespace + meta + install command + counts + tags.
+  const card = (r) => `
+    <a class="idx-card" href="${escAttr(r.homepage)}" target="_blank" rel="noreferrer">
+      <div class="idx-t">${esc(r.title)}</div>
+      <div class="idx-d">${esc(r.description)}</div>
+      <div class="dir-meta">
+        <span class="chip">@${esc(r.namespace)}</span>
+        ${r.components != null ? `<span class="chip">${esc(r.components)} components</span>` : ""}
+        ${r.blocks != null     ? `<span class="chip">${esc(r.blocks)} blocks</span>` : ""}
+        ${r.license            ? `<span class="chip">${esc(r.license)}</span>` : ""}
+        ${(r.tags ?? []).map((t) => `<span class="chip muted">${esc(t)}</span>`).join("")}
+      </div>
+      <div class="dir-cmd"><code>slintcn add @${esc(r.namespace)}/&lt;name&gt;</code></div>
+    </a>`;
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Directory — slintcn docs</title>
+<link rel="stylesheet" href="./docs.css">
+</head>
+<body>
+${topnav()}
+<div class="shell">
+${sidebar(items, "")}
+<main class="main">
+  <div class="hdr">
+    <h1>Directory</h1>
+    <p class="desc">Registries you can install slintcn components from. Add yours with a PR to
+      <a href="https://github.com/stevekwon211/slintcn/blob/main/registry/directory.json"><code>registry/directory.json</code></a>.</p>
+  </div>
+
+  <h2>Registries</h2>
+  <div class="idx-grid">${directory.registries.map(card).join("")}</div>
+
+  <h2>How it works</h2>
+  <p class="muted">slintcn isn't tied to a single registry. Any host serving a <code>registry.json</code>
+    + per-item <code>r/&lt;name&gt;.json</code> files (the shape <code>slintcn build</code> emits) is a
+    valid registry. Wire it into your project's <code>slintcn.json</code>:</p>
+  <div class="code-block"><pre><code>{
+  "style": "default",
+  "registries": {
+    "default": "https://stevekwon211.github.io/slintcn/r",
+    "acme":    "https://acme.dev/slintcn"
+  }
+}</code></pre></div>
+  <p class="muted">Then install with the namespace prefix:</p>
+  <div class="code-block"><pre><code>slintcn add @acme/button-pro
+slintcn add https://example.com/registry/r/special.json   # direct URL also works</code></pre></div>
+
+  <h2>List yours</h2>
+  <p class="muted">Open a PR that adds an entry to
+    <a href="https://github.com/stevekwon211/slintcn/blob/main/registry/directory.json"><code>registry/directory.json</code></a>:</p>
+  <div class="code-block"><pre><code>{
+  "namespace": "yours",
+  "title":     "Your registry",
+  "description": "What it offers in one line.",
+  "url":       "https://yours.example/r",
+  "homepage":  "https://yours.example",
+  "repo":      "https://github.com/you/yours",
+  "maintainer": "you",
+  "license":   "MIT",
+  "components": 12,
+  "blocks":     2,
+  "tags":      ["light", "minimal"]
+}</code></pre></div>
+</main>
+</div>
+<script src="./docs.js"></script>
+</body>
+</html>`;
+}
+
 function indexPage(items) {
   const ui = items.filter((i) => i.type === "registry:ui");
   const blocks = items.filter((i) => i.type === "registry:block");
@@ -234,6 +311,9 @@ async function main() {
   const a11y = JSON.parse(
     await readFile(path.join(ROOT, "registry", "default", "a11y.json"), "utf8"),
   );
+  const directory = JSON.parse(
+    await readFile(path.join(ROOT, "registry", "directory.json"), "utf8"),
+  );
   // docs pages = user-facing items only (ui + blocks); skip theme + lib helpers.
   const items = catalogFromRegistry(registry).filter(
     (i) => i.type === "registry:ui" || i.type === "registry:block",
@@ -243,6 +323,7 @@ async function main() {
   await writeFile(path.join(outDir, "docs.css"), DOCS_CSS);
   await writeFile(path.join(outDir, "docs.js"), DOCS_JS);
   await writeFile(path.join(outDir, "index.html"), indexPage(items));
+  await writeFile(path.join(outDir, "directory.html"), directoryPage(items, directory));
 
   for (let i = 0; i < items.length; i++) {
     const api = {
@@ -379,6 +460,10 @@ h2{font-size:21px;letter-spacing:-.01em;margin:40px 0 14px;scroll-margin-top:72p
 .idx-card{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);padding:16px}
 .idx-card:hover{border-color:var(--line-strong)}
 .idx-t{font-weight:600;margin-bottom:4px}.idx-d{font-size:13px;color:var(--muted)}
+.dir-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.dir-meta .chip{font-size:11px;padding:2px 8px}
+.dir-meta .chip.muted{opacity:.65}
+.dir-cmd{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;overflow-x:auto;white-space:nowrap}
 /* slint syntax highlight */
 .tok-cmt{color:#6b7280}.tok-str{color:#86efac}.tok-kw{color:#c4b5fd}.tok-type{color:#7dd3fc}.tok-prop{color:#fca5a5}
 /* mobile nav drawer */

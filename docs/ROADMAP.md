@@ -1,6 +1,25 @@
 # slintcn roadmap
 
-## v0.31 — MCP server (current)
+## v0.32 — Directory page (current)
+
+shadcn's `/docs/directory` shipped here. The discovery surface for community
++ official registries.
+
+- [x] New `registry/directory.json` — schema-shaped list of registries
+      (namespace · title · description · url · homepage · maintainer · counts
+      · license · tags). Default entry seeded with the slintcn official set.
+- [x] `scripts/build-docs.mjs` renders **`/docs/directory.html`** — card per
+      registry (chips for namespace / counts / license / tags + an
+      `slintcn add @ns/...` install command line), plus "how it works" + "list
+      yours" PR template sections.
+- [x] Sidebar `Directory` link in every docs page.
+- [x] README "Community registries" section pointing to the directory + the
+      JSON to PR into.
+
+No new runtime code — pure docs / ecosystem surface. Closes the shadcn-
+Tooling-Track parity except for the optional `/create` preset page.
+
+## v0.31 — MCP server
 
 shadcn's most-active growth lane is the AI-agent integration. Ship our own:
 
@@ -175,7 +194,7 @@ heavy, separate R&D track; the Game/HUD layer is the long-term differentiator.
 
 ### Tooling track (parallel)
 - **MCP server** shipped in v0.31.
-- **Directory page** (shadcn `/docs/directory` analog) for community registries.
+- **Directory page** shipped in v0.32.
 - Optional **`/create`-style preset page** (pick components → copy command).
 
 ### v1.0+ — Game / HUD round-out (the differentiator)
