@@ -63,14 +63,15 @@ you copy into your repo and customize.
 # Run the visual showcase
 cd examples/showcase && cargo run
 
-# Install components into your Slint project
+# Install components into your Slint project — cargo (no Node):
+cargo install slintcn
 cd your-slint-app
+slintcn init --base-color zinc
+slintcn add button card input dialog
+
+# …or with npm, if you prefer:
 npx slintcn@latest init
 npx slintcn@latest add button card input dialog
-
-# …or from a local checkout:
-node /path/to/slintcn/bin/slintcn.mjs init
-node /path/to/slintcn/bin/slintcn.mjs add button card input dialog
 ```
 
 ## Philosophy
@@ -152,7 +153,8 @@ silently falling through to the default styling.
 ## CLI & distribution
 
 slintcn isn't a library you depend on — it's a **distribution system for
-copy-paste Slint code** (the shadcn model). The CLI:
+copy-paste Slint code** (the shadcn model). The CLI ships two ways — `slintcn`
+(after `cargo install slintcn`) or `npx slintcn` — over the same registry:
 
 ```bash
 slintcn init                       # create slintcn.json + install theme tokens
@@ -161,6 +163,11 @@ slintcn list                       # browse the catalog, grouped by category
 slintcn view dialog [--files]      # an item's metadata, install order, and source
 slintcn build -o dist/registry     # emit a static registry (registry.json + r/*.json)
 ```
+
+> The **cargo** CLI (`cargo install slintcn`) covers the core path —
+> `init` / `add` / `list` / `view`, no Node required. The **npm** CLI
+> (`npx slintcn`) adds the full adoption toolkit (`diff`, `export`,
+> `build`, `--external-tokens`, `--import-map`, …) shown below.
 
 **Config — `slintcn.json`** (created by `init`): `style` (which registry),
 `baseColor` (`neutral` · `zinc` · `slate` · `stone` — pick at init with
@@ -181,8 +188,10 @@ slintcn add @acme/button                                           # via registr
 against the same registry. The official registry is served at
 `https://stevekwon211.github.io/slintcn/r/`.
 
-> **Maintainers:** publish to npm with `npm login && npm publish` (the package
-> ships `bin`, `registry`, `templates`, `schema`; `prepublishOnly` runs tests).
+> **Maintainers:** publish the npm package with `npm login && npm publish`
+> (ships `bin`, `registry`, `templates`, `schema`; `prepublishOnly` runs tests)
+> and the cargo CLI with `cd cli && cargo publish`. Keep both versions in lockstep
+> with `registry/default/registry.json`.
 
 ## Community registries
 

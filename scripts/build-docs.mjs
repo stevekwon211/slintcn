@@ -84,6 +84,7 @@ function topnav() {
     <a class="tn-link" href="../create.html">Create</a>
     <a class="tn-link" href="../demo.html">Playground</a>
     <a class="tn-link star-link" href="https://github.com/stevekwon211/slintcn" target="_blank" rel="noreferrer">GitHub <span data-stars></span></a>
+    <a class="tn-link" href="https://crates.io/crates/slintcn">crates.io</a>
     <a class="tn-link" href="https://www.npmjs.com/package/slintcn">npm</a>
   </div></header>
   <div id="scrim"></div>`;
