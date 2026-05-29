@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 
 /// Default hosted registry (GitHub Pages). Overridable via `--registry` or the
 /// `registry` field in slintcn.json.
-pub const DEFAULT_REGISTRY: &str = "https://stevekwon211.github.io/slintcn";
+pub const DEFAULT_REGISTRY: &str = "https://zero-sq.github.io/slintcn";
 
 // ---------------------------------------------------------------------------
 // Registry JSON shapes

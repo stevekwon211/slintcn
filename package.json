@@ -17,12 +17,12 @@
   "author": "Steve Kwon <stevekwon211@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stevekwon211/slintcn.git"
+    "url": "git+https://github.com/zero-sq/slintcn.git"
   },
   "bugs": {
-    "url": "https://github.com/stevekwon211/slintcn/issues"
+    "url": "https://github.com/zero-sq/slintcn/issues"
   },
-  "homepage": "https://stevekwon211.github.io/slintcn/docs/",
+  "homepage": "https://zero-sq.github.io/slintcn/docs/",
   "type": "module",
   "bin": {
     "slintcn": "bin/slintcn.mjs",

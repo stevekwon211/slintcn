@@ -22,7 +22,7 @@ notes, then write the title and first comment by hand in your own voice.
 Recommended link target:
 
 ```text
-https://stevekwon211.github.io/slintcn/docs/
+https://zero-sq.github.io/slintcn/docs/
 ```
 
 Title shape to write by hand:
@@ -67,7 +67,7 @@ Feedback wanted on component APIs, docs clarity, and which primitives should com
 ### This Week in Rust
 
 ```markdown
-[slintcn 0.22](https://github.com/stevekwon211/slintcn/blob/main/docs/INTRODUCING_SLINTCN.md) is a shadcn/ui-style copy-paste component registry for Slint native apps.
+[slintcn 0.22](https://github.com/zero-sq/slintcn/blob/main/docs/INTRODUCING_SLINTCN.md) is a shadcn/ui-style copy-paste component registry for Slint native apps.
 ```
 
 ### X Thread

@@ -96,7 +96,7 @@ test("MCP: view_component returns full metadata + usage snippet for a known item
   const text = resp.result.content[0].text;
   assert.match(text, /^# Button/m);
   assert.match(text, /install:.+npx slintcn@latest add button/);
-  assert.match(text, /docs: https:\/\/stevekwon211\.github\.io\/slintcn\/docs\/button/);
+  assert.match(text, /docs: https:\/\/zero-sq\.github\.io\/slintcn\/docs\/button/);
   assert.match(text, /## Usage/);
   assert.match(text, /import \{ Button/);
 });
