@@ -1,8 +1,8 @@
 {
   "$schema": "https://slintcn.dev/schema/registry.schema.json",
   "name": "default",
-  "homepage": "https://stevekwon211.github.io/slintcn",
-  "version": "0.34.0",
+  "homepage": "https://zero-sq.github.io/slintcn",
+  "version": "0.35.0",
   "description": "Dark glass theme — shadcn-adjacent primitives for Slint",
   "slintVersion": ">=1.16",
   "theme": {
@@ -13,13 +13,21 @@
     "files": ["theme/palette.slint", "theme/tokens.slint"]
   },
   "components": {
+    "focus-ring": {
+      "type": "registry:lib",
+      "title": "Focus ring",
+      "description": "Shared keyboard-only focus ring (focus-visible emulation) used by interactive controls.",
+      "category": "internal",
+      "files": ["components/focus-ring.slint"],
+      "requires": ["theme"]
+    },
     "button": {
       "type": "registry:ui",
       "title": "Button",
       "description": "Clickable action — 8 variants × 8 sizes, focus ring, press feedback.",
       "category": "actions",
       "files": ["components/button.slint"],
-      "requires": ["theme"]
+      "requires": ["theme", "focus-ring"]
     },
     "card": {
       "type": "registry:ui",
@@ -35,7 +43,7 @@
       "description": "Single-line text field with focus ring and placeholder.",
       "category": "form",
       "files": ["components/input.slint"],
-      "requires": ["theme"]
+      "requires": ["theme", "focus-ring"]
     },
     "badge": {
       "type": "registry:ui",
@@ -139,7 +147,7 @@
       "description": "Segmented control or line variant; arrow-key navigation.",
       "category": "navigation",
       "files": ["components/tabs.slint"],
-      "requires": ["theme"]
+      "requires": ["theme", "focus-ring"]
     },
     "checkbox": {
       "type": "registry:ui",
@@ -147,7 +155,7 @@
       "description": "Path-drawn check with optional label; Space toggles.",
       "category": "form",
       "files": ["components/checkbox.slint"],
-      "requires": ["theme"]
+      "requires": ["theme", "focus-ring"]
     },
     "switch": {
       "type": "registry:ui",
@@ -155,7 +163,7 @@
       "description": "Sliding on/off toggle (36×20 track) with optional label.",
       "category": "form",
       "files": ["components/switch.slint"],
-      "requires": ["theme"]
+      "requires": ["theme", "focus-ring"]
     },
     "icon": {
       "type": "registry:ui",
@@ -179,7 +187,7 @@
       "description": "Single-select group, vertical or horizontal, arrow-key nav.",
       "category": "form",
       "files": ["components/radio-group.slint"],
-      "requires": ["theme"]
+      "requires": ["theme", "focus-ring"]
     },
     "select": {
       "type": "registry:ui",
@@ -227,7 +235,7 @@
       "description": "Multi-line word-wrapping text field with focus ring.",
       "category": "form",
       "files": ["components/textarea.slint"],
-      "requires": ["theme"]
+      "requires": ["theme", "focus-ring"]
     },
     "toggle": {
       "type": "registry:ui",
@@ -259,7 +267,7 @@
       "description": "Draggable value slider (track + thumb), arrow-key support.",
       "category": "form",
       "files": ["components/slider.slint"],
-      "requires": ["theme"]
+      "requires": ["theme", "focus-ring"]
     },
     "breadcrumb": {
       "type": "registry:ui",

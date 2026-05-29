@@ -34,12 +34,15 @@ export component Alert inherits Rectangle {
         padding: Tokens.spacing-lg;       // p-4 (16)
         spacing: Tokens.spacing-md;       // gap-3
 
-        if root.icon != "": Icon {
-            commands: root.icon;
-            tint: root.accent;
-            size: 16px;
-            y: 2px;
+        if root.icon != "": VerticalLayout {
+            alignment: start;
             horizontal-stretch: 0;
+            padding-top: 1px;   // optical nudge onto the title's first line
+            Icon {
+                commands: root.icon;
+                tint: root.accent;
+                size: 16px;
+            }
         }
 
         VerticalLayout {

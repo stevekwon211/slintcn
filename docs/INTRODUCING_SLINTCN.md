@@ -84,6 +84,6 @@ without turning the components into a runtime dependency.
 
 ## Links
 
-- Docs: https://stevekwon211.github.io/slintcn/docs/
-- GitHub: https://github.com/stevekwon211/slintcn
+- Docs: https://zero-sq.github.io/slintcn/docs/
+- GitHub: https://github.com/zero-sq/slintcn
 - npm: https://www.npmjs.com/package/slintcn

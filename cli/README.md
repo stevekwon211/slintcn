@@ -1,7 +1,7 @@
 # slintcn
 
 Copy-paste [Slint](https://slint.dev) UI components — the **cargo-native**
-installer for the [slintcn](https://stevekwon211.github.io/slintcn/) registry.
+installer for the [slintcn](https://zero-sq.github.io/slintcn/) registry.
 No Node, no npm: if you build Slint apps you already have `cargo`.
 
 ```sh
@@ -34,6 +34,6 @@ tool.
 ## Docs
 
 Full component catalog, live previews, and the adoption guide:
-<https://stevekwon211.github.io/slintcn/>
+<https://zero-sq.github.io/slintcn/>
 
 MIT licensed.

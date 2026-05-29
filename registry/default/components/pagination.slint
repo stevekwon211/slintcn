@@ -30,23 +30,29 @@ export component Pagination inherits Rectangle {
         Rectangle {
             width: 36px;
             height: 36px;
-            border-radius: Tokens.radius-md;
-            border-width: 1px;
-            border-color: Tokens.color-border-hairline;
-            background: prev-touch.has-hover && root.current > 0
-                ? Tokens.color-accent : transparent;
-            Icon {
-                x: (parent.width - self.width) / 2;
-                y: (parent.height - self.height) / 2;
-                commands: LucidePaths.chevron-left;
-                tint: root.current > 0 ? Tokens.color-foreground : Tokens.color-muted-foreground;
-                size: 16px;
+            prev-surface := Rectangle {
+                x: 0;
+                y: prev-touch.pressed ? 1px : 0px;
+                width: parent.width;
+                height: parent.height;
+                border-radius: Tokens.radius-md;
+                border-width: 1px;
+                border-color: Tokens.color-border-hairline;
+                background: prev-touch.has-hover && root.current > 0
+                    ? Tokens.color-accent : transparent;
+                Icon {
+                    x: (parent.width - self.width) / 2;
+                    y: (parent.height - self.height) / 2;
+                    commands: LucidePaths.chevron-left;
+                    tint: root.current > 0 ? Tokens.color-foreground : Tokens.color-muted-foreground;
+                    size: 16px;
+                }
+                animate y, background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
             }
             prev-touch := TouchArea {
                 mouse-cursor: pointer;
                 clicked => { root.go(root.current - 1); }
             }
-            animate background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
         }
 
         // Page numbers
@@ -54,46 +60,58 @@ export component Pagination inherits Rectangle {
             property <bool> active: page == root.current;
             width: 36px;
             height: 36px;
-            border-radius: Tokens.radius-md;
-            background: active
-                ? Tokens.color-primary
-                : (num-touch.has-hover ? Tokens.color-accent : transparent);
-            Text {
-                x: (parent.width - self.preferred-width) / 2;
-                y: (parent.height - self.preferred-height) / 2;
-                text: (page + 1);
-                color: active ? Tokens.color-primary-foreground : Tokens.color-foreground;
-                font-size: Tokens.typography-body-size;
-                font-weight: Tokens.typography-weight-medium;
+            page-surface := Rectangle {
+                x: 0;
+                y: num-touch.pressed ? 1px : 0px;
+                width: parent.width;
+                height: parent.height;
+                border-radius: Tokens.radius-md;
+                background: active
+                    ? Tokens.color-primary
+                    : (num-touch.has-hover ? Tokens.color-accent : transparent);
+                Text {
+                    x: (parent.width - self.preferred-width) / 2;
+                    y: (parent.height - self.preferred-height) / 2;
+                    text: (page + 1);
+                    color: active ? Tokens.color-primary-foreground : Tokens.color-foreground;
+                    font-size: Tokens.typography-body-size;
+                    font-weight: Tokens.typography-weight-medium;
+                }
+                animate y, background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
             }
             num-touch := TouchArea {
                 mouse-cursor: pointer;
                 clicked => { root.go(page); }
             }
-            animate background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
         }
 
         // Next
         Rectangle {
             width: 36px;
             height: 36px;
-            border-radius: Tokens.radius-md;
-            border-width: 1px;
-            border-color: Tokens.color-border-hairline;
-            background: next-touch.has-hover && root.current < root.total - 1
-                ? Tokens.color-accent : transparent;
-            Icon {
-                x: (parent.width - self.width) / 2;
-                y: (parent.height - self.height) / 2;
-                commands: LucidePaths.chevron-right;
-                tint: root.current < root.total - 1 ? Tokens.color-foreground : Tokens.color-muted-foreground;
-                size: 16px;
+            next-surface := Rectangle {
+                x: 0;
+                y: next-touch.pressed ? 1px : 0px;
+                width: parent.width;
+                height: parent.height;
+                border-radius: Tokens.radius-md;
+                border-width: 1px;
+                border-color: Tokens.color-border-hairline;
+                background: next-touch.has-hover && root.current < root.total - 1
+                    ? Tokens.color-accent : transparent;
+                Icon {
+                    x: (parent.width - self.width) / 2;
+                    y: (parent.height - self.height) / 2;
+                    commands: LucidePaths.chevron-right;
+                    tint: root.current < root.total - 1 ? Tokens.color-foreground : Tokens.color-muted-foreground;
+                    size: 16px;
+                }
+                animate y, background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
             }
             next-touch := TouchArea {
                 mouse-cursor: pointer;
                 clicked => { root.go(root.current + 1); }
             }
-            animate background { duration: Tokens.motion-fast; easing: Tokens.motion-easing-standard; }
         }
     }
 }

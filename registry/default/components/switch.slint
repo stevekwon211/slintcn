@@ -1,4 +1,5 @@
 import { Tokens } from "../theme/tokens.slint";
+import { FocusRing } from "focus-ring.slint";
 
 // Two-state toggle. 36 x 20 px track with a 16 x 16 knob that slides
 // between off (left) and on (right). Space toggles; 2 px focus ring.
@@ -11,6 +12,9 @@ export component Switch {
     in property <bool> disabled: false;
     // Fired with the new `checked` value.
     callback toggled(bool);
+    // True while focus arrived from a pointer press — suppresses the ring so it
+    // is keyboard-only (focus-visible emulation).
+    property <bool> pointer-focus: false;
 
     HorizontalLayout {
         spacing: 8px;
@@ -44,15 +48,13 @@ export component Switch {
                 }
             }
 
-            if focus-scope.has-focus: Rectangle {
-                x: -3px;
-                y: -3px;
-                width:  parent.width  + 6px;
-                height: parent.height + 6px;
-                border-width: Tokens.focus-ring-width;
-                border-color: Tokens.color-ring-muted;
-                border-radius: 13px;
-                background: transparent;
+            if focus-scope.has-focus && !root.pointer-focus : FocusRing {
+                offset:     2px;
+                ring-width: 2px;
+                radius:     12px;
+                ring-color: Tokens.color-ring-muted;
+                host-width: parent.width;
+                host-height: parent.height;
             }
 
             animate background, border-color {
@@ -75,6 +77,13 @@ export component Switch {
 
     TouchArea {
         mouse-cursor: root.disabled ? default : pointer;
+        pointer-event(ev) => {
+            if (!root.disabled
+                    && ev.button == PointerEventButton.left
+                    && ev.kind == PointerEventKind.down) {
+                root.pointer-focus = true;
+            }
+        }
         clicked => {
             if (!root.disabled) {
                 root.checked = !root.checked;
@@ -86,8 +95,13 @@ export component Switch {
 
     forward-focus: focus-scope;
     focus-scope := FocusScope {
+        // Zero-size so the scope cannot intercept the first pointer press
+        // (default FocusScope fills its parent and swallows that click).
+        width: 0px;
+        height: 0px;
         enabled: !root.disabled;
         key-pressed(event) => {
+            root.pointer-focus = false;
             if (event.text == " " || event.text == "\n") {
                 if (!root.disabled) {
                     root.checked = !root.checked;

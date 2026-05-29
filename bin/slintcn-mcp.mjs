@@ -135,7 +135,7 @@ function view(name) {
     `- category: ${item.category}`,
     `- requires: ${reqs.length ? reqs.join(", ") : "theme only"}`,
     `- install: \`npx slintcn@latest add ${name}\``,
-    `- docs: https://stevekwon211.github.io/slintcn/docs/${name}`,
+    `- docs: https://zero-sq.github.io/slintcn/docs/${name}`,
     ``,
     "## Usage",
     "```slint",

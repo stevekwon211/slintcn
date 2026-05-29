@@ -1,12 +1,12 @@
 [package]
 name = "slintcn"
-version = "0.34.0"
+version = "0.35.0"
 edition = "2021"
 rust-version = "1.74"
 description = "Copy-paste Slint UI components — the cargo-native installer for the slintcn registry (no Node required)."
 license = "MIT"
-repository = "https://github.com/stevekwon211/slintcn"
-homepage = "https://stevekwon211.github.io/slintcn/"
+repository = "https://github.com/zero-sq/slintcn"
+homepage = "https://zero-sq.github.io/slintcn/"
 readme = "README.md"
 keywords = ["slint", "ui", "components", "cli", "shadcn"]
 categories = ["command-line-utilities", "gui"]

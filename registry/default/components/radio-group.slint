@@ -16,6 +16,7 @@
 // arrow movement already commits.
 
 import { Tokens } from "../theme/tokens.slint";
+import { FocusRing } from "focus-ring.slint";
 
 export struct RadioItem {
     value: string,
@@ -37,6 +38,8 @@ component RadioRow inherits Rectangle {
     in property <bool> disabled: false;
     // Fired when this RadioItem is activated.
     callback clicked();
+    // Fired on left-button pointer-down (used by RadioGroup to set pointer-focus).
+    callback pointer-down();
 
     background: transparent;
     height: 22px;
@@ -67,15 +70,13 @@ component RadioRow inherits Rectangle {
                 border-radius: 3px;
             }
 
-            if root.show-focus: Rectangle {
-                x: -3px;
-                y: -3px;
-                width:  parent.width  + 6px;
-                height: parent.height + 6px;
-                border-width: Tokens.focus-ring-width;
-                border-color: Tokens.color-ring-muted;
-                border-radius: 11px;
-                background: transparent;
+            if root.show-focus : FocusRing {
+                host-width:  parent.width;
+                host-height: parent.height;
+                offset:     2px;
+                ring-width: 2px;
+                radius:     10px;
+                ring-color: Tokens.color-ring-muted;
             }
 
             animate background, border-color {
@@ -99,6 +100,13 @@ component RadioRow inherits Rectangle {
     TouchArea {
         mouse-cursor: root.disabled ? default : pointer;
         clicked => { if (!root.disabled) { root.clicked(); } }
+        pointer-event(ev) => {
+            if (!root.disabled
+                    && ev.button == PointerEventButton.left
+                    && ev.kind == PointerEventKind.down) {
+                root.pointer-down();
+            }
+        }
     }
 }
 
@@ -114,6 +122,10 @@ export component RadioGroup inherits Rectangle {
     // Fired with the new `selected` index.
     callback changed(int);
 
+    // True while focus arrived from a pointer press — suppresses the ring so it
+    // is keyboard-only (focus-visible emulation).
+    property <bool> pointer-focus: false;
+
     // `inherits Rectangle` + explicit min sizes so parent layouts honor the
     // RadioGroup's footprint. Without this, sibling columns squished the
     // group to 0-width and Radio items spilled into adjacent columns
@@ -124,8 +136,13 @@ export component RadioGroup inherits Rectangle {
 
     forward-focus: nav;
     nav := FocusScope {
+        // Zero-size so the scope cannot intercept the first pointer press
+        // (default FocusScope fills its parent and swallows that click).
+        width: 0px;
+        height: 0px;
         enabled: !root.disabled;
         key-pressed(event) => {
+            root.pointer-focus = false;
             if (root.items.length <= 0) { return reject; }
 
             if (root.orientation == RadioOrientation.vertical) {
@@ -161,7 +178,7 @@ export component RadioGroup inherits Rectangle {
         for item[idx] in items: RadioRow {
             label: item.label;
             active: idx == root.selected;
-            show-focus: nav.has-focus && idx == root.selected;
+            show-focus: nav.has-focus && idx == root.selected && !root.pointer-focus;
             disabled: root.disabled;
             clicked => {
                 if (root.selected != idx) {
@@ -170,6 +187,7 @@ export component RadioGroup inherits Rectangle {
                 }
                 nav.focus();
             }
+            pointer-down => { root.pointer-focus = true; }
         }
     }
 
@@ -179,7 +197,7 @@ export component RadioGroup inherits Rectangle {
         for item[idx] in items: RadioRow {
             label: item.label;
             active: idx == root.selected;
-            show-focus: nav.has-focus && idx == root.selected;
+            show-focus: nav.has-focus && idx == root.selected && !root.pointer-focus;
             disabled: root.disabled;
             clicked => {
                 if (root.selected != idx) {
@@ -188,6 +206,7 @@ export component RadioGroup inherits Rectangle {
                 }
                 nav.focus();
             }
+            pointer-down => { root.pointer-focus = true; }
         }
     }
 }

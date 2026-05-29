@@ -83,7 +83,7 @@ function topnav() {
     <span class="grow"></span>
     <a class="tn-link" href="../create.html">Create</a>
     <a class="tn-link" href="../demo.html">Playground</a>
-    <a class="tn-link star-link" href="https://github.com/stevekwon211/slintcn" target="_blank" rel="noreferrer">GitHub <span data-stars></span></a>
+    <a class="tn-link star-link" href="https://github.com/zero-sq/slintcn" target="_blank" rel="noreferrer">GitHub <span data-stars></span></a>
     <a class="tn-link" href="https://crates.io/crates/slintcn">crates.io</a>
     <a class="tn-link" href="https://www.npmjs.com/package/slintcn">npm</a>
   </div></header>
@@ -229,7 +229,7 @@ ${sidebar(items, "")}
   <div class="hdr">
     <h1>Directory</h1>
     <p class="desc">Registries you can install slintcn components from. Add yours with a PR to
-      <a href="https://github.com/stevekwon211/slintcn/blob/main/registry/directory.json"><code>registry/directory.json</code></a>.</p>
+      <a href="https://github.com/zero-sq/slintcn/blob/main/registry/directory.json"><code>registry/directory.json</code></a>.</p>
   </div>
 
   <h2>Registries</h2>
@@ -242,7 +242,7 @@ ${sidebar(items, "")}
   <div class="code-block"><pre><code>{
   "style": "default",
   "registries": {
-    "default": "https://stevekwon211.github.io/slintcn/r",
+    "default": "https://zero-sq.github.io/slintcn/r",
     "acme":    "https://acme.dev/slintcn"
   }
 }</code></pre></div>
@@ -252,7 +252,7 @@ slintcn add https://example.com/registry/r/special.json   # direct URL also work
 
   <h2>List yours</h2>
   <p class="muted">Open a PR that adds an entry to
-    <a href="https://github.com/stevekwon211/slintcn/blob/main/registry/directory.json"><code>registry/directory.json</code></a>:</p>
+    <a href="https://github.com/zero-sq/slintcn/blob/main/registry/directory.json"><code>registry/directory.json</code></a>:</p>
   <div class="code-block"><pre><code>{
   "namespace": "yours",
   "title":     "Your registry",
@@ -497,7 +497,7 @@ h2{font-size:21px;letter-spacing:-.01em;margin:40px 0 14px;scroll-margin-top:72p
 }`;
 
 const DOCS_JS = `// package-manager pills → swap the shown command
-fetch("https://api.github.com/repos/stevekwon211/slintcn")
+fetch("https://api.github.com/repos/zero-sq/slintcn")
   .then((res)=>res.ok?res.json():null)
   .then((repo)=>{
     if(!repo||typeof repo.stargazers_count!=="number")return;

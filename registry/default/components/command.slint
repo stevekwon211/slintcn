@@ -108,25 +108,37 @@ export component Command inherits Rectangle {
             // is blocked until Slint adds `contains` / `starts-with`.
             for item[i] in root.items: Rectangle {
                 height: 38px;
-                border-radius: Tokens.radius-sm;
-                background: (it-touch.has-hover || i == root.highlighted-index)
-                    ? Tokens.color-surface-1 : transparent;
 
-                HorizontalLayout {
-                    padding-left: 12px;
-                    padding-right: 12px;
-                    Text {
-                        text: item.label;
-                        color: Tokens.color-foreground;
-                        font-size: Tokens.typography-body-size;
-                        vertical-alignment: center;
-                        horizontal-stretch: 1;
+                surface := Rectangle {
+                    x: 0;
+                    y: it-touch.pressed ? 1px : 0px;
+                    width: parent.width;
+                    height: parent.height;
+                    border-radius: Tokens.radius-sm;
+                    background: (it-touch.has-hover || i == root.highlighted-index)
+                        ? Tokens.color-surface-1 : transparent;
+
+                    HorizontalLayout {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        Text {
+                            text: item.label;
+                            color: Tokens.color-foreground;
+                            font-size: Tokens.typography-body-size;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
+                        }
+                        if item.hint != "": Text {
+                            text: item.hint;
+                            color: Tokens.color-muted-foreground;
+                            font-size: Tokens.typography-body-sm-size;
+                            vertical-alignment: center;
+                        }
                     }
-                    if item.hint != "": Text {
-                        text: item.hint;
-                        color: Tokens.color-muted-foreground;
-                        font-size: Tokens.typography-body-sm-size;
-                        vertical-alignment: center;
+
+                    animate y, background {
+                        duration: Tokens.motion-fast;
+                        easing: Tokens.motion-easing-standard;
                     }
                 }
 

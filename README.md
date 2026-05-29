@@ -1,13 +1,13 @@
 # slintcn
 
-[![Pages](https://github.com/stevekwon211/slintcn/actions/workflows/pages.yml/badge.svg)](https://github.com/stevekwon211/slintcn/actions/workflows/pages.yml)
+[![Pages](https://github.com/zero-sq/slintcn/actions/workflows/pages.yml/badge.svg)](https://github.com/zero-sq/slintcn/actions/workflows/pages.yml)
 [![crates.io](https://img.shields.io/crates/v/slintcn?color=white&label=crates.io)](https://crates.io/crates/slintcn)
 [![npm](https://img.shields.io/npm/v/slintcn?color=white)](https://www.npmjs.com/package/slintcn)
 [![License: MIT](https://img.shields.io/badge/License-MIT-white.svg)](LICENSE)
 
 **shadcn/ui-style copy-paste components for Slint native apps.**
 
-[Live docs](https://stevekwon211.github.io/slintcn/docs/) · [Live demo](https://stevekwon211.github.io/slintcn) · [crates.io](https://crates.io/crates/slintcn) · [npm](https://www.npmjs.com/package/slintcn)
+[Live docs](https://zero-sq.github.io/slintcn/docs/) · [Live demo](https://zero-sq.github.io/slintcn) · [crates.io](https://crates.io/crates/slintcn) · [npm](https://www.npmjs.com/package/slintcn)
 
 56 UI components, 8 installable blocks, a theme system, and a static registry you can host yourself.
 
@@ -180,13 +180,13 @@ a `registry.json` index plus `r/<name>.json` files with each component's
 source inlined. Host that anywhere and install from it:
 
 ```bash
-slintcn add https://stevekwon211.github.io/slintcn/r/button.json   # direct URL
+slintcn add https://zero-sq.github.io/slintcn/r/button.json   # direct URL
 slintcn add @acme/button                                           # via registries config
 ```
 
 `registryDependencies` (e.g. a component needing `theme`) resolve recursively
 against the same registry. The official registry is served at
-`https://stevekwon211.github.io/slintcn/r/`.
+`https://zero-sq.github.io/slintcn/r/`.
 
 > **Maintainers:** publish the npm package with `npm login && npm publish`
 > (ships `bin`, `registry`, `templates`, `schema`; `prepublishOnly` runs tests)
@@ -200,7 +200,7 @@ per-item `r/<name>.json` (the shape `slintcn build` emits) is a valid registry,
 and `slintcn add @namespace/name` installs from it once you wire the namespace
 into `slintcn.json`'s `registries` map.
 
-Browse + list yours at **[stevekwon211.github.io/slintcn/docs/directory](https://stevekwon211.github.io/slintcn/docs/directory.html)** —
+Browse + list yours at **[zero-sq.github.io/slintcn/docs/directory](https://zero-sq.github.io/slintcn/docs/directory.html)** —
 open a PR to [`registry/directory.json`](registry/directory.json) to be listed.
 
 ## MCP server (AI agents)
@@ -297,7 +297,7 @@ slintcn export button                 # → dist/export/button.json
 56 components across 11 categories — **actions, form, layout, display, feedback,
 overlay, navigation, data, media, typography, hud** — plus 8 installable blocks.
 Every component has a live preview, an auto-generated Properties section, and an
-accessibility contract at **[stevekwon211.github.io/slintcn/docs](https://stevekwon211.github.io/slintcn/docs/)**
+accessibility contract at **[zero-sq.github.io/slintcn/docs](https://zero-sq.github.io/slintcn/docs/)**
 — that's the canonical catalog and never drifts from the source.
 
 A quick map of the categories:

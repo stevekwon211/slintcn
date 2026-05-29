@@ -23,32 +23,39 @@ export component SlotTile inherits Rectangle {
 
     width:  root.size;
     height: root.size;
-    border-radius: Tokens.radius-md;
     opacity: state == SlotTileState.disabled ? 0.4 : 1.0;
 
-    background:
-        tone == SlotTileTone.empty  ? transparent :
-        tone == SlotTileTone.accent ? Tokens.color-primary.with-alpha(0.12) :
-        (root.hot && touch.has-hover ? Tokens.color-surface-2 : Tokens.color-surface-1);
+    surface := Rectangle {
+        x: 0;
+        y: root.hot && touch.pressed ? 1px : 0px;
+        width:  parent.width;
+        height: parent.height;
+        border-radius: Tokens.radius-md;
 
-    border-width:
-        state == SlotTileState.active ? 2px : 1px;
-    border-color:
-        state == SlotTileState.active ? Tokens.color-primary :
-        tone == SlotTileTone.empty    ? Tokens.color-border-hairline :
-        tone == SlotTileTone.accent   ? Tokens.color-primary.with-alpha(0.5) :
-        Tokens.color-border-hairline-strong;
+        background:
+            tone == SlotTileTone.empty  ? transparent :
+            tone == SlotTileTone.accent ? Tokens.color-primary.with-alpha(0.12) :
+            (root.hot && touch.has-hover ? Tokens.color-surface-2 : Tokens.color-surface-1);
 
-    @children
+        border-width:
+            state == SlotTileState.active ? 2px : 1px;
+        border-color:
+            state == SlotTileState.active ? Tokens.color-primary :
+            tone == SlotTileTone.empty    ? Tokens.color-border-hairline :
+            tone == SlotTileTone.accent   ? Tokens.color-primary.with-alpha(0.5) :
+            Tokens.color-border-hairline-strong;
+
+        @children
+
+        animate y, background, border-color {
+            duration: Tokens.motion-fast;
+            easing: Tokens.motion-easing-standard;
+        }
+    }
 
     touch := TouchArea {
         enabled: root.hot;
         mouse-cursor: root.hot ? pointer : default;
         clicked => { root.clicked(); }
-    }
-
-    animate background, border-color {
-        duration: Tokens.motion-fast;
-        easing: Tokens.motion-easing-standard;
     }
 }

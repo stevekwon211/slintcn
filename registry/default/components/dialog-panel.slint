@@ -88,22 +88,32 @@ export component DialogPanel inherits Rectangle {
         y: 12px;
         width: 28px;
         height: 28px;
-        border-radius: Tokens.radius-sm;
-        background: x-touch.has-hover ? Tokens.color-accent : transparent;
-        Icon {
-            x: (parent.width - self.width) / 2;
-            y: (parent.height - self.height) / 2;
-            commands: LucidePaths.x-mark;
-            tint: Tokens.color-muted-foreground;
-            size: 16px;
+
+        surface := Rectangle {
+            x: 0;
+            y: x-touch.pressed ? 1px : 0px;
+            width: parent.width;
+            height: parent.height;
+            border-radius: Tokens.radius-sm;
+            background: x-touch.has-hover ? Tokens.color-accent : transparent;
+
+            Icon {
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                commands: LucidePaths.x-mark;
+                tint: Tokens.color-muted-foreground;
+                size: 16px;
+            }
+
+            animate y, background {
+                duration: Tokens.motion-fast;
+                easing: Tokens.motion-easing-standard;
+            }
         }
+
         x-touch := TouchArea {
             mouse-cursor: pointer;
             clicked => { root.closed(); }
-        }
-        animate background {
-            duration: Tokens.motion-fast;
-            easing: Tokens.motion-easing-standard;
         }
     }
 

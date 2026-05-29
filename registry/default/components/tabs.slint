@@ -18,6 +18,7 @@
 // Keyboard: Tab focuses the strip; ← / → cycle the active tab (wrap-around).
 
 import { Tokens } from "../theme/tokens.slint";
+import { FocusRing } from "focus-ring.slint";
 
 export struct TabItem { label: string }
 
@@ -36,6 +37,7 @@ export component Tabs inherits Rectangle {
     callback changed(int);
 
     property <bool> segmented: variant == TabsVariant.default;
+    property <bool> pointer-focus: false;
 
     // TabsList container: bg-muted + rounded for segmented; bare for line.
     background: segmented ? Tokens.color-muted : transparent;
@@ -44,7 +46,12 @@ export component Tabs inherits Rectangle {
 
     forward-focus: nav;
     nav := FocusScope {
+        // Zero-size so the scope cannot intercept the first pointer press
+        // (default FocusScope fills its parent and swallows that click).
+        width: 0px;
+        height: 0px;
         key-pressed(event) => {
+            root.pointer-focus = false;
             if (event.text == Key.LeftArrow) {
                 if (root.items.length > 0) {
                     root.current = mod(root.current + root.items.length - 1, root.items.length);
@@ -70,42 +77,54 @@ export component Tabs inherits Rectangle {
         for item[idx] in items: Rectangle {
             property <bool> active: idx == root.current;
 
-            // Segmented: active lifts onto a bg-background surface (shadow-sm).
-            // Line: transparent, active marked by the underline below.
-            background: root.segmented
-                ? (active
-                    ? Tokens.color-background
-                    : (touch.has-hover ? Tokens.color-surface-1 : transparent))
-                : (touch.has-hover && !active ? Tokens.color-surface-1 : transparent);
-            border-radius: Tokens.radius-md;
-
-            drop-shadow-blur:     root.segmented && active ? Tokens.shadow-e2-blur  : 0px;
-            drop-shadow-offset-y: root.segmented && active ? 1px                    : 0px;
-            drop-shadow-color:    root.segmented && active ? Tokens.shadow-e2-color : transparent;
-
             min-width: label-text.preferred-width + 24px;   // px-3 each side
 
-            label-text := Text {
-                x: (parent.width  - self.preferred-width)  / 2;
-                y: (parent.height - self.preferred-height) / 2;
-                text: item.label;
-                color: active
-                    ? Tokens.color-foreground
-                    : Tokens.color-muted-foreground;
-                font-size: Tokens.typography-body-size;
-                font-weight: active
-                    ? Tokens.typography-weight-semibold
-                    : Tokens.typography-weight-medium;
-            }
+            surface := Rectangle {
+                x: 0;
+                y: touch.pressed ? 1px : 0px;
+                width:  parent.width;
+                height: parent.height;
 
-            // Line variant: 2px underline under the active trigger.
-            if !root.segmented && active: Rectangle {
-                x: 10px;
-                y: parent.height - 2px;
-                width: parent.width - 20px;
-                height: 2px;
-                background: Tokens.color-foreground;
-                border-radius: 1px;
+                // Segmented: active lifts onto a bg-background surface (shadow-sm).
+                // Line: transparent, active marked by the underline below.
+                background: root.segmented
+                    ? (active
+                        ? Tokens.color-background
+                        : (touch.has-hover ? Tokens.color-surface-1 : transparent))
+                    : (touch.has-hover && !active ? Tokens.color-surface-1 : transparent);
+                border-radius: Tokens.radius-md;
+
+                drop-shadow-blur:     root.segmented && active ? Tokens.shadow-e2-blur  : 0px;
+                drop-shadow-offset-y: root.segmented && active ? 1px                    : 0px;
+                drop-shadow-color:    root.segmented && active ? Tokens.shadow-e2-color : transparent;
+
+                label-text := Text {
+                    x: (parent.width  - self.preferred-width)  / 2;
+                    y: (parent.height - self.preferred-height) / 2;
+                    text: item.label;
+                    color: active
+                        ? Tokens.color-foreground
+                        : Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-body-size;
+                    font-weight: active
+                        ? Tokens.typography-weight-semibold
+                        : Tokens.typography-weight-medium;
+                }
+
+                // Line variant: 2px underline under the active trigger.
+                if !root.segmented && active: Rectangle {
+                    x: 10px;
+                    y: parent.height - 2px;
+                    width: parent.width - 20px;
+                    height: 2px;
+                    background: Tokens.color-foreground;
+                    border-radius: 1px;
+                }
+
+                animate y, background, drop-shadow-blur {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
+                }
             }
 
             touch := TouchArea {
@@ -115,24 +134,20 @@ export component Tabs inherits Rectangle {
                     root.changed(idx);
                     nav.focus();
                 }
-            }
-
-            animate background, drop-shadow-blur {
-                duration: Tokens.motion-fast;
-                easing: Tokens.motion-easing-standard;
+                pointer-event(ev) => {
+                    if (ev.button == PointerEventButton.left
+                            && ev.kind == PointerEventKind.down) {
+                        root.pointer-focus = true;
+                    }
+                }
             }
         }
     }
 
-    // Focus ring around the whole strip while it has keyboard focus.
-    if nav.has-focus: Rectangle {
-        x: -Tokens.focus-ring-offset;
-        y: -Tokens.focus-ring-offset;
-        width:  parent.width  + 2 * Tokens.focus-ring-offset;
-        height: parent.height + 2 * Tokens.focus-ring-offset;
-        border-width: Tokens.focus-ring-width;
-        border-color: Tokens.color-ring-muted;
-        border-radius: Tokens.radius-lg + Tokens.focus-ring-offset;
-        background: transparent;
+    // Focus ring around the whole strip — keyboard-only.
+    if nav.has-focus && !root.pointer-focus : FocusRing {
+        host-width: parent.width;
+        host-height: parent.height;
+        radius: Tokens.radius-lg + Tokens.focus-ring-offset;
     }
 }

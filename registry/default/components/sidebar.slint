@@ -43,30 +43,40 @@ export component Sidebar inherits Rectangle {
         // Toggle row — chevron pivots on collapse state.
         Rectangle {
             height: 36px;
-            border-radius: Tokens.radius-sm;
-            background: toggle-touch.has-hover
-                ? Tokens.color-surface-1 : transparent;
-            HorizontalLayout {
-                padding-left: 10px;
-                padding-right: 10px;
-                spacing: 8px;
-                VerticalLayout {
-                    alignment: center;
-                    Icon {
-                        commands: root.collapsed
-                            ? LucidePaths.chevron-right
-                            : LucidePaths.chevron-left;
-                        size: 16px;
-                        tint: Tokens.color-muted-foreground;
+            toggle-surface := Rectangle {
+                x: 0;
+                y: toggle-touch.pressed ? 1px : 0px;
+                width: parent.width;
+                height: parent.height;
+                border-radius: Tokens.radius-sm;
+                background: toggle-touch.has-hover
+                    ? Tokens.color-surface-1 : transparent;
+                HorizontalLayout {
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    spacing: 8px;
+                    VerticalLayout {
+                        alignment: center;
+                        Icon {
+                            commands: root.collapsed
+                                ? LucidePaths.chevron-right
+                                : LucidePaths.chevron-left;
+                            size: 16px;
+                            tint: Tokens.color-muted-foreground;
+                        }
+                    }
+                    Text {
+                        visible: !root.collapsed;
+                        text: "Collapse";
+                        color: Tokens.color-muted-foreground;
+                        font-size: Tokens.typography-body-sm-size;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
                     }
                 }
-                Text {
-                    visible: !root.collapsed;
-                    text: "Collapse";
-                    color: Tokens.color-muted-foreground;
-                    font-size: Tokens.typography-body-sm-size;
-                    vertical-alignment: center;
-                    horizontal-stretch: 1;
+                animate y, background {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
                 }
             }
             toggle-touch := TouchArea {
@@ -81,36 +91,46 @@ export component Sidebar inherits Rectangle {
         // Items — icon on the left, label hidden when collapsed.
         for item[i] in root.items: Rectangle {
             height: 36px;
-            border-radius: Tokens.radius-sm;
-            background: item.id == root.active
-                ? Tokens.color-surface-2
-                : (item-touch.has-hover ? Tokens.color-surface-1 : transparent);
-            HorizontalLayout {
-                padding-left: 10px;
-                padding-right: 10px;
-                spacing: 10px;
-                VerticalLayout {
-                    alignment: center;
-                    if item.icon != "": Icon {
-                        commands: item.icon;
-                        size: 16px;
-                        tint: item.id == root.active
+            item-surface := Rectangle {
+                x: 0;
+                y: item-touch.pressed ? 1px : 0px;
+                width: parent.width;
+                height: parent.height;
+                border-radius: Tokens.radius-sm;
+                background: item.id == root.active
+                    ? Tokens.color-surface-2
+                    : (item-touch.has-hover ? Tokens.color-surface-1 : transparent);
+                HorizontalLayout {
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    spacing: 10px;
+                    VerticalLayout {
+                        alignment: center;
+                        if item.icon != "": Icon {
+                            commands: item.icon;
+                            size: 16px;
+                            tint: item.id == root.active
+                                ? Tokens.color-foreground
+                                : Tokens.color-muted-foreground;
+                        }
+                    }
+                    Text {
+                        visible: !root.collapsed;
+                        text: item.label;
+                        color: item.id == root.active
                             ? Tokens.color-foreground
                             : Tokens.color-muted-foreground;
+                        font-size: Tokens.typography-body-sm-size;
+                        font-weight: item.id == root.active
+                            ? Tokens.typography-weight-semibold
+                            : Tokens.typography-weight-medium;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
                     }
                 }
-                Text {
-                    visible: !root.collapsed;
-                    text: item.label;
-                    color: item.id == root.active
-                        ? Tokens.color-foreground
-                        : Tokens.color-muted-foreground;
-                    font-size: Tokens.typography-body-sm-size;
-                    font-weight: item.id == root.active
-                        ? Tokens.typography-weight-semibold
-                        : Tokens.typography-weight-medium;
-                    vertical-alignment: center;
-                    horizontal-stretch: 1;
+                animate y, background {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
                 }
             }
             item-touch := TouchArea {
@@ -119,10 +139,6 @@ export component Sidebar inherits Rectangle {
                     root.active = item.id;
                     root.navigate(item.id);
                 }
-            }
-            animate background {
-                duration: Tokens.motion-fast;
-                easing: Tokens.motion-easing-standard;
             }
         }
     }

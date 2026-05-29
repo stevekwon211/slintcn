@@ -21,9 +21,9 @@ export component ScrollArea inherits Rectangle {
     // Vertical scrollbar — only when the content overflows.
     if root.content-height > flick.height: Rectangle {
         x: parent.width - 8px;
-        y: 0;
+        y: 4px;
         width: 6px;
-        height: parent.height;
+        height: parent.height - 8px;
         background: transparent;
 
         thumb := Rectangle {

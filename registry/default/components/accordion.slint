@@ -28,27 +28,39 @@ export component Accordion inherits Rectangle {
             // Header row
             header := Rectangle {
                 height: 48px;
-                background: touch.has-hover ? Tokens.color-surface-1 : transparent;
 
-                HorizontalLayout {
-                    padding-left: 4px;
-                    padding-right: 4px;
-                    spacing: 8px;
+                surface := Rectangle {
+                    x: 0;
+                    y: touch.pressed ? 1px : 0px;
+                    width: parent.width;
+                    height: parent.height;
+                    background: touch.has-hover ? Tokens.color-surface-1 : transparent;
 
-                    Text {
-                        text: item.title;
-                        color: Tokens.color-foreground;
-                        font-size: Tokens.typography-body-size;
-                        font-weight: Tokens.typography-weight-medium;
-                        vertical-alignment: center;
-                        horizontal-stretch: 1;
+                    HorizontalLayout {
+                        padding-left: 4px;
+                        padding-right: 4px;
+                        spacing: 8px;
+
+                        Text {
+                            text: item.title;
+                            color: Tokens.color-foreground;
+                            font-size: Tokens.typography-body-size;
+                            font-weight: Tokens.typography-weight-medium;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
+                        }
+                        Icon {
+                            commands: (idx == root.open-index)
+                                ? LucidePaths.chevron-up
+                                : LucidePaths.chevron-down;
+                            tint: Tokens.color-muted-foreground;
+                            size: 16px;
+                        }
                     }
-                    Icon {
-                        commands: (idx == root.open-index)
-                            ? LucidePaths.chevron-up
-                            : LucidePaths.chevron-down;
-                        tint: Tokens.color-muted-foreground;
-                        size: 16px;
+
+                    animate y, background {
+                        duration: Tokens.motion-fast;
+                        easing: Tokens.motion-easing-standard;
                     }
                 }
 
@@ -58,10 +70,6 @@ export component Accordion inherits Rectangle {
                         root.open-index = (idx == root.open-index) ? -1 : idx;
                         root.changed(root.open-index);
                     }
-                }
-                animate background {
-                    duration: Tokens.motion-fast;
-                    easing: Tokens.motion-easing-standard;
                 }
             }
 
@@ -73,6 +81,7 @@ export component Accordion inherits Rectangle {
                 body := VerticalLayout {
                     padding-left: 4px;
                     padding-right: 4px;
+                    padding-top: 8px;
                     padding-bottom: 16px;
                     Text {
                         text: item.content;

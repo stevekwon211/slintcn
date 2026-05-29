@@ -46,6 +46,8 @@ export component Select inherits Rectangle {
     in-out property <int> highlighted-index: 0;
     // Fired with the new `selected-index` when the user picks an item.
     callback changed(int);
+    // True while focus arrived from a pointer press — keeps the ring keyboard-only.
+    property <bool> pointer-focus: false;
 
     // `inherits Rectangle` + explicit dimensions so parent layouts get a
     // concrete preferred size — without this, Select collapsed to 0×0 in
@@ -99,7 +101,7 @@ export component Select inherits Rectangle {
             }
         }
 
-        if trigger-focus.has-focus: Rectangle {
+        if trigger-focus.has-focus && !root.pointer-focus: Rectangle {
             x: -2px;
             y: -2px;
             width:  parent.width  + 4px;
@@ -117,6 +119,13 @@ export component Select inherits Rectangle {
 
         trigger-touch := TouchArea {
             mouse-cursor: root.disabled ? default : pointer;
+            pointer-event(ev) => {
+                if (!root.disabled
+                        && ev.button == PointerEventButton.left
+                        && ev.kind == PointerEventKind.down) {
+                    root.pointer-focus = true;
+                }
+            }
             clicked => {
                 if (!root.disabled) { root.open-dropdown(); }
             }
@@ -124,8 +133,13 @@ export component Select inherits Rectangle {
     }
 
     trigger-focus := FocusScope {
+        // Zero-size so the scope cannot intercept the first pointer press
+        // (default FocusScope fills its parent and swallows that click).
+        width: 0px;
+        height: 0px;
         enabled: !root.disabled;
         key-pressed(event) => {
+            root.pointer-focus = false;
             if (event.text == "\n" || event.text == " " || event.text == Key.DownArrow) {
                 root.open-dropdown();
                 return accept;
