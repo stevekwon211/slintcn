@@ -59,19 +59,31 @@ export component ContextMenu inherits Rectangle {
                 spacing: 0;
                 for item[idx] in root.items: Rectangle {
                     height: 30px;
-                    border-radius: Tokens.radius-sm;
-                    background: item-touch.has-hover
-                        ? Tokens.color-surface-1 : transparent;
 
-                    HorizontalLayout {
-                        padding-left: 8px;
-                        padding-right: 8px;
-                        Text {
-                            text: item.label;
-                            color: Tokens.color-foreground;
-                            font-size: Tokens.typography-body-size;
-                            vertical-alignment: center;
-                            horizontal-stretch: 1;
+                    surface := Rectangle {
+                        x: 0;
+                        y: item-touch.pressed ? 1px : 0px;
+                        width: parent.width;
+                        height: parent.height;
+                        border-radius: Tokens.radius-sm;
+                        background: item-touch.has-hover
+                            ? Tokens.color-surface-1 : transparent;
+
+                        HorizontalLayout {
+                            padding-left: 8px;
+                            padding-right: 8px;
+                            Text {
+                                text: item.label;
+                                color: Tokens.color-foreground;
+                                font-size: Tokens.typography-body-size;
+                                vertical-alignment: center;
+                                horizontal-stretch: 1;
+                            }
+                        }
+
+                        animate y, background {
+                            duration: Tokens.motion-fast;
+                            easing: Tokens.motion-easing-standard;
                         }
                     }
 

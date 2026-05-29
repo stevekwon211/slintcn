@@ -47,24 +47,40 @@ export component NavigationMenu inherits Rectangle {
         spacing: 4px;
         for it[i] in root.items: Rectangle {
             height: 36px;
-            border-radius: Tokens.radius-sm;
-            background: i == root.active
-                ? Tokens.color-surface-2
-                : (ta.has-hover ? Tokens.color-surface-1 : transparent);
+            // Intrinsic width must live on the item itself: the label now sits
+            // inside `surface` (width: parent.width), so without this the item
+            // collapses to 0 in the horizontal row. 14px padding each side.
+            min-width: lab.preferred-width + 28px;
 
-            HorizontalLayout {
-                padding-left: 14px;
-                padding-right: 14px;
-                Text {
-                    text: it.label;
-                    color: i == root.active
-                        ? Tokens.color-foreground
-                        : Tokens.color-muted-foreground;
-                    font-size: Tokens.typography-body-sm-size;
-                    font-weight: i == root.active
-                        ? Tokens.typography-weight-semibold
-                        : Tokens.typography-weight-medium;
-                    vertical-alignment: center;
+            surface := Rectangle {
+                x: 0;
+                y: ta.pressed ? 1px : 0px;
+                width: parent.width;
+                height: parent.height;
+                border-radius: Tokens.radius-sm;
+                background: i == root.active
+                    ? Tokens.color-surface-2
+                    : (ta.has-hover ? Tokens.color-surface-1 : transparent);
+
+                HorizontalLayout {
+                    padding-left: 14px;
+                    padding-right: 14px;
+                    lab := Text {
+                        text: it.label;
+                        color: i == root.active
+                            ? Tokens.color-foreground
+                            : Tokens.color-muted-foreground;
+                        font-size: Tokens.typography-body-sm-size;
+                        font-weight: i == root.active
+                            ? Tokens.typography-weight-semibold
+                            : Tokens.typography-weight-medium;
+                        vertical-alignment: center;
+                    }
+                }
+
+                animate y, background {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
                 }
             }
 
@@ -74,11 +90,6 @@ export component NavigationMenu inherits Rectangle {
                     root.active = i;
                     root.navigate(i);
                 }
-            }
-
-            animate background {
-                duration: Tokens.motion-fast;
-                easing: Tokens.motion-easing-standard;
             }
         }
     }

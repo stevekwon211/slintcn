@@ -1,4 +1,5 @@
 import { Tokens } from "../theme/tokens.slint";
+import { FocusRing } from "focus-ring.slint";
 
 // Horizontal slider. Drag the thumb or click the track. `value` is in-out.
 export component Slider inherits Rectangle {
@@ -12,6 +13,8 @@ export component Slider inherits Rectangle {
     in property <bool> disabled: false;
     // Fired with the new `value` while dragging.
     callback changed(float);
+
+    property <bool> pointer-focus: false;
 
     height: 20px;            // hit area
     horizontal-stretch: 1;
@@ -58,27 +61,38 @@ export component Slider inherits Rectangle {
         border-color: Tokens.color-primary;
         border-radius: 8px;
 
-        if focus-scope.has-focus: Rectangle {
-            x: -3px; y: -3px;
-            width: parent.width + 6px;
-            height: parent.height + 6px;
-            border-width: Tokens.focus-ring-width;
-            border-color: Tokens.color-ring-muted;
-            border-radius: 11px;
-            background: transparent;
+        if focus-scope.has-focus && !root.pointer-focus : FocusRing {
+            host-width: parent.width;
+            host-height: parent.height;
+            offset: 2px;
+            ring-width: 2px;
+            radius: 10px;
+            ring-color: Tokens.color-ring-muted;
         }
     }
 
     touch := TouchArea {
         mouse-cursor: root.disabled ? default : pointer;
+        pointer-event(ev) => {
+            if (!root.disabled
+                    && ev.button == PointerEventButton.left
+                    && ev.kind == PointerEventKind.down) {
+                root.pointer-focus = true;
+            }
+        }
         clicked => { root.set-from-x(self.mouse-x); focus-scope.focus(); }
         moved => { if (self.pressed) { root.set-from-x(self.mouse-x); } }
     }
 
     forward-focus: focus-scope;
     focus-scope := FocusScope {
+        // Zero-size so the scope cannot intercept the first pointer press
+        // (default FocusScope fills its parent and swallows that click).
+        width: 0px;
+        height: 0px;
         enabled: !root.disabled;
         key-pressed(event) => {
+            root.pointer-focus = false;
             if (event.text == Key.LeftArrow) {
                 root.value = max(root.minimum, root.value - 1);
                 root.changed(root.value);

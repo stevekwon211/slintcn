@@ -489,6 +489,16 @@ export component AppWindow inherits Window {
 
                 Rectangle { height: 14px; background: transparent; }
 
+                // Scrollable nav list — fills the space between the logo and the
+                // pinned theme toggle, so a short window doesn't overflow it.
+                nav-scroll := Flickable {
+                    vertical-stretch: 1;
+                    viewport-width: self.width;
+                    viewport-height: navlist.preferred-height;
+                    navlist := VerticalLayout {
+                        spacing: 4px;
+                        alignment: start;
+
                 Label { text: "Components"; variant: LabelVariant.muted; }
 
                 NavItem {
@@ -581,10 +591,7 @@ export component AppWindow inherits Window {
                     active: root.active-section == 6;
                     clicked => { root.active-section = 6; }
                 }
-
-                Rectangle {
-                    background: transparent;
-                    vertical-stretch: 1;
+                    }
                 }
 
                 Separator { orientation: SeparatorOrientation.horizontal; }
@@ -611,6 +618,17 @@ export component AppWindow inherits Window {
         Rectangle {
             background: transparent;
             horizontal-stretch: 1;
+            clip: true;
+
+            // Sections can exceed the window height — make the content scroll.
+            content-scroll := Flickable {
+                width: parent.width;
+                height: parent.height;
+                viewport-width: self.width;
+                viewport-height: page.preferred-height;
+
+                page := VerticalLayout {
+                    alignment: start;
 
             // (0) Buttons gallery
             if root.active-section == 0: VerticalLayout {
@@ -1784,6 +1802,8 @@ export component AppWindow inherits Window {
                             horizontal-alignment: center;
                         }
                     }
+                }
+            }
                 }
             }
         }

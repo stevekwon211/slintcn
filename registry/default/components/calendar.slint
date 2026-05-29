@@ -49,13 +49,23 @@ export component Calendar inherits Rectangle {
             Rectangle {
                 width: 28px;
                 height: 28px;
-                border-radius: Tokens.radius-sm;
-                background: prev-touch.has-hover
-                    ? Tokens.color-surface-1 : transparent;
-                Icon {
-                    commands: LucidePaths.chevron-left;
-                    size: 16px;
-                    tint: Tokens.color-foreground;
+                prev-surface := Rectangle {
+                    x: 0;
+                    y: prev-touch.pressed ? 1px : 0px;
+                    width: parent.width;
+                    height: parent.height;
+                    border-radius: Tokens.radius-sm;
+                    background: prev-touch.has-hover
+                        ? Tokens.color-surface-1 : transparent;
+                    Icon {
+                        commands: LucidePaths.chevron-left;
+                        size: 16px;
+                        tint: Tokens.color-foreground;
+                    }
+                    animate y, background {
+                        duration: Tokens.motion-fast;
+                        easing: Tokens.motion-easing-standard;
+                    }
                 }
                 prev-touch := TouchArea {
                     mouse-cursor: pointer;
@@ -76,13 +86,23 @@ export component Calendar inherits Rectangle {
             Rectangle {
                 width: 28px;
                 height: 28px;
-                border-radius: Tokens.radius-sm;
-                background: next-touch.has-hover
-                    ? Tokens.color-surface-1 : transparent;
-                Icon {
-                    commands: LucidePaths.chevron-right;
-                    size: 16px;
-                    tint: Tokens.color-foreground;
+                next-surface := Rectangle {
+                    x: 0;
+                    y: next-touch.pressed ? 1px : 0px;
+                    width: parent.width;
+                    height: parent.height;
+                    border-radius: Tokens.radius-sm;
+                    background: next-touch.has-hover
+                        ? Tokens.color-surface-1 : transparent;
+                    Icon {
+                        commands: LucidePaths.chevron-right;
+                        size: 16px;
+                        tint: Tokens.color-foreground;
+                    }
+                    animate y, background {
+                        duration: Tokens.motion-fast;
+                        easing: Tokens.motion-easing-standard;
+                    }
                 }
                 next-touch := TouchArea {
                     mouse-cursor: pointer;
@@ -118,23 +138,34 @@ export component Calendar inherits Rectangle {
                 property <bool> in-month: day-num >= 1 && day-num <= root.days-in-month;
                 property <bool> selected: in-month && day-num == root.selected-day;
                 horizontal-stretch: 1;
+                min-width: 36px;
                 height: 36px;
-                border-radius: Tokens.radius-sm;
-                background: selected
-                    ? Tokens.color-foreground
-                    : (cell-touch.has-hover && in-month
-                        ? Tokens.color-surface-1
-                        : transparent);
-                Text {
-                    text: in-month ? day-num : "";
-                    color: selected
-                        ? Tokens.color-background
-                        : (in-month
-                            ? Tokens.color-foreground
-                            : Tokens.color-muted-foreground);
-                    font-size: Tokens.typography-body-sm-size;
-                    horizontal-alignment: center;
-                    vertical-alignment: center;
+                day-surface := Rectangle {
+                    x: 0;
+                    y: cell-touch.pressed && in-month ? 1px : 0px;
+                    width: parent.width;
+                    height: parent.height;
+                    border-radius: Tokens.radius-sm;
+                    background: selected
+                        ? Tokens.color-foreground
+                        : (cell-touch.has-hover && in-month
+                            ? Tokens.color-surface-1
+                            : transparent);
+                    Text {
+                        text: in-month ? day-num : "";
+                        color: selected
+                            ? Tokens.color-background
+                            : (in-month
+                                ? Tokens.color-foreground
+                                : Tokens.color-muted-foreground);
+                        font-size: Tokens.typography-body-sm-size;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                    animate y, background {
+                        duration: Tokens.motion-fast;
+                        easing: Tokens.motion-easing-standard;
+                    }
                 }
                 cell-touch := TouchArea {
                     enabled: in-month;
@@ -143,10 +174,6 @@ export component Calendar inherits Rectangle {
                         root.selected-day = day-num;
                         root.day-selected(day-num);
                     }
-                }
-                animate background {
-                    duration: Tokens.motion-fast;
-                    easing: Tokens.motion-easing-standard;
                 }
             }
         }

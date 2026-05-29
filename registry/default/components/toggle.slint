@@ -17,24 +17,36 @@ export component Toggle inherits Rectangle {
 
     height: Tokens.density-button-default;   // h-9
     min-width: label.preferred-width + 24px;  // px-3
-    border-radius: Tokens.radius-md;
-
-    background: root.pressed
-        ? Tokens.color-accent
-        : (touch.has-hover && !root.disabled ? Tokens.color-surface-1 : transparent);
-    border-width: variant == ToggleVariant.outline ? 1px : 0px;
-    border-color: Tokens.color-border-hairline;
     opacity: root.disabled ? 0.5 : 1.0;
 
-    label := Text {
-        x: (parent.width  - self.preferred-width)  / 2;
-        y: (parent.height - self.preferred-height) / 2;
-        text: root.text;
-        color: root.pressed
-            ? Tokens.color-foreground
-            : Tokens.color-muted-foreground;
-        font-size: Tokens.typography-body-size;
-        font-weight: Tokens.typography-weight-medium;
+    surface := Rectangle {
+        x: 0;
+        y: touch.pressed && !root.disabled ? 1px : 0px;
+        width: parent.width;
+        height: parent.height;
+        border-radius: Tokens.radius-md;
+
+        background: root.pressed
+            ? Tokens.color-accent
+            : (touch.has-hover && !root.disabled ? Tokens.color-surface-1 : transparent);
+        border-width: variant == ToggleVariant.outline ? 1px : 0px;
+        border-color: Tokens.color-border-hairline;
+
+        label := Text {
+            x: (parent.width  - self.preferred-width)  / 2;
+            y: (parent.height - self.preferred-height) / 2;
+            text: root.text;
+            color: root.pressed
+                ? Tokens.color-foreground
+                : Tokens.color-muted-foreground;
+            font-size: Tokens.typography-body-size;
+            font-weight: Tokens.typography-weight-medium;
+        }
+
+        animate y, background {
+            duration: Tokens.motion-fast;
+            easing: Tokens.motion-easing-standard;
+        }
     }
 
     touch := TouchArea {
@@ -45,10 +57,5 @@ export component Toggle inherits Rectangle {
                 root.toggled(root.pressed);
             }
         }
-    }
-
-    animate background {
-        duration: Tokens.motion-fast;
-        easing: Tokens.motion-easing-standard;
     }
 }

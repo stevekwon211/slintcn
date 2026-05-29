@@ -22,20 +22,32 @@ export component ToggleGroup inherits Rectangle {
         for item[idx] in items: Rectangle {
             property <bool> active: idx == root.selected;
             min-width: t.preferred-width + 24px;
-            border-radius: Tokens.radius-md;
-            background: active
-                ? Tokens.color-accent
-                : (touch.has-hover ? Tokens.color-surface-1 : transparent);
 
-            t := Text {
-                x: (parent.width  - self.preferred-width)  / 2;
-                y: (parent.height - self.preferred-height) / 2;
-                text: item.label;
-                color: active
-                    ? Tokens.color-foreground
-                    : Tokens.color-muted-foreground;
-                font-size: Tokens.typography-body-size;
-                font-weight: Tokens.typography-weight-medium;
+            surface := Rectangle {
+                x: 0;
+                y: touch.pressed ? 1px : 0px;
+                width: parent.width;
+                height: parent.height;
+                border-radius: Tokens.radius-md;
+                background: active
+                    ? Tokens.color-accent
+                    : (touch.has-hover ? Tokens.color-surface-1 : transparent);
+
+                t := Text {
+                    x: (parent.width  - self.preferred-width)  / 2;
+                    y: (parent.height - self.preferred-height) / 2;
+                    text: item.label;
+                    color: active
+                        ? Tokens.color-foreground
+                        : Tokens.color-muted-foreground;
+                    font-size: Tokens.typography-body-size;
+                    font-weight: Tokens.typography-weight-medium;
+                }
+
+                animate y, background {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
+                }
             }
 
             touch := TouchArea {
@@ -44,11 +56,6 @@ export component ToggleGroup inherits Rectangle {
                     root.selected = idx;
                     root.changed(idx);
                 }
-            }
-
-            animate background {
-                duration: Tokens.motion-fast;
-                easing: Tokens.motion-easing-standard;
             }
         }
     }

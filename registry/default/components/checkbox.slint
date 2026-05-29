@@ -1,4 +1,5 @@
 import { Tokens } from "../theme/tokens.slint";
+import { FocusRing } from "focus-ring.slint";
 
 // Checkbox with optional trailing label. Space toggles; 2 px focus ring
 // matches the rest of slintcn's keyboard accessibility contract.
@@ -11,6 +12,9 @@ export component Checkbox {
     in property <bool> disabled: false;
     // Fired with the new `checked` value when the user toggles.
     callback toggled(bool);
+    // True while focus arrived from a pointer press — suppresses the ring so it
+    // is keyboard-only (focus-visible emulation).
+    property <bool> pointer-focus: false;
 
     HorizontalLayout {
         spacing: 8px;
@@ -39,21 +43,26 @@ export component Checkbox {
                 if root.checked: Path {
                     width: 16px;
                     height: 16px;
+                    // Pin the viewBox to 16 units so the commands keep their
+                    // built-in inset; without it Slint auto-fits the path's
+                    // bounding box and the check fills edge-to-edge (no margin).
+                    viewbox-x: 0;
+                    viewbox-y: 0;
+                    viewbox-width: 16;
+                    viewbox-height: 16;
                     stroke: Tokens.color-primary-foreground;
                     stroke-width: 2px;
                     fill: transparent;
                     commands: "M 4 8 L 7 12 L 13 4";
                 }
 
-                if focus-scope.has-focus: Rectangle {
-                    x: -3px;
-                    y: -3px;
-                    width:  parent.width  + 6px;
-                    height: parent.height + 6px;
-                    border-width: Tokens.focus-ring-width;
-                    border-color: Tokens.color-ring-muted;
-                    border-radius: 4px + 3px;
-                    background: transparent;
+                if focus-scope.has-focus && !root.pointer-focus : FocusRing {
+                    host-width:  parent.width;
+                    host-height: parent.height;
+                    offset:      2px;
+                    ring-width:  2px;
+                    radius:      6px;
+                    ring-color:  Tokens.color-ring-muted;
                 }
 
                 animate background, border-color {
@@ -77,6 +86,13 @@ export component Checkbox {
 
     TouchArea {
         mouse-cursor: root.disabled ? default : pointer;
+        pointer-event(ev) => {
+            if (!root.disabled
+                    && ev.button == PointerEventButton.left
+                    && ev.kind   == PointerEventKind.down) {
+                root.pointer-focus = true;
+            }
+        }
         clicked => {
             if (!root.disabled) {
                 root.checked = !root.checked;
@@ -88,8 +104,13 @@ export component Checkbox {
 
     forward-focus: focus-scope;
     focus-scope := FocusScope {
+        // Zero-size so the scope cannot intercept the first pointer press
+        // (default FocusScope fills its parent and swallows that click).
+        width: 0px;
+        height: 0px;
         enabled: !root.disabled;
         key-pressed(event) => {
+            root.pointer-focus = false;
             if (event.text == " " || event.text == "\n") {
                 if (!root.disabled) {
                     root.checked = !root.checked;

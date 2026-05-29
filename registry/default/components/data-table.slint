@@ -59,35 +59,45 @@ export component DataTable inherits Rectangle {
             background: Tokens.color-surface-1;
             border-radius: Tokens.radius-md;
             HorizontalLayout {
-                padding-left: 8px;
-                padding-right: 8px;
+                padding-left: 16px;
+                padding-right: 16px;
                 spacing: 4px;
                 for col[ci] in root.columns: Rectangle {
                     horizontal-stretch: 1;
-                    border-radius: Tokens.radius-sm;
-                    background: header-touch.has-hover
-                        ? Tokens.color-surface-2 : transparent;
-                    HorizontalLayout {
-                        padding-left: 8px;
-                        padding-right: 8px;
-                        spacing: 4px;
-                        Text {
-                            text: col;
-                            color: Tokens.color-foreground;
-                            font-size: Tokens.typography-body-sm-size;
-                            font-weight: Tokens.typography-weight-semibold;
-                            vertical-alignment: center;
-                            horizontal-stretch: 1;
-                        }
-                        if ci == root.sort-column: VerticalLayout {
-                            alignment: center;
-                            Icon {
-                                commands: root.sort-desc
-                                    ? LucidePaths.chevron-down
-                                    : LucidePaths.chevron-up;
-                                size: 14px;
-                                tint: Tokens.color-muted-foreground;
+                    head-surface := Rectangle {
+                        x: 0;
+                        y: header-touch.pressed ? 1px : 0px;
+                        width: parent.width;
+                        height: parent.height;
+                        border-radius: Tokens.radius-sm;
+                        background: header-touch.has-hover
+                            ? Tokens.color-surface-2 : transparent;
+                        HorizontalLayout {
+                            padding-left: 8px;
+                            padding-right: 8px;
+                            spacing: 4px;
+                            Text {
+                                text: col;
+                                color: Tokens.color-foreground;
+                                font-size: Tokens.typography-body-sm-size;
+                                font-weight: Tokens.typography-weight-semibold;
+                                vertical-alignment: center;
+                                horizontal-stretch: 1;
                             }
+                            if ci == root.sort-column: VerticalLayout {
+                                alignment: center;
+                                Icon {
+                                    commands: root.sort-desc
+                                        ? LucidePaths.chevron-down
+                                        : LucidePaths.chevron-up;
+                                    size: 14px;
+                                    tint: Tokens.color-muted-foreground;
+                                }
+                            }
+                        }
+                        animate y, background {
+                            duration: Tokens.motion-fast;
+                            easing: Tokens.motion-easing-standard;
                         }
                     }
                     header-touch := TouchArea {
@@ -103,10 +113,6 @@ export component DataTable inherits Rectangle {
                             root.sort(ci);
                         }
                     }
-                    animate background {
-                        duration: Tokens.motion-fast;
-                        easing: Tokens.motion-easing-standard;
-                    }
                 }
             }
         }
@@ -116,23 +122,34 @@ export component DataTable inherits Rectangle {
             height: 44px;
             background: row-touch.has-hover
                 ? Tokens.color-surface-1 : transparent;
-            HorizontalLayout {
-                padding-left: 16px;
-                padding-right: 16px;
-                spacing: 4px;
-                for cell in row.cells: Rectangle {
-                    horizontal-stretch: 1;
-                    HorizontalLayout {
-                        padding-left: 8px;
-                        padding-right: 8px;
-                        Text {
-                            text: cell;
-                            color: Tokens.color-foreground;
-                            font-size: Tokens.typography-body-size;
-                            vertical-alignment: center;
-                            horizontal-stretch: 1;
+            row-surface := Rectangle {
+                x: 0;
+                y: row-touch.pressed ? 1px : 0px;
+                width: parent.width;
+                height: parent.height;
+                background: transparent;
+                HorizontalLayout {
+                    padding-left: 16px;
+                    padding-right: 16px;
+                    spacing: 4px;
+                    for cell in row.cells: Rectangle {
+                        horizontal-stretch: 1;
+                        HorizontalLayout {
+                            padding-left: 8px;
+                            padding-right: 8px;
+                            Text {
+                                text: cell;
+                                color: Tokens.color-foreground;
+                                font-size: Tokens.typography-body-size;
+                                vertical-alignment: center;
+                                horizontal-stretch: 1;
+                            }
                         }
                     }
+                }
+                animate y {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
                 }
             }
             row-touch := TouchArea {

@@ -21,30 +21,40 @@ export component Collapsible inherits Rectangle {
         // Trigger row — click anywhere to toggle.
         Rectangle {
             height: 40px;
-            border-radius: Tokens.radius-sm;
-            background: trigger-touch.has-hover
-                ? Tokens.color-surface-1 : transparent;
-            HorizontalLayout {
-                padding-left: 12px;
-                padding-right: 12px;
-                spacing: 8px;
-                Text {
-                    text: root.title;
-                    color: Tokens.color-foreground;
-                    font-size: Tokens.typography-body-size;
-                    font-weight: Tokens.typography-weight-semibold;
-                    vertical-alignment: center;
-                    horizontal-stretch: 1;
-                }
-                VerticalLayout {
-                    alignment: center;
-                    Icon {
-                        commands: root.open
-                            ? LucidePaths.chevron-up
-                            : LucidePaths.chevron-down;
-                        size: 14px;
-                        tint: Tokens.color-muted-foreground;
+            surface := Rectangle {
+                x: 0;
+                y: trigger-touch.pressed ? 1px : 0px;
+                width: parent.width;
+                height: parent.height;
+                border-radius: Tokens.radius-sm;
+                background: trigger-touch.has-hover
+                    ? Tokens.color-surface-1 : transparent;
+                HorizontalLayout {
+                    padding-left: 12px;
+                    padding-right: 12px;
+                    spacing: 8px;
+                    Text {
+                        text: root.title;
+                        color: Tokens.color-foreground;
+                        font-size: Tokens.typography-body-size;
+                        font-weight: Tokens.typography-weight-semibold;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
                     }
+                    VerticalLayout {
+                        alignment: center;
+                        Icon {
+                            commands: root.open
+                                ? LucidePaths.chevron-up
+                                : LucidePaths.chevron-down;
+                            size: 14px;
+                            tint: Tokens.color-muted-foreground;
+                        }
+                    }
+                }
+                animate y, background {
+                    duration: Tokens.motion-fast;
+                    easing: Tokens.motion-easing-standard;
                 }
             }
             trigger-touch := TouchArea {
@@ -53,10 +63,6 @@ export component Collapsible inherits Rectangle {
                     root.open = !root.open;
                     root.toggled(root.open);
                 }
-            }
-            animate background {
-                duration: Tokens.motion-fast;
-                easing: Tokens.motion-easing-standard;
             }
         }
 
